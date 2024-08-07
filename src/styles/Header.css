@@ -1,0 +1,126 @@
+header {
+  background-color: #214e92;
+  color: white;
+  padding: 0;
+  position: fixed;
+  width: 65%;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  transition: margin-left 0.3s ease-in-out;
+  height: 60px;
+}
+
+.cabecalho2 {
+  background-color: #214e92;
+  position: fixed;
+  width: 35%;
+  top: 0;
+  left: 65%;
+  z-index: 5;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.conteudo-cabecalho2 {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; 
+  width: 90%;
+}
+
+.icone {
+  font-size: 20px;
+  color: rgb(177, 177, 177);
+  cursor: pointer;
+  margin-left: 15px;
+  transition: color 0.3s ease;
+  position: relative;
+}
+
+.icone:last-child {
+  margin-right: 0;
+}
+
+.icone:hover {
+  color:white;
+}
+
+.icone::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: -25px;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  font-size: 12px;
+}
+
+.icone:hover::after {
+  opacity: 1;
+}
+
+.notification-dot {
+  width: 10px;
+  height: 10px;
+  background-color: orange;
+  border-radius: 50%;
+  position: absolute;
+  top: -3px;
+  right: -3px;
+}
+
+.conteudo-cabecalho {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 20px;
+}
+
+.toggle-menu {
+  color: #b8b5b5;
+  cursor: pointer;
+  font-size: 24px;
+  z-index: 11;
+  transition: 0.5s;
+  margin-right: 15px;
+}
+
+.toggle-menu:hover {
+  color: white;
+}
+
+.barra-busca {
+  flex: 1;
+  max-width: 500px;
+  padding: 0 10px;
+}
+
+.barra-busca input {
+  width: 100%;
+  border-radius: 3px;
+  border: none;
+  background-color: #214e92;
+  color: rgb(212, 212, 212);
+  font-family: "Hind Vadodara", sans-serif;
+}
+
+.barra-busca input::placeholder {
+  color: #b3b0b0;
+  opacity: 1;
+  font-weight: 500;
+  font-size: 15px;
+}
+
+.barra-busca input:focus {
+  outline: none;
+}
