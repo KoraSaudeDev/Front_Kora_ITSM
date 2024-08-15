@@ -3,23 +3,12 @@ import Autosuggest from 'react-autosuggest';
 import { useNavigate } from 'react-router-dom';
 import '../styles/SearchBar.css';
 
-
 const paths = [
-  { name: 'Dados Consolidados (MV)', category: 'MV', path: '/MV/DadosConsolidadosMV' },
-  { name: 'Consumo Diário (MV)', category: 'MV', path: '/MV/ConsumoDiarioMV' },
-  { name: 'Estoque Consolidado (MV)', category: 'MV', path: '/MV/EstoqueConsolidadoMV' },
-  { name: 'Estoque Simplificado (MV)', category: 'MV', path: '/MV/EstoqueSimplificadoMV' },
-  { name: 'ABC de Consumo (MV)', category: 'MV', path: '/MV/AbcConsumoMV' },
-  { name: 'Cadastro de Materiais (Tasy)', category: 'TASY', path: '/TASY/CadastroMateriaisTASY' },
-  { name: 'Saldo de Estoque (Tasy)', category: 'TASY', path: '/TASY/SaldoEstoqueTASY' },
-  { name: 'Movimento Sintético Operações (Tasy)', category: 'TASY', path: '/TASY/MovimentoSinteticoTASY' },
-  { name: 'Consumo Diário por Material (Tasy)', category: 'TASY', path: '/TASY/ConsumoDiarioTASY' },
-  { name: 'Ordem de Compra (Tasy)', category: 'TASY', path: '/TASY/OrdemCompraTASY' },
-  { name: 'Solicitação de Compras não Atendidas - Sem baixa (Tasy)', category: 'TASY', path: '/TASY/SolicComprasNaoAtendidasTASY' },
-  { name: 'Detalhe Nota Fiscal (Tasy)', category: 'TASY', path: '/TASY/DetalheNotaFiscalTASY' },
-  { name: 'Requisições (SAP)', category: 'SAP', path: '/SAP/RequisicaoSAP' },
-  { name: 'Estoques (SAP)', category: 'SAP', path: '/SAP/EstoqueSAP' },
-  { name: 'Pedidos (SAP)', category: 'SAP', path: '/SAP/PedidoSAP' },
+  { name: 'Novo Ticket', category: 'ITSM', path: '/itsm/novo-ticket' },
+  { name: 'Meus Atendimentos', category: 'ITSM', path: '/itsm/meus-atendimentos' },
+  { name: 'Minha Equipe', category: 'ITSM', path: '/itsm/minha-equipe' },
+  { name: 'Todos os Tickets', category: 'ITSM', path: '/itsm/all-tickets' },
+  { name: 'Dashboard', category: 'Dashboard', path: '/dashboard/tickets' },
 ];
 
 const SearchBar = ({ onSearch }) => {
@@ -65,7 +54,7 @@ const SearchBar = ({ onSearch }) => {
   };
 
   const inputProps = {
-    placeholder: 'Pesquisar projetos...',
+    placeholder: 'Pesquisar...',
     value,
     onChange,
   };

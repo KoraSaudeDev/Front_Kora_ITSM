@@ -3,9 +3,9 @@ import Main from '../components/Main';
 
 const Home = () => {
   return (
-    <Main title="Kora Planning" description="">
+    <Main title="Kora System" description="">
      
-      {/* Conteúdo adicional da home */}
+      {}
     </Main>
   );
 };

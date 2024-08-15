@@ -52,7 +52,7 @@ main {
 }
 
 .conteudo {
-    background-color: white;
+    
     width: calc(100% - 50px); 
     height: 500px;
     margin-top: 40px;

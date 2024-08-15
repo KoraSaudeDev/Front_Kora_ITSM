@@ -11,8 +11,9 @@
 }
 
 .main-title {
+  font-family:'Jost', -apple-system, sans-serif;;
   font-size: 23px;
-  font-weight: 600;
+  font-weight: 500;
   margin: 0;
   text-shadow: none; 
   border: none; 
@@ -50,18 +51,7 @@ main.main-content.reduced-margin {
   opacity: 0.8; 
 }
 
-.conteudo {
-  
-  background-color: white;
-  padding: 20px;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
-  border-radius: 3px;
-  margin-top: 20px;
-  opacity: 1;
-  transform: translateY(0);
-  margin-left: 20px; 
-  margin-right: 20px;
-}
+
 
 #usuario {
   color: #153d77;

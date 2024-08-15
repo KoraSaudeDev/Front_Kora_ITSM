@@ -43,7 +43,7 @@ main.mover.zoom {
 #usuario {
   color: #153d77;
   font-weight: 500;
-  margin-top: -10px;
+  margin-top: 20px;
   margin-right: 0px;
 }
 
@@ -140,6 +140,7 @@ main.mover.zoom {
 }
 
 .informacoes-usuario {
+  margin-top: 5px;
   text-align: center;
   margin-bottom: 20px;
 }
@@ -184,7 +185,7 @@ main.mover.zoom {
   margin-left: 10px;
 }
 
-.link-navegacao .icon {
+.icon {
   margin-right: 10px; 
 }
 

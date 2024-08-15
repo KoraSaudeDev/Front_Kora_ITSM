@@ -1,10 +1,10 @@
 import React from 'react';
 
-const PedidoSAP = () => {
+const AllTickets = () => {
   return (
     <div>
       
-      {/* Conteúdo da página */
+      {
       
       
       
@@ -13,4 +13,4 @@ const PedidoSAP = () => {
   );
 };
 
-export default PedidoSAP;
+export default AllTickets;

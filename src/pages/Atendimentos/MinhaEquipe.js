@@ -1,10 +1,10 @@
 import React from 'react';
 
-const ConsumoDiarioTASY = () => {
+const MinhaEquipe = () => {
   return (
     <div>
       
-      {/* Conteúdo da página */
+      {
       
       
       
@@ -13,4 +13,4 @@ const ConsumoDiarioTASY = () => {
   );
 };
 
-export default ConsumoDiarioTASY;
+export default MinhaEquipe;

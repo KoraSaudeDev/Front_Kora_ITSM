@@ -1,0 +1,125 @@
+body {
+    font-family: 'Jost', -apple-system, sans-serif;
+    font-size: 15px;
+    color: #3E4676;
+    background-color: #fff;
+    margin: 0;
+    padding: 0;
+}
+
+.container-novo-ticket {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 20px;
+}
+
+.info-basicas, .detalhes-ticket {
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-right: 10px;
+    padding: 20px;
+    width: 48%; 
+}
+
+.info-basicas h2, .detalhes-ticket h2 {
+    margin-top: 0;
+    font-weight: 300;
+}
+
+.formulario {
+    display: flex;
+    flex-direction: column;
+}
+
+.formulario .campo {
+    margin-bottom: 15px;
+}
+
+.formulario label {
+    display: block;
+    font-weight: 300;
+    margin-bottom: 5px;
+}
+
+.formulario input,
+.formulario select,
+.formulario textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.formulario .campo-upload input {
+    border: none;
+    padding: 0;
+}
+
+.botao-enviar {
+    background-color: #0881cc;
+    color: #fff;
+    border: none;
+    padding: 8px 15px;
+    font-size: 15px;
+    cursor: pointer;
+    border-radius: 4px;
+    text-align: center;
+    font-weight: 300;
+    margin-left: auto;
+}
+
+.botao-enviar:hover {
+    background-color: #214e92;
+}
+
+.campo-obrigatorio {
+    color: #00c3ff;
+    font-size: 16px;
+}
+
+.campo-leitura {
+    background-color: #f9f9f9;
+    cursor: not-allowed;
+    color: #6c757d;
+    border: 1px solid #ddd;
+}
+
+#cargo{
+    margin:0px ;
+}
+
+#descricao{
+    height: 100px;
+}
+
+#observacao{
+    height: 70px;
+}
+
+.mensagem-sucesso {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: 400;
+    background-color: #f9f9f9; 
+    color: #333; 
+    padding: 20px 40px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 18px;
+    z-index: 1000; 
+    opacity: 0;
+    animation: fadeInOut 3s ease-in-out;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { opacity: 0; }
+}

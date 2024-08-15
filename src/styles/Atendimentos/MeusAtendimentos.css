@@ -1,0 +1,111 @@
+body {
+    font-family: 'Jost', -apple-system, sans-serif;
+    font-size: 15px;
+    color: #3E4676;
+    background-color: #fff;
+    margin: 0;
+    padding: 0;
+}
+
+
+.container-meus-atendimentos {
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+
+h2{
+    margin-top: 0;
+    font-weight: 300;
+}
+.caixa-atendimento {
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    border: 1px solid #ddd;
+    margin-bottom: 20px;
+}
+
+.tabela-atendimentos {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tabela-atendimentos th, .tabela-atendimentos td {
+    padding: 10px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    font-weight: 300;
+}
+
+.tabela-atendimentos th {
+    background-color: #f9f9f9;
+    color: #3E4676;
+    font-weight: 400;
+    font-size: 16px;
+}
+
+.tabela-atendimentos td {
+    font-weight: 300;
+    font-size: 15px;
+}
+
+.tabela-atendimentos tr:hover {
+    background-color: #f5f5f5;
+    cursor: pointer;
+}
+
+.status.em-andamento {
+    color: yellow;
+    animation: piscar 1s infinite;
+}
+
+.status.em-atraso {
+    color: red;
+    font-weight: bold;
+}
+
+.status.no-prazo {
+    color: green;
+    font-weight: bold;
+}
+
+@keyframes piscar {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.botao-enviar {
+    background-color: #3E4676;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 15px;
+    cursor: pointer;
+    border-radius: 4px;
+    text-align: center;
+    font-weight: 300;
+    margin-top: 20px;
+    align-self: flex-end;
+}
+
+.botao-enviar:hover {
+    background-color: #2d3a54;
+}
+
+.breadcrumb {
+    color: #fff;
+    font-weight: 300;
+}
+
+.breadcrumb a {
+    color: #ddd;
+    text-decoration: none;
+}
+
+.breadcrumb a:hover {
+    text-decoration: underline;
+}
