@@ -35,7 +35,7 @@ const Detalhamento = () => {
             <p><strong>Descrição:</strong> {detalhes.descricao}</p>
             <p><strong>Anexo:</strong> {detalhes.anexo}</p>
             <p><strong>Observação:</strong> {detalhes.observacao}</p>
-            {/* Adicione mais campos conforme necessário */}
+            {}
             <div className="acoes">
                 <button onClick={handleAprovar} className="botao-aprovar">Aprovar</button>
                 <button onClick={handleReprovar} className="botao-reprovar">Reprovar</button>
