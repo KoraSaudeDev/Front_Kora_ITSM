@@ -1,21 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import '../styles/Sidebar.css';
-import { FaChartPie, FaChartBar, FaPlus, FaHome, FaHeadset, FaChevronDown } from 'react-icons/fa'; 
+import { FaChartPie, FaChartBar, FaPlus, FaHome, FaHeadset, FaChevronDown, FaSignOutAlt } from 'react-icons/fa'; 
 import logokora from '../assets/images/logokora.png';
 import SemFoto from '../assets/images/Sem_foto.png';
+import { useAuth } from '../context/AuthContext';
 
 const Sidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [activeDropdown, setActiveDropdown] = useState('');
-  const [fotoPerfil, setFotoPerfil] = useState(SemFoto);
+  const { user, logout } = useAuth();
 
   useEffect(() => {
-    const savedFoto = localStorage.getItem('fotoPerfil');
-    if (savedFoto) {
-      setFotoPerfil(savedFoto);
-    }
-
     const menu = document.querySelector('.menu-lateral');
     const conteudoPrincipal = document.querySelector('main');
     const cabecalho = document.querySelector('header');
@@ -51,24 +48,6 @@ const Sidebar = () => {
     setActiveDropdown((prevState) => (prevState === id ? '' : id));
   };
 
-  const atualizarFotoPerfil = (e) => {
-    const arquivo = e.target.files[0];
-    if (arquivo) {
-      const leitor = new FileReader();
-      leitor.onload = function (e) {
-        const foto = e.target.result;
-        setFotoPerfil(foto);
-        localStorage.setItem('fotoPerfil', foto); 
-      };
-      leitor.readAsDataURL(arquivo);
-    }
-  };
-
-  const removerFotoPerfil = () => {
-    setFotoPerfil(SemFoto);
-    localStorage.removeItem('fotoPerfil');
-  };
-
   const resetDropdowns = () => {
     setActiveDropdown('');
   };
@@ -77,6 +56,10 @@ const Sidebar = () => {
     if (window.confirm("Certifique-se de estar conectado em uma Rede Kora")) {
       window.location.href = "http://10.27.254.161:8088/superset/dashboard/p/nZk8vLL2gQ1/";
     }
+  };
+
+  const handleLogout = () => {
+    logout();
   };
 
   return (
@@ -89,17 +72,17 @@ const Sidebar = () => {
       <div className="conteudo-menu-lateral">
         <div className="secao-perfil">
           <div className="foto-perfil-container">
-            <div className="foto-perfil" onClick={() => document.getElementById('inputArquivo').click()}>
-              <img id="fotoPerfil" border="none" src={fotoPerfil} alt="Foto de Perfil" />
-              <input type="file" id="inputArquivo" accept="image/*" style={{ display: 'none' }} onChange={atualizarFotoPerfil} />
-              {fotoPerfil !== SemFoto && (
-                <button className="remover-foto" onClick={removerFotoPerfil}>X</button>
-              )}
+            <div className="foto-perfil">
+              <img 
+                id="fotoPerfil" 
+                border="none" 
+                src={user?.picture || SemFoto}
+                alt="Foto de Perfil" 
+              />
             </div>
           </div>
           <div className="informacoes-usuario">
-            <p id="usuario">Nome do Usuário</p>
-            <p id="cargo">Cargo</p>
+            <p id="usuario">{user?.name || 'Nome do Usuário'}</p>
           </div>
         </div>
         <div className="titulo-botoes">Menu</div>
@@ -148,6 +131,12 @@ const Sidebar = () => {
                 </a>
               </li>
             </ul>
+          </li>
+          <li className="item-navegacao logout">
+            <a href="#" className="link-navegacao" onClick={handleLogout}>
+              <FaSignOutAlt className="icon" />
+              <span>Logout</span>
+            </a>
           </li>
         </ul>
       </div>
