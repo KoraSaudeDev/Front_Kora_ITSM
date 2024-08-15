@@ -71,12 +71,12 @@ const NovoTicket = () => {
                 setMostrarMensagem(false);
             }, 3000);
 
-            // Limpar todos os campos de entrada
+          
             document.getElementById("nome-completo").value = '';
             document.getElementById("email").value = '';
             document.getElementById("matricula").value = '';
             document.getElementById("telefone").value = '';
-            document.getElementById("cargo").value = ''; // Adicionado para limpar o campo "Cargo"
+            document.getElementById("cargo").value = ''; 
             document.getElementById("descricao").value = '';
             document.getElementById("observacao").value = '';
             document.getElementById("unidade-negocio").value = '';
