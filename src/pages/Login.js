@@ -19,7 +19,8 @@ const Login = () => {
   };
 
   return (
-    <div>
+    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <h2>Kora Helper - Login</h2>
       <GoogleLogin
         onSuccess={onSuccess}
         onError={onFailure}

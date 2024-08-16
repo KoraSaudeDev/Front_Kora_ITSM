@@ -19,18 +19,25 @@ const App = () => {
   return (
     <AuthProvider>
       <Router>
-        <div>
-          <Header />
-          <Sidebar />
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/" element={<ProtectedRoute element={<Home />} />} />
-            <Route path="/atendimentos/meus-atendimentos" element={<ProtectedRoute element={<Main title="Meus Atendimentos" description="Atendimentos / Meus Atendimentos"><MeusAtendimentos /></Main>} />} />
-            <Route path="/atendimentos/minha-equipe" element={<ProtectedRoute element={<Main title="Minha Equipe" description="Atendimentos / Minha Equipe"><MinhaEquipe /></Main>} />} />
-            <Route path="/atendimentos/all-tickets" element={<ProtectedRoute element={<Main title="All Tickets" description="Atendimentos / All Tickets"><AllTickets /></Main>} />} />
-            <Route path="/atendimentos/novo-ticket" element={<ProtectedRoute element={<Main title="Novo Ticket" description="Atendimentos / Novo Ticket"><NovoTicket /></Main>} />} />
-          </Routes>
-        </div>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/*"
+            element={
+              <div>
+                <Header />
+                <Sidebar />
+                <Routes>
+                  <Route path="/" element={<ProtectedRoute element={<Home />} />} />
+                  <Route path="/atendimentos/meus-atendimentos" element={<ProtectedRoute element={<Main title="Meus Atendimentos" description="Atendimentos / Meus Atendimentos"><MeusAtendimentos /></Main>} />} />
+                  <Route path="/atendimentos/minha-equipe" element={<ProtectedRoute element={<Main title="Minha Equipe" description="Atendimentos / Minha Equipe"><MinhaEquipe /></Main>} />} />
+                  <Route path="/atendimentos/all-tickets" element={<ProtectedRoute element={<Main title="All Tickets" description="Atendimentos / All Tickets"><AllTickets /></Main>} />} />
+                  <Route path="/atendimentos/novo-ticket" element={<ProtectedRoute element={<Main title="Novo Ticket" description="Atendimentos / Novo Ticket"><NovoTicket /></Main>} />} />
+                </Routes>
+              </div>
+            }
+          />
+        </Routes>
       </Router>
     </AuthProvider>
   );
