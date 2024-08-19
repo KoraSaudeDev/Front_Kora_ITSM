@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 import { useAuth } from '../context/AuthContext';
@@ -8,8 +8,19 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const user = jwtDecode(token);
+      login(user);
+      navigate('/');
+    }
+  }, [login, navigate]);
+
   const onSuccess = (res) => {
-    const user = jwtDecode(res?.credential);
+    const token = res?.credential;
+    const user = jwtDecode(token);
+    localStorage.setItem('token', token);
     login(user);
     navigate('/');
   };
