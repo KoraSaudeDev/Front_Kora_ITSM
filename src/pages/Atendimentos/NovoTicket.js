@@ -22,12 +22,12 @@ const NovoTicket = () => {
 
     const alterarCategoria = (e) => {
         setCategoria(e.target.value);
-        setExibirSubcategoria(true); 
+        setExibirSubcategoria(e.target.value !== ''); 
     };
 
     const alterarSubcategoria = (e) => {
         setSubcategoria(e.target.value);
-        setExibirAssunto(true); 
+        setExibirAssunto(e.target.value !== ''); 
     };
 
     const handleSubmit = (e) => {
@@ -71,12 +71,11 @@ const NovoTicket = () => {
                 setMostrarMensagem(false);
             }, 3000);
 
-            // Limpar todos os campos de entrada
             document.getElementById("nome-completo").value = '';
             document.getElementById("email").value = '';
             document.getElementById("matricula").value = '';
             document.getElementById("telefone").value = '';
-            document.getElementById("cargo").value = ''; // Adicionado para limpar o campo "Cargo"
+            document.getElementById("cargo").value = ''; 
             document.getElementById("descricao").value = '';
             document.getElementById("observacao").value = '';
             document.getElementById("unidade-negocio").value = '';
@@ -127,6 +126,7 @@ const NovoTicket = () => {
                     <div className="campo">
                         <label htmlFor="unidade-negocio">Unidade de Negócio <span className="campo-obrigatorio">*</span></label>
                         <select id="unidade-negocio" name="unidade-negocio" required>
+                            <option value="">Selecionar</option>
                             <option value="unidade1">Unidade 1</option>
                             <option value="unidade2">Unidade 2</option>
                         </select>
@@ -134,6 +134,7 @@ const NovoTicket = () => {
                     <div className="campo">
                         <label htmlFor="categoria">Categoria <span className="campo-obrigatorio">*</span></label>
                         <select id="categoria" name="categoria" value={categoria} onChange={alterarCategoria} required>
+                            <option value="">Selecionar</option>
                             <option value="categoria1">Categoria 1</option>
                             <option value="categoria2">Categoria 2</option>
                         </select>
@@ -142,6 +143,7 @@ const NovoTicket = () => {
                         <div className="campo">
                             <label htmlFor="subcategoria">Subcategoria <span className="campo-obrigatorio">*</span></label>
                             <select id="subcategoria" name="subcategoria" value={subcategoria} onChange={alterarSubcategoria} required>
+                                <option value="">Selecionar</option>
                                 <option value="subcategoria1">Subcategoria 1</option>
                                 <option value="subcategoria2">Subcategoria 2</option>
                             </select>
@@ -151,6 +153,7 @@ const NovoTicket = () => {
                         <div className="campo">
                             <label htmlFor="assunto">Assunto <span className="campo-obrigatorio">*</span></label>
                             <select id="assunto" name="assunto" value={assunto} onChange={(e) => setAssunto(e.target.value)} required>
+                                <option value="">Selecionar</option>
                                 <option value="assunto1">Assunto 1</option>
                                 <option value="assunto2">Assunto 2</option>
                             </select>
@@ -174,7 +177,5 @@ const NovoTicket = () => {
         </div>
     );
 };
-
-
 
 export default NovoTicket;

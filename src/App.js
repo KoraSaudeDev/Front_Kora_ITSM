@@ -3,12 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import './App.css';
-
 import Main from './components/Main';
 import Home from './pages/Home';
-
-
-
 import MeusAtendimentos from './pages/Atendimentos/MeusAtendimentos';
 import MinhaEquipe from './pages/Atendimentos/MinhaEquipe';
 import AllTickets from './pages/Atendimentos/AllTickets';

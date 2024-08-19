@@ -113,13 +113,13 @@ const Sidebar = () => {
           <li className={`item-navegacao ${activeDropdown === 'dropdownAtendimentos' ? 'active' : ''}`}>
             <a href="#" className={`link-navegacao ${location.pathname.includes('/atendimentos') ? 'active' : ''}`} onClick={() => alternarDropdown('dropdownAtendimentos')}>
               <FaHeadset className="icon" />
-              <span>Atendimentos</span>
+              <span>ITSM</span>
               <FaChevronDown className={`seta ${activeDropdown === 'dropdownAtendimentos' ? 'rotacionar' : ''}`} />
             </a>
             <ul id="dropdownAtendimentos" className={`conteudo-dropdown ${activeDropdown === 'dropdownAtendimentos' ? 'mostrar' : ''}`}>
               <li className={location.pathname === '/atendimentos/novo-ticket' ? 'active' : ''}>
                 <Link to="/atendimentos/novo-ticket" className={location.pathname === '/atendimentos/novo-ticket' ? 'active' : ''}>
-                  <FaPlus className="icon" />
+
                   <span>Novo Ticket</span>
                 </Link>
               </li>
@@ -128,9 +128,6 @@ const Sidebar = () => {
               </li>
               <li className={location.pathname === '/atendimentos/minha-equipe' ? 'active' : ''}>
                 <Link to="/atendimentos/minha-equipe" className={location.pathname === '/atendimentos/minha-equipe' ? 'active' : ''}>Minha Equipe</Link>
-              </li>
-              <li className={location.pathname === '/atendimentos/all-tickets' ? 'active' : ''}>
-                <Link to="/atendimentos/all-tickets" className={location.pathname === '/atendimentos/all-tickets' ? 'active' : ''}>All Tickets</Link>
               </li>
             </ul>
           </li>
