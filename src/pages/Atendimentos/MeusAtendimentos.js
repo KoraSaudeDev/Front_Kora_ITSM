@@ -79,11 +79,22 @@ const MeusAtendimentos = () => {
     };
 
     const handleSalvarAtividade = () => {
+        const descricao = document.querySelector('.conteudo-modal-atividades textarea').value.trim();
+        const destinatario = document.querySelector('.conteudo-modal-atividades select').value;
+        const visibilidade = document.querySelector('input[name="visibilidade"]:checked');
+        const anexo = document.querySelector('#anexoAtividade').files[0]?.name || 'Nenhum anexo';
+
+        // Validation: Check if required fields are filled
+        if (!descricao || !destinatario || !visibilidade) {
+            alert("Por favor, preencha todos os campos obrigatórios.");
+            return;
+        }
+
         const novaAtividade = {
-            descricao: document.querySelector('.conteudo-modal-atividades textarea').value,
-            destinatario: document.querySelector('.conteudo-modal-atividades select').value,
-            visibilidade: document.querySelector('input[name="visibilidade"]:checked').value,
-            anexo: document.querySelector('#anexoAtividade').files[0]?.name || 'Nenhum anexo'
+            descricao,
+            destinatario,
+            visibilidade: visibilidade.value,
+            anexo
         };
 
         setAtividades([...atividades, novaAtividade]);

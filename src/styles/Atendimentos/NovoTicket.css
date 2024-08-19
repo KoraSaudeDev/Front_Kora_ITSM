@@ -10,6 +10,7 @@ body {
 .container-novo-ticket {
     display: flex;
     flex-direction: row;
+    align-items: flex-start;
     justify-content: space-between;
     margin: 20px;
 }
@@ -26,6 +27,7 @@ body {
 .info-basicas h2, .detalhes-ticket h2 {
     margin-top: 0;
     font-weight: 300;
+    text-align: left;
 }
 
 .formulario {

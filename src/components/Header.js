@@ -25,9 +25,9 @@ const Header = () => {
         <div className="toggle-menu" onClick={alternarMenu} data-tooltip="Menu">
           &#9776;
         </div>
-        <div className="barra-busca">
+        {/* <div className="barra-busca">
           <SearchBar />
-        </div>
+        </div> */}
         <div className="cabecalho2">
           <div className="conteudo-cabecalho2">
             <div className="icone notification" onClick={() => alert('Ver notificações')} data-tooltip="Notificação">

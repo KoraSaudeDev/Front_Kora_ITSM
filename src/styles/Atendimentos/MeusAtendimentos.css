@@ -11,6 +11,7 @@ body {
 .container-meus-atendimentos {
     padding: 20px;
     background-color: #f9f9f9;
+    box-shadow: 0 4px 6px -2px rgba(0, 0, 0, 0.1);
 }
 
 .header-meus-atendimentos {
@@ -27,12 +28,15 @@ body {
     margin-right: 20px;
 }
 
+
 .search-bar {
-    padding: 5px;
+    padding: 8px;
+    padding-left: 30px;
     margin-left: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    width: 200px;
+    font-size: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 220px;
 }
 
 .filtro-status {
@@ -156,11 +160,16 @@ body {
 
 .conteudo-modal-esquerda {
     flex: 1;
+    
 }
+
 
 .conteudo-modal-direita {
     flex: 0.4;
     margin-left: 20px;
+}
+strong{
+    margin-right: 10px;
 }
 
 .campo-anexo {
@@ -205,11 +214,12 @@ h2 {
     font-size: 15px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    width: 200px;
+    width: 240px;
 }
 
 .search-icon {
     position: absolute;
+    margin-left: 10px;
     left: 8px;
     color: #888;
 }
@@ -664,23 +674,35 @@ a {
 .botao-prioridade:hover {
     background-color: darkorange;
 }
-
 .botao-atividades {
-    font-weight: 500;
-    width: 200px;
+    font-weight: 300; 
+    width: 140px; 
     margin-top: 20px;
     border: none;
-    background-color: #007aff; 
-    color: white;
-    border-radius: 4px; 
-    height: 50px; 
+    background-color: #007aff;
+    border-radius: 8px; 
+    height: 40px; 
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    letter-spacing: 1px; 
+    color: white;
 }
 
 .botao-atividades:hover {
     background-color: #005bb5; 
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); 
 }
+
+.botao-atividades:active {
+    background-color: #004494; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
+    transform: translateY(1px); 
+}
+
 
 
 
@@ -820,3 +842,4 @@ a {
 .remover-atividade:hover {
     color: darkred;
 }
+

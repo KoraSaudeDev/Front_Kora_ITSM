@@ -1,0 +1,72 @@
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f5f5f5;
+  }
+  
+  .login-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    animation: fadeInUp 1s ease-in-out;
+  }
+
+  @keyframes fadeInUp {
+    0% {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .login-logo {
+    width: 120px;
+    margin-bottom: 20px;
+    animation: bounceIn 1.5s ease-in-out;
+    align-self: center; 
+  }
+  
+  @keyframes bounceIn {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    60% {
+      opacity: 1;
+      transform: translateY(10px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+  
+  h2 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    animation: fadeIn 1.5s ease-in-out;
+  }
+  
+  .google-login-button {
+    margin-top: 20px;
+    align-self: center; 
+  }
+
+  .login-logo {
+    width: 80px; 
+    margin-bottom: 20px;
+    animation: bounceIn 1.5s ease-in-out;
+    align-self: center;
+  }
+  

@@ -87,12 +87,12 @@ const Sidebar = () => {
         </div>
         <div className="titulo-botoes">Menu</div>
         <ul className="botoes-navegacao">
-          <li className={`item-navegacao ${location.pathname === '/' ? 'active' : ''}`}>
+          {/* <li className={`item-navegacao ${location.pathname === '/' ? 'active' : ''}`}>
             <Link to="/" className={`link-navegacao ${location.pathname === '/' ? 'active' : ''}`} onClick={resetDropdowns}>
               <FaHome className="icon" />
               <span>Home</span>
             </Link>
-          </li>
+          </li> */}
           <li className={`item-navegacao ${activeDropdown === 'dropdownAtendimentos' ? 'active' : ''}`}>
             <a href="#" className={`link-navegacao ${location.pathname.includes('/atendimentos') ? 'active' : ''}`} onClick={() => alternarDropdown('dropdownAtendimentos')}>
               <FaHeadset className="icon" />
