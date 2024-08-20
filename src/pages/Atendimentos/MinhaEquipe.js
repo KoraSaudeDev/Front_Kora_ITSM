@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import dadosTickets from './dadosTickets';
 import 'styles/Atendimentos/MeusAtendimentos.css';
-import { FaSearch, FaTimes, FaFileAlt, FaEdit } from 'react-icons/fa';
+import { FaSearch, FaTimes, FaFileAlt, FaPlus, FaEdit } from 'react-icons/fa';
 
-const MinhaEquipe = () => {
+const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
     const [atendimentos] = useState(dadosTickets.filter(ticket => ticket.equipe === 'TI'));
     const [ticketSelecionado, setTicketSelecionado] = useState(null);
     const [filtroStatus, setFiltroStatus] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [isClosing, setIsClosing] = useState(false);
+    const [showAtividadesModal, setShowAtividadesModal] = useState(false);
+    const [isClosingAtividadesModal, setIsClosingAtividadesModal] = useState(false);
+    const [atividades, setAtividades] = useState([]);
+    const [atividadeSelecionada, setAtividadeSelecionada] = useState(null);
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [prioridadeSelecionada, setPrioridadeSelecionada] = useState(null);
     const [isEditing, setIsEditing] = useState({
         hub: false,
         unidadeNegocio: false,
@@ -16,7 +22,6 @@ const MinhaEquipe = () => {
         subcategoria: false,
         assunto: false
     });
-    const [prioridadeSelecionada, setPrioridadeSelecionada] = useState(null);
 
     const options = {
         hub: ['Hub 1', 'Hub 2', 'Hub 3'],
@@ -26,6 +31,22 @@ const MinhaEquipe = () => {
         assunto: ['Assunto 1', 'Assunto 2', 'Assunto 3']
     };
 
+    const prioridades = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7'];
+
+    useEffect(() => {
+        if (selectedTicket) {
+            handleClick(selectedTicket);
+        }
+    }, [selectedTicket]);
+
+
+    useEffect(() => {
+        return () => {
+            setTicketSelecionado(null);
+            if (onResetTicket) onResetTicket();
+        };
+    }, []);
+
     const handleClick = (ticket) => {
         setIsClosing(false);
         setTicketSelecionado(ticket);
@@ -33,20 +54,10 @@ const MinhaEquipe = () => {
 
     const handleFechar = () => {
         setIsClosing(true);
-        setTimeout(() => setTicketSelecionado(null), 500);
-    };
-
-    const handleCancelar = () => {
-        alert('Ticket cancelado');
-        handleFechar();
-    };
-
-    const handleAnexoChange = (e) => {
-        const file = e.target.files[0];
-        setTicketSelecionado({
-            ...ticketSelecionado,
-            anexo: file ? file.name : null,
-        });
+        setTimeout(() => {
+            setTicketSelecionado(null);
+            if (onResetTicket) onResetTicket(); 
+        }, 500);
     };
 
     const handleFiltroClick = (status) => {
@@ -63,6 +74,53 @@ const MinhaEquipe = () => {
         setSearchTerm(e.target.value);
     };
 
+    const handleAbrirAtividadesModal = () => {
+        setAtividadeSelecionada(null); 
+        setIsEditMode(true);
+        setShowAtividadesModal(true);
+    };
+
+    const handleFecharAtividadesModal = () => {
+        setIsClosingAtividadesModal(true);
+        setTimeout(() => {
+            setShowAtividadesModal(false);
+            setIsClosingAtividadesModal(false);
+        }, 500);
+    };
+
+    const handleSalvarAtividade = () => {
+        const descricao = document.querySelector('.conteudo-modal-atividades textarea').value.trim();
+        const destinatario = document.querySelector('.conteudo-modal-atividades select').value;
+        const visibilidade = document.querySelector('input[name="visibilidade"]:checked');
+        const anexo = document.querySelector('#anexoAtividade').files[0]?.name || 'Nenhum anexo';
+
+        if (!descricao || !destinatario || !visibilidade) {
+            alert("Por favor, preencha todos os campos obrigatórios.");
+            return;
+        }
+
+        const novaAtividade = {
+            descricao,
+            destinatario,
+            visibilidade: visibilidade.value,
+            anexo
+        };
+
+        setAtividades([...atividades, novaAtividade]);
+        handleFecharAtividadesModal();
+    };
+
+    const handleRemoverAtividade = (index) => {
+        const novasAtividades = atividades.filter((_, i) => i !== index);
+        setAtividades(novasAtividades);
+    };
+
+    const handleAbrirDetalhesAtividade = (atividade) => {
+        setAtividadeSelecionada(atividade);
+        setIsEditMode(false); 
+        setShowAtividadesModal(true);
+    };
+
     const handleEditClick = (field) => {
         setIsEditing((prev) => ({ ...prev, [field]: true }));
     };
@@ -71,8 +129,6 @@ const MinhaEquipe = () => {
         setTicketSelecionado((prev) => ({ ...prev, [field]: value }));
         setIsEditing((prev) => ({ ...prev, [field]: false }));
     };
-
-    const prioridades = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7'];
 
     const handlePrioridadeClick = (prioridade) => {
         setPrioridadeSelecionada(prioridade);
@@ -136,7 +192,7 @@ const MinhaEquipe = () => {
                         <button className="fechar-modal" onClick={handleFechar}><FaTimes /></button>
                         {ticketSelecionado.status !== 'Concluido' && ticketSelecionado.status !== 'Cancelado' && (
                             <div className="botoes-modal">
-                                <button className="botao-cancelar" onClick={handleCancelar}>
+                                <button className="botao-cancelar" onClick={handleFechar}>
                                     <FaTimes /> Cancelar
                                 </button>
                             </div>
@@ -295,7 +351,7 @@ const MinhaEquipe = () => {
                             </div>
                             {ticketSelecionado.status !== 'Concluido' && ticketSelecionado.status !== 'Cancelado' && (
                                 <div className="conteudo-modal-direita">
-                                  <div className="campo-prioridades">
+                                    <div className="campo-prioridades">
                                         <label>Prioridade:</label>
                                         <div className="botoes-prioridades">
                                             {prioridades.map(prioridade => (
@@ -308,22 +364,84 @@ const MinhaEquipe = () => {
                                                 </button>
                                             ))}
                                         </div>
-                                    </div>  <div className="campo-anexo">
-                                        <label htmlFor="anexo">Anexar Arquivo:</label>
-                                        <input
-                                            type="file"
-                                            id="anexo"
-                                            onChange={handleAnexoChange}
-                                        />
                                     </div>
-                                    <textarea
-                                        placeholder="Observações"
-                                        onChange={(e) =>
-                                            setTicketSelecionado({ ...ticketSelecionado, observacao: e.target.value })
-                                        }
-                                        style={{ height: '50px' }} 
-                                    ></textarea>
+                                    <button className="botao-atividades" onClick={handleAbrirAtividadesModal}>
+                                        <FaPlus style={{ marginRight: '8px' }} /> Atividades
+                                    </button>
+                                    {atividades.map((atividade, index) => (
+                                        <div className="card-atividade" key={index} onClick={() => handleAbrirDetalhesAtividade(atividade)}>
+                                            <button className="remover-atividade" onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleRemoverAtividade(index);
+                                            }}>×</button>
+                                            <p><strong>Descrição:</strong> {atividade.descricao}</p>
+                                            <p><strong>Destinatário:</strong> {atividade.destinatario}</p>
+                                            <p><strong>Visibilidade:</strong> {atividade.visibilidade}</p>
+                                            <p><strong>Anexo:</strong>
+                                                {atividade.anexo}&nbsp;
+                                                <FaFileAlt 
+                                                    className="icone-anexo" 
+                                                    style={{ cursor: 'pointer' }} 
+                                                    onClick={() => window.open(URL.createObjectURL(new Blob([atividade.anexo])))}
+                                                />
+                                            </p>
+                                        </div>
+                                    ))}
                                 </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showAtividadesModal && (
+                <div className="modal-overlay">
+                    <div className={`modal atividades-modal ${isClosingAtividadesModal ? 'fechar' : ''}`}>
+                        <button className="fechar-modal" onClick={handleFecharAtividadesModal}>×</button>
+                        <div className="conteudo-modal-atividades">
+                            {atividadeSelecionada ? (
+                                <>
+                                    <h3>Detalhes da Atividade</h3>
+                                    <p><strong>Descrição:</strong> {atividadeSelecionada.descricao}</p>
+                                    <p><strong>Destinatário:</strong> {atividadeSelecionada.destinatario}</p>
+                                    <p><strong>Visibilidade:</strong> {atividadeSelecionada.visibilidade}</p>
+                                    <p><strong>Anexo:</strong>
+                                        {atividadeSelecionada.anexo}&nbsp;
+                                        <FaFileAlt 
+                                            className="icone-anexo" 
+                                            style={{ cursor: 'pointer' }} 
+                                            onClick={() => window.open(URL.createObjectURL(new Blob([atividadeSelecionada.anexo])))}
+                                        />
+                                    </p>
+                                </>
+                            ) : (
+                                <>
+                                    <h3>Atividades do Ticket #{ticketSelecionado.numeroTicket}</h3>
+                                    <p><strong>Início:</strong> {ticketSelecionado.abertura}</p>
+                                    <p><strong>Status:</strong> {ticketSelecionado.status}</p>
+                                    <textarea placeholder="Descrição"></textarea>
+                                    <select>
+                                        <option value="">Selecionar Destinatário</option>
+                                        {[...Array(10).keys()].map(i => (
+                                            <option key={i} value={`Opção ${i + 1}`}>Opção {i + 1}</option>
+                                        ))}
+                                    </select>
+                                    <div className="switch-container">
+                                        <label>
+                                            Pública
+                                            <input type="radio" name="visibilidade" value="publica" />
+                                        </label>
+                                        <label>
+                                            Privada
+                                            <input type="radio" name="visibilidade" value="privada" />
+                                        </label>
+                                    </div>
+                                    <div className="campo-anexo">
+                                        <label htmlFor="anexoAtividade">Anexar Arquivo:</label>
+                                        <input type="file" id="anexoAtividade" />
+                                    </div>
+                                    <button className="botao-salvar" onClick={handleSalvarAtividade}>Salvar</button>
+                                </>
                             )}
                         </div>
                     </div>

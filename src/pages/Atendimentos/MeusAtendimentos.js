@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import dadosTickets from './dadosTickets';
 import 'styles/Atendimentos/MeusAtendimentos.css';
 import { FaTimes, FaSearch, FaFileAlt, FaPlus, FaEdit } from 'react-icons/fa';
 
-const MeusAtendimentos = () => {
+const MeusAtendimentos = ({ onResetTicket }) => {
     const [atendimentos] = useState(dadosTickets.filter(ticket => ticket.nomeCompleto === 'Lucas E'));
     const [ticketSelecionado, setTicketSelecionado] = useState(null);
+    const location = useLocation();
     const [filtroStatus, setFiltroStatus] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [isClosing, setIsClosing] = useState(false);
@@ -35,10 +37,23 @@ const MeusAtendimentos = () => {
     const prioridades = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7'];
 
     useEffect(() => {
+        if (location.state && location.state.ticket) {
+            handleClick(location.state.ticket); 
+        }
+    }, [location.state]);
+
+    useEffect(() => {
         if (ticketSelecionado) {
             setDataLimite(ticketSelecionado.abertura);
         }
     }, [ticketSelecionado]);
+
+    useEffect(() => {
+        return () => {
+            setTicketSelecionado(null);
+            if (onResetTicket) onResetTicket(); 
+        };
+    }, []);
 
     const handleClick = (ticket) => {
         setIsClosing(false);
@@ -47,7 +62,10 @@ const MeusAtendimentos = () => {
 
     const handleFechar = () => {
         setIsClosing(true);
-        setTimeout(() => setTicketSelecionado(null), 500);
+        setTimeout(() => {
+            setTicketSelecionado(null);
+            if (onResetTicket) onResetTicket(); 
+        }, 500);
     };
 
     const handleFiltroClick = (status) => {
@@ -84,7 +102,6 @@ const MeusAtendimentos = () => {
         const visibilidade = document.querySelector('input[name="visibilidade"]:checked');
         const anexo = document.querySelector('#anexoAtividade').files[0]?.name || 'Nenhum anexo';
 
-        // Validation: Check if required fields are filled
         if (!descricao || !destinatario || !visibilidade) {
             alert("Por favor, preencha todos os campos obrigatórios.");
             return;
@@ -168,7 +185,7 @@ const MeusAtendimentos = () => {
                             <tr key={atendimento.numeroTicket} onClick={() => handleClick(atendimento)}>
                                 <td>{atendimento.numeroTicket}</td>
                                 <td>{atendimento.nomeCompleto}</td>
-                                <td className={`status ${atendimento.status ? atendimento.status.replace(/\s/g, '-').toLowerCase() : ''}`}>
+                                <td className={`status ${atendimento.status.replace(/\s/g, '-').toLowerCase()}`}>
                                     {atendimento.status}
                                 </td>
                                 <td>{atendimento.abertura}</td>
@@ -193,7 +210,7 @@ const MeusAtendimentos = () => {
                         <div className="conteudo-modal">
                             <div className="conteudo-modal-esquerda">
                                 <h3>Detalhes do Ticket #{ticketSelecionado.numeroTicket}</h3>
-                                <p><strong>Status:</strong> <span className={`status-inline ${ticketSelecionado.status ? ticketSelecionado.status.replace(/\s/g, '-').toLowerCase() : ''}`}>{ticketSelecionado.status}</span></p>
+                                <p><strong>Status:</strong> <span className={`status-inline ${ticketSelecionado.status.replace(/\s/g, '-').toLowerCase()}`}>{ticketSelecionado.status}</span></p>
                                 <p><strong>SLA:</strong> 
                                     <span className={`sla-inline`}>
                                         <span className={`status-bolinha ${new Date() < new Date(dataLimite) ? 'verde' : 'vermelha'}`} style={{ marginRight: '5px' }}></span>
@@ -201,130 +218,134 @@ const MeusAtendimentos = () => {
                                     </span>
                                 </p>
                                 
-                                <p><strong>HUB:</strong> 
-                                    {isEditing.hub ? (
-                                        <select 
-                                            value={ticketSelecionado.hub} 
-                                            onChange={(e) => handleFieldChange('hub', e.target.value)} 
-                                            onBlur={() => handleFieldChange('hub', ticketSelecionado.hub)}
-                                        >
-                                            {options.hub.map((option, index) => (
-                                                <option key={index} value={option}>
-                                                    {option}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    ) : (
-                                        <>
-                                            {ticketSelecionado.hub}
-                                            <FaEdit 
-                                                className="edit-icon" 
-                                                onClick={() => handleEditClick('hub')}
-                                                style={{ marginLeft: '10px', cursor: 'pointer' }}
-                                            />
-                                        </>
-                                    )}
-                                </p>
+                                {ticketSelecionado.status !== 'Concluido' && ticketSelecionado.status !== 'Cancelado' && (
+                                    <>
+                                        <p><strong>HUB:</strong> 
+                                            {isEditing.hub ? (
+                                                <select 
+                                                    value={ticketSelecionado.hub} 
+                                                    onChange={(e) => handleFieldChange('hub', e.target.value)} 
+                                                    onBlur={() => handleFieldChange('hub', ticketSelecionado.hub)}
+                                                >
+                                                    {options.hub.map((option, index) => (
+                                                        <option key={index} value={option}>
+                                                            {option}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            ) : (
+                                                <>
+                                                    {ticketSelecionado.hub}
+                                                    <FaEdit 
+                                                        className="edit-icon" 
+                                                        onClick={() => handleEditClick('hub')}
+                                                        style={{ marginLeft: '10px', cursor: 'pointer' }}
+                                                    />
+                                                </>
+                                            )}
+                                        </p>
 
-                                <p><strong>Unidade de Negócio:</strong> 
-                                    {isEditing.unidadeNegocio ? (
-                                        <select 
-                                            value={ticketSelecionado.unidadeNegocio} 
-                                            onChange={(e) => handleFieldChange('unidadeNegocio', e.target.value)} 
-                                            onBlur={() => handleFieldChange('unidadeNegocio', ticketSelecionado.unidadeNegocio)}
-                                        >
-                                            {options.unidadeNegocio.map((option, index) => (
-                                                <option key={index} value={option}>
-                                                    {option}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    ) : (
-                                        <>
-                                            {ticketSelecionado.unidadeNegocio}
-                                            <FaEdit 
-                                                className="edit-icon" 
-                                                onClick={() => handleEditClick('unidadeNegocio')}
-                                                style={{ marginLeft: '10px', cursor: 'pointer' }}
-                                            />
-                                        </>
-                                    )}
-                                </p>
+                                        <p><strong>Unidade de Negócio:</strong> 
+                                            {isEditing.unidadeNegocio ? (
+                                                <select 
+                                                    value={ticketSelecionado.unidadeNegocio} 
+                                                    onChange={(e) => handleFieldChange('unidadeNegocio', e.target.value)} 
+                                                    onBlur={() => handleFieldChange('unidadeNegocio', ticketSelecionado.unidadeNegocio)}
+                                                >
+                                                    {options.unidadeNegocio.map((option, index) => (
+                                                        <option key={index} value={option}>
+                                                            {option}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            ) : (
+                                                <>
+                                                    {ticketSelecionado.unidadeNegocio}
+                                                    <FaEdit 
+                                                        className="edit-icon" 
+                                                        onClick={() => handleEditClick('unidadeNegocio')}
+                                                        style={{ marginLeft: '10px', cursor: 'pointer' }}
+                                                    />
+                                                </>
+                                            )}
+                                        </p>
 
-                                <p><strong>Categoria:</strong> 
-                                    {isEditing.categoria ? (
-                                        <select 
-                                            value={ticketSelecionado.categoria} 
-                                            onChange={(e) => handleFieldChange('categoria', e.target.value)} 
-                                            onBlur={() => handleFieldChange('categoria', ticketSelecionado.categoria)}
-                                        >
-                                            {options.categoria.map((option, index) => (
-                                                <option key={index} value={option}>
-                                                    {option}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    ) : (
-                                        <>
-                                            {ticketSelecionado.categoria}
-                                            <FaEdit 
-                                                className="edit-icon" 
-                                                onClick={() => handleEditClick('categoria')}
-                                                style={{ marginLeft: '10px', cursor: 'pointer' }}
-                                            />
-                                        </>
-                                    )}
-                                </p>
+                                        <p><strong>Categoria:</strong> 
+                                            {isEditing.categoria ? (
+                                                <select 
+                                                    value={ticketSelecionado.categoria} 
+                                                    onChange={(e) => handleFieldChange('categoria', e.target.value)} 
+                                                    onBlur={() => handleFieldChange('categoria', ticketSelecionado.categoria)}
+                                                >
+                                                    {options.categoria.map((option, index) => (
+                                                        <option key={index} value={option}>
+                                                            {option}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            ) : (
+                                                <>
+                                                    {ticketSelecionado.categoria}
+                                                    <FaEdit 
+                                                        className="edit-icon" 
+                                                        onClick={() => handleEditClick('categoria')}
+                                                        style={{ marginLeft: '10px', cursor: 'pointer' }}
+                                                    />
+                                                </>
+                                            )}
+                                        </p>
 
-                                <p><strong>Subcategoria:</strong> 
-                                    {isEditing.subcategoria ? (
-                                        <select 
-                                            value={ticketSelecionado.subcategoria} 
-                                            onChange={(e) => handleFieldChange('subcategoria', e.target.value)} 
-                                            onBlur={() => handleFieldChange('subcategoria', ticketSelecionado.subcategoria)}
-                                        >
-                                            {options.subcategoria.map((option, index) => (
-                                                <option key={index} value={option}>
-                                                    {option}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    ) : (
-                                        <>
-                                            {ticketSelecionado.subcategoria}
-                                            <FaEdit 
-                                                className="edit-icon" 
-                                                onClick={() => handleEditClick('subcategoria')}
-                                                style={{ marginLeft: '10px', cursor: 'pointer' }}
-                                            />
-                                        </>
-                                    )}
-                                </p>
+                                        <p><strong>Subcategoria:</strong> 
+                                            {isEditing.subcategoria ? (
+                                                <select 
+                                                    value={ticketSelecionado.subcategoria} 
+                                                    onChange={(e) => handleFieldChange('subcategoria', e.target.value)} 
+                                                    onBlur={() => handleFieldChange('subcategoria', ticketSelecionado.subcategoria)}
+                                                >
+                                                    {options.subcategoria.map((option, index) => (
+                                                        <option key={index} value={option}>
+                                                            {option}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            ) : (
+                                                <>
+                                                    {ticketSelecionado.subcategoria}
+                                                    <FaEdit 
+                                                        className="edit-icon" 
+                                                        onClick={() => handleEditClick('subcategoria')}
+                                                        style={{ marginLeft: '10px', cursor: 'pointer' }}
+                                                    />
+                                                </>
+                                            )}
+                                        </p>
 
-                                <p><strong>Assunto:</strong> 
-                                    {isEditing.assunto ? (
-                                        <select 
-                                            value={ticketSelecionado.assunto} 
-                                            onChange={(e) => handleFieldChange('assunto', e.target.value)} 
-                                            onBlur={() => handleFieldChange('assunto', ticketSelecionado.assunto)}
-                                        >
-                                            {options.assunto.map((option, index) => (
-                                                <option key={index} value={option}>
-                                                    {option}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    ) : (
-                                        <>
-                                            {ticketSelecionado.assunto}
-                                            <FaEdit 
-                                                className="edit-icon" 
-                                                onClick={() => handleEditClick('assunto')}
-                                                style={{ marginLeft: '10px', cursor: 'pointer' }}
-                                            />
-                                        </>
-                                    )}
-                                </p>
+                                        <p><strong>Assunto:</strong> 
+                                            {isEditing.assunto ? (
+                                                <select 
+                                                    value={ticketSelecionado.assunto} 
+                                                    onChange={(e) => handleFieldChange('assunto', e.target.value)} 
+                                                    onBlur={() => handleFieldChange('assunto', ticketSelecionado.assunto)}
+                                                >
+                                                    {options.assunto.map((option, index) => (
+                                                        <option key={index} value={option}>
+                                                            {option}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            ) : (
+                                                <>
+                                                    {ticketSelecionado.assunto}
+                                                    <FaEdit 
+                                                        className="edit-icon" 
+                                                        onClick={() => handleEditClick('assunto')}
+                                                        style={{ marginLeft: '10px', cursor: 'pointer' }}
+                                                    />
+                                                </>
+                                            )}
+                                        </p>
+                                    </>
+                                )}
 
                                 <p><strong>Nome Completo:</strong> {ticketSelecionado.nomeCompleto}</p>
                                 <p><strong>Matrícula:</strong> {ticketSelecionado.matricula}</p>
@@ -333,7 +354,8 @@ const MeusAtendimentos = () => {
                                 <p><strong>Cargo:</strong> {ticketSelecionado.cargo}</p>
                                 <p><strong>Data de Criação:</strong> {ticketSelecionado.abertura}</p>
                                 <p><strong>Descrição:</strong> {ticketSelecionado.descricao}</p>
-                                <p style={{ display: 'flex', alignItems: 'center' }}><strong>Autorização:</strong>&nbsp;
+                                <p style={{ display: 'flex', alignItems: 'center' }}>
+                                    <strong>Autorização:</strong>&nbsp;
                                     <a href={URL.createObjectURL(new Blob([ticketSelecionado.autorizacao]))} target="_blank" rel="noopener noreferrer" style={{ marginRight: '5px' }}>
                                         Abrir
                                     </a>
@@ -372,7 +394,15 @@ const MeusAtendimentos = () => {
                                             <p><strong>Descrição:</strong> {atividade.descricao}</p>
                                             <p><strong>Destinatário:</strong> {atividade.destinatario}</p>
                                             <p><strong>Visibilidade:</strong> {atividade.visibilidade}</p>
-                                            <p><strong>Anexo:</strong> {atividade.anexo}</p>
+                                            <p style={{ display: 'flex', alignItems: 'center' }}>
+                                                <strong>Anexo:</strong>&nbsp;
+                                                <span>{atividade.anexo}</span>
+                                                <FaFileAlt 
+                                                    className="icone-anexo" 
+                                                    style={{ marginLeft: '10px', cursor: 'pointer' }} 
+                                                    onClick={() => window.open(URL.createObjectURL(new Blob([atividade.anexo])))}
+                                                />
+                                            </p>
                                         </div>
                                     ))}
                                 </div>
@@ -393,7 +423,15 @@ const MeusAtendimentos = () => {
                                     <p><strong>Descrição:</strong> {atividadeSelecionada.descricao}</p>
                                     <p><strong>Destinatário:</strong> {atividadeSelecionada.destinatario}</p>
                                     <p><strong>Visibilidade:</strong> {atividadeSelecionada.visibilidade}</p>
-                                    <p><strong>Anexo:</strong> {atividadeSelecionada.anexo}</p>
+                                    <p style={{ display: 'flex', alignItems: 'center' }}>
+                                        <strong>Anexo:</strong>&nbsp;
+                                        <span>{atividadeSelecionada.anexo}</span>
+                                        <FaFileAlt 
+                                            className="icone-anexo" 
+                                            style={{ marginLeft: '10px', cursor: 'pointer' }} 
+                                            onClick={() => window.open(URL.createObjectURL(new Blob([atividadeSelecionada.anexo])))}
+                                        />
+                                    </p>
                                 </>
                             ) : (
                                 <>

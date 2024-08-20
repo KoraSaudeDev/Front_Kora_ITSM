@@ -27,7 +27,7 @@ header {
 .conteudo-cabecalho2 {
   display: flex;
   align-items: center;
-  justify-content: flex-end; 
+  justify-content: flex-end;
   width: 90%;
 }
 
@@ -45,7 +45,7 @@ header {
 }
 
 .icone:hover {
-  color:white;
+  color: white;
 }
 
 .icone::after {
@@ -77,6 +77,25 @@ header {
   position: absolute;
   top: -3px;
   right: -3px;
+}
+
+.pulsating {
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .conteudo-cabecalho {
@@ -124,3 +143,89 @@ header {
 .barra-busca input:focus {
   outline: none;
 }
+
+.caixa-notificacoes {
+  position: absolute;
+  top: 60px;
+  right: 20px;
+  width: 280px; 
+  background-color: white;
+  color: #333;
+  border-radius: 8px; 
+  border: 1px solid #ddd; 
+  padding: 8px; 
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); 
+  z-index: 1000;
+  margin-right: 25px;
+  opacity: 0;
+  transform: translateY(-15px); 
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.caixa-notificacoes.ativa {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.notificacao-item {
+  padding: 3px; 
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-family: "Helvetica Neue", sans-serif; 
+  font-size: 13px; 
+  color: #333;
+  transition: background-color 0.5s ease;
+  
+}
+
+.notificacao-item:hover {
+  background-color: #f0f0f5; 
+}
+
+.notificacao-item:last-child {
+  border-bottom: none;
+}
+
+.notificacao-item strong {
+  font-weight: 500; 
+}
+
+.notification-dot {
+  width: 8px; 
+  height: 8px;
+  background-color: #ff9500; 
+  border-radius: 50%;
+  position: absolute;
+  top: 4px;
+  right: 10px;
+}
+
+.notification:hover {
+  color: white;
+}
+
+@keyframes swing {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(15deg);
+  }
+  50% {
+    transform: rotate(-10deg);
+  }
+  75% {
+    transform: rotate(5deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.swinging {
+  animation: swing 1s ease-in-out;
+  transform-origin: top center; 
+}
+

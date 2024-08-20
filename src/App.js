@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
@@ -16,6 +16,21 @@ import AllTickets from './pages/Atendimentos/AllTickets';
 import NovoTicket from './pages/Atendimentos/NovoTicket';
 
 const App = () => {
+  const [selectedTicket, setSelectedTicket] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const handleSelectTicket = (ticket) => {
+    setSelectedTicket(ticket);
+  };
+
+  const handleResetTicket = () => {
+    setSelectedTicket(null);
+  };
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   return (
     <AuthProvider>
       <Router>
@@ -24,15 +39,74 @@ const App = () => {
           <Route
             path="/*"
             element={
-              <div>
-                <Header />
-                <Sidebar />
+              <div className={`app-container ${isSidebarOpen ? 'sidebar-open' : ''}`}>
+                <Header
+                  onSelectTicket={handleSelectTicket}
+                  onToggleSidebar={toggleSidebar}
+                  onResetTicket={handleResetTicket}
+                />
+                <Sidebar isOpen={isSidebarOpen} />
                 <Routes>
-                  <Route path="/" element={<ProtectedRoute element={<Main title="Minha Equipe" description="Atendimentos / Minha Equipe"><MinhaEquipe /></Main>} />} />
-                  <Route path="/atendimentos/meus-atendimentos" element={<ProtectedRoute element={<Main title="Meus Atendimentos" description="Atendimentos / Meus Atendimentos"><MeusAtendimentos /></Main>} />} />
-                  <Route path="/atendimentos/minha-equipe" element={<ProtectedRoute element={<Main title="Minha Equipe" description="Atendimentos / Minha Equipe"><MinhaEquipe /></Main>} />} />
-                  <Route path="/atendimentos/all-tickets" element={<ProtectedRoute element={<Main title="All Tickets" description="Atendimentos / All Tickets"><AllTickets /></Main>} />} />
-                  <Route path="/atendimentos/novo-ticket" element={<ProtectedRoute element={<Main title="Novo Ticket" description="Atendimentos / Novo Ticket"><NovoTicket /></Main>} />} />
+                  <Route
+                    path="/"
+                    element={
+                      <ProtectedRoute
+                        element={
+                          <Main title="Minha Equipe" description="Atendimentos / Minha Equipe">
+                            <MinhaEquipe selectedTicket={selectedTicket} onResetTicket={handleResetTicket} />
+                          </Main>
+                        }
+                      />
+                    }
+                  />
+                  <Route
+                    path="/atendimentos/meus-atendimentos"
+                    element={
+                      <ProtectedRoute
+                        element={
+                          <Main title="Meus Atendimentos" description="Atendimentos / Meus Atendimentos">
+                            <MeusAtendimentos selectedTicket={selectedTicket} onResetTicket={handleResetTicket} />
+                          </Main>
+                        }
+                      />
+                    }
+                  />
+                  <Route
+                    path="/atendimentos/minha-equipe"
+                    element={
+                      <ProtectedRoute
+                        element={
+                          <Main title="Minha Equipe" description="Atendimentos / Minha Equipe">
+                            <MinhaEquipe selectedTicket={selectedTicket} onResetTicket={handleResetTicket} />
+                          </Main>
+                        }
+                      />
+                    }
+                  />
+                  <Route
+                    path="/atendimentos/all-tickets"
+                    element={
+                      <ProtectedRoute
+                        element={
+                          <Main title="All Tickets" description="Atendimentos / All Tickets">
+                            <AllTickets selectedTicket={selectedTicket} onResetTicket={handleResetTicket} />
+                          </Main>
+                        }
+                      />
+                    }
+                  />
+                  <Route
+                    path="/atendimentos/novo-ticket"
+                    element={
+                      <ProtectedRoute
+                        element={
+                          <Main title="Novo Ticket" description="Atendimentos / Novo Ticket">
+                            <NovoTicket />
+                          </Main>
+                        }
+                      />
+                    }
+                  />
                 </Routes>
               </div>
             }
