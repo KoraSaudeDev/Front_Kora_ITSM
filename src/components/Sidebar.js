@@ -100,12 +100,12 @@ const Sidebar = () => {
               <FaChevronDown className={`seta ${activeDropdown === 'dropdownAtendimentos' ? 'rotacionar' : ''}`} />
             </a>
             <ul id="dropdownAtendimentos" className={`conteudo-dropdown ${activeDropdown === 'dropdownAtendimentos' ? 'mostrar' : ''}`}>
-              <li className={location.pathname === '/atendimentos/novo-ticket' ? 'active' : ''}>
+              {/* <li className={location.pathname === '/atendimentos/novo-ticket' ? 'active' : ''}>
                 <Link to="/atendimentos/novo-ticket" className={location.pathname === '/atendimentos/novo-ticket' ? 'active' : ''}>
 
                   <span>Novo Ticket</span>
                 </Link>
-              </li>
+              </li> */}
               <li className={location.pathname === '/atendimentos/meus-atendimentos' ? 'active' : ''}>
                 <Link to="/atendimentos/meus-atendimentos" className={location.pathname === '/atendimentos/meus-atendimentos' ? 'active' : ''}>Meus Atendimentos</Link>
               </li>

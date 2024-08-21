@@ -202,9 +202,9 @@ const MeusAtendimentos = ({ onResetTicket }) => {
                         <button className="fechar-modal" onClick={handleFechar}>×</button>
                         {ticketSelecionado.status !== 'Concluido' && ticketSelecionado.status !== 'Cancelado' && (
                             <div className="botoes-modal">
-                                <button onClick={() => alert('Ticket Cancelado')}>
+                                {/* <button onClick={() => alert('Ticket Cancelado')}>
                                     <FaTimes /> Cancelar
-                                </button>
+                                </button> */}
                             </div>
                         )}
                         <div className="conteudo-modal">

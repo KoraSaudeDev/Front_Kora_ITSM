@@ -192,9 +192,9 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
                         <button className="fechar-modal" onClick={handleFechar}><FaTimes /></button>
                         {ticketSelecionado.status !== 'Concluido' && ticketSelecionado.status !== 'Cancelado' && (
                             <div className="botoes-modal">
-                                <button className="botao-cancelar" onClick={handleFechar}>
+                                {/* <button className="botao-cancelar" onClick={handleFechar}>
                                     <FaTimes /> Cancelar
-                                </button>
+                                </button> */}
                             </div>
                         )}
                         <div className="conteudo-modal">
