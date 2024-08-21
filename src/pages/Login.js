@@ -3,21 +3,21 @@ import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import '../styles/Login.css'; 
+import '../styles/Login.css';
+import axios from 'axios';
 
 const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      const user = jwtDecode(token);
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
       login(user);
       navigate('/atendimentos/minha-equipe');
     }
 
-    // Custom styles for the Google button
     const button = document.querySelector('.nsm7Bb-HzV7m-LgbsSe');
     if (button) {
       button.style.backgroundColor = '#4285f4';
@@ -31,12 +31,28 @@ const Login = () => {
 
   }, [login, navigate]);
 
-  const onSuccess = (res) => {
-    const token = res?.credential;
-    const user = jwtDecode(token);
-    localStorage.setItem('token', token);
-    login(user);
-    navigate('/atendimentos/minha-equipe');
+  const onSuccess = async (res) => {
+    try {
+      const token = res?.credential;
+      const user = jwtDecode(token);
+
+      const config = {
+        method: 'get',
+        maxBodyLength: Infinity,
+        url: `${process.env.REACT_APP_API_BASE_URL}/access/meus-grupos?email=${user.email}`,
+        headers: {}
+      };
+
+      const response = await axios.request(config);
+
+      const roles = response.data.map(item => item.papel);
+      user.cargo = roles;
+
+      login(user);
+      navigate('/atendimentos/minha-equipe');
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const onFailure = (res) => {
@@ -46,7 +62,7 @@ const Login = () => {
   return (
     <div className="login-container">
       <div className="login-box">
-      <img src="https://i.postimg.cc/8k9pdsZV/unnamed.png" alt="Kora Logo" className="login-logo" />
+        <img src="https://i.postimg.cc/8k9pdsZV/unnamed.png" alt="Kora Logo" className="login-logo" />
 
 
         <h2>Kora System</h2>
