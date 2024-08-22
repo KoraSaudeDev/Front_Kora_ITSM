@@ -38,34 +38,8 @@ body {
     width: 220px;
 }
 
-.filtro-status {
-    display: flex;
-    gap: 10px;
-}
 
-.status-bolinha {
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    display: inline-block;
-    cursor: pointer;
-}
 
-.status-bolinha.em-andamento {
-    background-color: yellow;
-}
-
-.status-bolinha.pendente {
-    background-color: blue;
-}
-
-.status-bolinha.concluido {
-    background-color: green;
-}
-
-.status-bolinha.cancelado {
-    background-color: red;
-}
 
 .status-inline {
     display: flex;
@@ -294,58 +268,6 @@ h2 {
     margin-left: 5px;
 }
 
-.status.em-andamento::before,
-.status-inline.em-andamento::before {
-    content: '';
-    position: relative;
-    top: 0;
-    left: 0;
-    margin-right: 5px;
-    width: 10px;
-    height: 10px;
-    background-color: orange;
-    border-radius: 50%;
-    animation: none;
-}
-
-.status.pendente::before,
-.status-inline.pendente::before {
-    content: '';
-    position: relative;
-    top: 0;
-    left: 0;
-    margin-right: 5px;
-    width: 10px;
-    height: 10px;
-    background-color: blue;
-    border-radius: 50%;
-}
-
-.status.concluido::before,
-.status-inline.concluido::before {
-    content: '';
-    position: relative;
-    top: 0;
-    left: 0;
-    margin-right: 5px;
-    width: 10px;
-    height: 10px;
-    background-color: green;
-    border-radius: 50%;
-}
-
-.status.cancelado::before,
-.status-inline.cancelado::before {
-    content: '';
-    position: relative;
-    top: 0;
-    left: 0;
-    margin-right: 5px;
-    width: 10px;
-    height: 10px;
-    background-color: red;
-    border-radius: 50%;
-}
 
 .botoes-modal {
     display: flex;
@@ -839,3 +761,166 @@ a {
     color: darkred;
 }
 
+.pagination-controls {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 5px 15px;
+    margin-top: 10px;
+}
+
+.pagination-button {
+    background-color: transparent; 
+    color: #007aff; 
+    border: none; 
+    padding: 4px 10px;
+    margin: 0 2px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
+}
+
+.pagination-button:hover {
+    background-color: rgba(0, 122, 255, 0.1); 
+    color: #007aff; 
+}
+
+.pagination-button:disabled {
+    background-color: transparent; 
+    color: #a1a1a6; 
+    cursor: not-allowed;
+}
+
+.pagination-button.active {
+    background-color: #007aff; 
+    color: white; 
+    box-shadow: 0 0 5px rgba(0, 122, 255, 0.3); 
+}
+
+.pagination-button svg {
+    vertical-align: middle;
+    width: 14px;
+    height: 14px;
+    fill: #007aff; 
+    transition: fill 0.3s;
+}
+
+.pagination-button:disabled svg {
+    fill: #a1a1a6; 
+}
+
+.container-meus-atendimentos {
+    position: relative;
+    padding-bottom: 50px; 
+}
+
+.pagination-controls {
+    position: absolute;
+    bottom: 5px;
+    right: 10px; 
+}
+
+.filtro-sla {
+    display: flex;
+    align-items: center;
+    gap: 10px; 
+    margin-right: 20px; 
+}
+
+.sla-bolinha {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.sla-bolinha.active {
+    transform: scale(1.2); 
+}
+
+
+.sla-bolinha {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px; 
+}
+
+
+.dropdown-status-select {
+    padding: 5px 8px; 
+    border-radius: 6px;
+    font-size: 14px;
+    color: #3E4676;
+    background-color: #f5f7fa;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg fill='%233E4676' height='16' viewBox='0 0 24 24' width='16' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 10px;
+    cursor: pointer;
+    width: 160px; 
+    margin-bottom: 5px;
+}
+
+.dropdown-status-select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(62, 70, 118, 0.2);
+}
+
+.dropdown-status-select:hover {
+    background-color: #eaeef3;
+}
+
+.dropdown-status-select option {
+    background-color: #fff;
+    color: #333;
+}
+
+
+
+.status-bolinha {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px; 
+}
+/* Inicialização da animação em cascata */
+.tabela-atendimentos tbody tr {
+    opacity: 0;
+    transform: translateY(10px);
+    animation: cascadeIn 0.3s ease forwards;
+    animation-delay: calc(var(--stagger) * 0.05s);
+}
+
+/* Definindo o tempo de atraso para cada linha */
+.tabela-atendimentos tbody tr:nth-child(1) { --stagger: 1; }
+.tabela-atendimentos tbody tr:nth-child(2) { --stagger: 2; }
+.tabela-atendimentos tbody tr:nth-child(3) { --stagger: 3; }
+.tabela-atendimentos tbody tr:nth-child(4) { --stagger: 4; }
+.tabela-atendimentos tbody tr:nth-child(5) { --stagger: 5; }
+.tabela-atendimentos tbody tr:nth-child(6) { --stagger: 6; }
+.tabela-atendimentos tbody tr:nth-child(7) { --stagger: 7; }
+.tabela-atendimentos tbody tr:nth-child(8) { --stagger: 8; }
+.tabela-atendimentos tbody tr:nth-child(9) { --stagger: 9; }
+.tabela-atendimentos tbody tr:nth-child(10) { --stagger: 10; }
+
+/* Animação em cascata */
+@keyframes cascadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

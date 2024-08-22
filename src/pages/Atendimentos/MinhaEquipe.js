@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import 'styles/Atendimentos/MeusAtendimentos.css';
-import { FaSearch, FaTimes, FaFileAlt, FaPlus, FaEdit } from 'react-icons/fa';
+import { FaSearch, FaTimes, FaFileAlt, FaPlus, FaEdit, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 
@@ -9,6 +9,7 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
     const [atendimentos, setAtendimentos] = useState([]);
     const [ticketSelecionado, setTicketSelecionado] = useState(null);
     const [filtroStatus, setFiltroStatus] = useState('');
+    const [filtroSLA, setFiltroSLA] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [isClosing, setIsClosing] = useState(false);
     const [showAtividadesModal, setShowAtividadesModal] = useState(false);
@@ -24,6 +25,27 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
         subcategoria: false,
         assunto: false
     });
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [loading, setLoading] = useState(true);
+    const [showNoDataMessage, setShowNoDataMessage] = useState(false);
+
+    const itemsPerPage = 8;
+
+    const statusOptions = {
+        "Em Andamento": "#ffc107",
+        "Aguardando Retorno Fornecedor": "#17a2b8",
+        "Aguardando Retorno": "#6c757d",
+        "Em Aberto": "#007bff",
+        "Agendada": "#6610f2",
+        "Criação de Usuário": "#fd7e14"
+    };
+
+    const slaOptions = {
+        "Em Atraso": "#dc3545",
+        "No Prazo": "#28a745"
+    };
 
     const options = {
         hub: ['Hub 1', 'Hub 2', 'Hub 3'],
@@ -45,7 +67,7 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
                 let config = {
                     method: 'post',
                     maxBodyLength: Infinity,
-                    url: `${process.env.REACT_APP_API_BASE_URL}/tickets/minha-equipe?page=1&per_page=15`,
+                    url: `${process.env.REACT_APP_API_BASE_URL}/tickets/minha-equipe?page=${currentPage}&per_page=${itemsPerPage}`,
                     headers: {
                         'Content-Type': 'application/json'
                     },
@@ -53,22 +75,29 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
                 };
 
                 const response = await axios.request(config);
-                console.log(response.data)
                 setAtendimentos(response.data.tickets);
+                setTotalPages(Math.ceil(response.data.total_items / itemsPerPage));
+                setLoading(false); 
             } catch (error) {
                 console.error('Erro ao buscar atendimentos:', error);
+                setLoading(false); 
             }
         };
 
         fetchAtendimentos();
-    }, [user.cargo]);
+
+        const timer = setTimeout(() => {
+            setShowNoDataMessage(true); 
+        }, 10000);
+
+        return () => clearTimeout(timer);
+    }, [user.cargo, currentPage]);
 
     useEffect(() => {
         if (selectedTicket) {
             handleClick(selectedTicket);
         }
     }, [selectedTicket]);
-
 
     useEffect(() => {
         return () => {
@@ -94,9 +123,14 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
         setFiltroStatus(filtroStatus === status ? '' : status);
     };
 
+    const handleSLAClick = (sla) => {
+        setFiltroSLA(filtroSLA === sla ? '' : sla);
+    };
+
     const handleClearFiltro = (e) => {
         if (e.target.className === 'container-meus-atendimentos') {
             setFiltroStatus('');
+            setFiltroSLA('');
         }
     };
 
@@ -164,9 +198,50 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
         setPrioridadeSelecionada(prioridade);
     };
 
+    const handlePageClick = (pageNumber) => {
+        if (pageNumber >= 1 && pageNumber <= totalPages) {
+            setCurrentPage(pageNumber);
+        }
+    };
+
+    const handlePreviousPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
+
+    const handleNextPage = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
+
     const atendimentosFiltrados = atendimentos
         .filter(atendimento => !filtroStatus || atendimento.status === filtroStatus)
+        .filter(atendimento => !filtroSLA || atendimento.sla_util === filtroSLA)
         .filter(atendimento => !searchTerm || atendimento.cod_fluxo.includes(searchTerm));
+
+    const renderPaginationButtons = () => {
+        const pageButtons = [];
+        const maxPagesToShow = 3;
+
+        let startPage = Math.max(1, currentPage - maxPagesToShow);
+        let endPage = Math.min(totalPages, currentPage + maxPagesToShow);
+
+        for (let i = startPage; i <= endPage; i++) {
+            pageButtons.push(
+                <button
+                    key={i}
+                    className={`pagination-button ${currentPage === i ? 'active' : ''}`}
+                    onClick={() => handlePageClick(i)}
+                >
+                    {i}
+                </button>
+            );
+        }
+
+        return pageButtons;
+    };
 
     return (
         <div className="container-meus-atendimentos" onClick={handleClearFiltro}>
@@ -182,15 +257,37 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
                         onChange={handleSearchChange}
                     />
                 </div>
-                <div className="filtro-status">
-                    <span className={`status-bolinha em-andamento ${filtroStatus === 'Em Andamento' ? 'active' : ''}`} onClick={() => handleFiltroClick('Em Andamento')}></span>
-                    <span className={`status-bolinha pendente ${filtroStatus === 'Pendente' ? 'active' : ''}`} onClick={() => handleFiltroClick('Pendente')}></span>
-                    <span className={`status-bolinha concluido ${filtroStatus === 'Concluido' ? 'active' : ''}`} onClick={() => handleFiltroClick('Concluido')}></span>
-                    <span className={`status-bolinha cancelado ${filtroStatus === 'Cancelado' ? 'active' : ''}`} onClick={() => handleFiltroClick('Cancelado')}></span>
+                <div className="filtro-sla">
+                    <span
+                        className={`sla-bolinha ${filtroSLA === 'No Prazo' ? 'active' : ''}`}
+                        style={{ backgroundColor: slaOptions['No Prazo'] }}
+                        onClick={() => handleSLAClick('No Prazo')}
+                    ></span>
+                    <span
+                        className={`sla-bolinha ${filtroSLA === 'Em Atraso' ? 'active' : ''}`}
+                        style={{ backgroundColor: slaOptions['Em Atraso'] }}
+                        onClick={() => handleSLAClick('Em Atraso')}
+                    ></span>
+                </div>
+                <div className="dropdown-filtro-status">
+                    <select
+                        value={filtroStatus}
+                        onChange={(e) => handleFiltroClick(e.target.value)}
+                        className="dropdown-status-select"
+                    >
+                        <option value="">Todos os Status</option>
+                        {Object.keys(statusOptions).map((status) => (
+                            <option key={status} value={status}>
+                                {status}
+                            </option>
+                        ))}
+                    </select>
                 </div>
             </div>
             
-            {atendimentosFiltrados.length === 0 ? (
+            {loading ? (
+                <p>Buscando dados...</p>
+            ) : atendimentosFiltrados.length === 0 && showNoDataMessage ? (
                 <p>Sem atendimentos no momento.</p>
             ) : (
                 <div className="tabela-container">
@@ -218,9 +315,25 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
                                     <td>{atendimento.cod_fluxo}</td>
                                     <td>{new Date(atendimento.abertura).toLocaleString().replace(',', '')}</td>
                                     <td className={`status ${atendimento.status.replace(/\s/g, '-').toLowerCase()}`}>
+                                        <span
+                                            className="status-bolinha"
+                                            style={{ 
+                                                backgroundColor: statusOptions[atendimento.status] || '#000',
+                                                marginRight: '8px'  
+                                            }}
+                                        ></span>
                                         {atendimento.status}
                                     </td>
-                                    <td>{atendimento.sla_util}</td>
+                                    <td className={`sla ${atendimento.sla_util.replace(/\s/g, '-').toLowerCase()}`}>
+                                        <span
+                                            className="sla-bolinha"
+                                            style={{ 
+                                                backgroundColor: slaOptions[atendimento.sla_util] || '#000',
+                                                marginRight: '8px'
+                                            }}
+                                        ></span>
+                                        {atendimento.sla_util}
+                                    </td>
                                     <td>{new Date(atendimento.data_limite).toLocaleString().replace(',', '')}</td>
                                     <td>{atendimento.grupo}</td>
                                     <td>{atendimento.nome}</td>
@@ -237,21 +350,51 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
                 </div>
             )}
 
+            <div className="pagination-controls">
+                <button
+                    className="pagination-button"
+                    onClick={handlePreviousPage}
+                    disabled={currentPage === 1}
+                >
+                    <FaChevronLeft />
+                </button>
+                {renderPaginationButtons()}
+                <button
+                    className="pagination-button"
+                    onClick={handleNextPage}
+                    disabled={currentPage === totalPages}
+                >
+                    <FaChevronRight />
+                </button>
+            </div>
+
             {ticketSelecionado && (
                 <div className="modal-overlay">
                     <div className={`modal ${isClosing ? 'fechar' : ''}`}>
                         <button className="fechar-modal" onClick={handleFechar}><FaTimes /></button>
-                        {ticketSelecionado.status !== 'Concluido' && ticketSelecionado.status !== 'Cancelado' && (
-                            <div className="botoes-modal">
-                                {/* <button className="botao-cancelar" onClick={handleFechar}>
-                                    <FaTimes /> Cancelar
-                                </button> */}
-                            </div>
-                        )}
                         <div className="conteudo-modal">
                             <div className="conteudo-modal-esquerda">
-                                <h3>Detalhes do Ticket #{ticketSelecionado.numeroTicket}</h3>
-                                <p><strong>Status:</strong> <span className={`status-inline ${ticketSelecionado.status.replace(/\s/g, '-').toLowerCase()}`}>{ticketSelecionado.status}</span></p>
+                                <h3>Detalhes do Ticket #{ticketSelecionado.cod_fluxo}</h3>
+                                <p><strong>Status:</strong> 
+                                    <span
+                                        className="status-bolinha"
+                                        style={{ 
+                                            backgroundColor: statusOptions[ticketSelecionado.status] || '#000',
+                                            marginRight: '8px'  
+                                        }}
+                                    ></span>
+                                    {ticketSelecionado.status}
+                                </p>
+                                <p><strong>SLA (Útil):</strong> 
+                                    <span
+                                        className="sla-bolinha"
+                                        style={{ 
+                                            backgroundColor: slaOptions[ticketSelecionado.sla_util] || '#000',
+                                            marginRight: '8px'  
+                                        }}
+                                    ></span>
+                                    {ticketSelecionado.sla_util}
+                                </p>
 
                                 {ticketSelecionado.status !== 'Concluido' && ticketSelecionado.status !== 'Cancelado' && (
                                     <>
@@ -467,9 +610,28 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
                                 </>
                             ) : (
                                 <>
-                                    <h3>Atividades do Ticket #{ticketSelecionado.numeroTicket}</h3>
+                                    <h3>Atividades do Ticket #{ticketSelecionado.cod_fluxo}</h3>
                                     <p><strong>Início:</strong> {ticketSelecionado.abertura}</p>
-                                    <p><strong>Status:</strong> {ticketSelecionado.status}</p>
+                                    <p><strong>Status:</strong> 
+                                        <span
+                                            className="status-bolinha"
+                                            style={{ 
+                                                backgroundColor: statusOptions[ticketSelecionado.status] || '#000',
+                                                marginRight: '8px'  
+                                            }}
+                                        ></span>
+                                        {ticketSelecionado.status}
+                                    </p>
+                                    <p><strong>SLA (Útil):</strong> 
+                                        <span
+                                            className="sla-bolinha"
+                                            style={{ 
+                                                backgroundColor: slaOptions[ticketSelecionado.sla_util] || '#000',
+                                                marginRight: '8px'  
+                                            }}
+                                        ></span>
+                                        {ticketSelecionado.sla_util}
+                                    </p>
                                     <textarea placeholder="Descrição"></textarea>
                                     <select>
                                         <option value="">Selecionar Destinatário</option>
