@@ -10,7 +10,6 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
     const [ticketSelecionado, setTicketSelecionado] = useState(null);
     const [filtroStatus, setFiltroStatus] = useState('');
     const [filtroSLA, setFiltroSLA] = useState('');
-    const [searchTerm, setSearchTerm] = useState('');
     const [isClosing, setIsClosing] = useState(false);
     const [showAtividadesModal, setShowAtividadesModal] = useState(false);
     const [isClosingAtividadesModal, setIsClosingAtividadesModal] = useState(false);
@@ -134,8 +133,26 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
         }
     };
 
-    const handleSearchChange = (e) => {
-        setSearchTerm(e.target.value);
+    const handleSearchChange = async (e) => {
+        let data = JSON.stringify({
+            "grupos": user.cargo
+        });
+
+        setCurrentPage(1);
+
+        let config = {
+            method: 'post',
+            maxBodyLength: Infinity,
+            url: `${process.env.REACT_APP_API_BASE_URL}/tickets/minha-equipe?page=${currentPage}&per_page=${itemsPerPage}&cod_fluxo=${e.target.value}`,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: data
+        };
+
+        const response = await axios.request(config);
+        setAtendimentos(response.data.tickets);
+        setTotalPages(Math.ceil(response.data.total_items / itemsPerPage));
     };
 
     const handleAbrirAtividadesModal = () => {
@@ -218,8 +235,7 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
 
     const atendimentosFiltrados = atendimentos
         .filter(atendimento => !filtroStatus || atendimento.status === filtroStatus)
-        .filter(atendimento => !filtroSLA || atendimento.sla_util === filtroSLA)
-        .filter(atendimento => !searchTerm || atendimento.cod_fluxo.includes(searchTerm));
+        .filter(atendimento => !filtroSLA || atendimento.sla_util === filtroSLA);
 
     const renderPaginationButtons = () => {
         const pageButtons = [];
@@ -253,7 +269,6 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
                         type="text"
                         className="search-bar"
                         placeholder="Pesquisar pelo número do ticket"
-                        value={searchTerm}
                         onChange={handleSearchChange}
                     />
                 </div>
