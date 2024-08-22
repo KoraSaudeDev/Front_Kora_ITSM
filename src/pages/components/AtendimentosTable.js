@@ -28,6 +28,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
     const [showNoDataMessage, setShowNoDataMessage] = useState(false);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+    const [successText, setSuccessText] = useState('Salvando ticket...');
 
     const statusOptions = {
         "Em Andamento": "#ffc107",
@@ -100,6 +101,16 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
             if (onResetTicket) onResetTicket();
         };
     }, []);
+
+    useEffect(() => {
+        if (showSuccessMessage) {
+            const timer = setTimeout(() => {
+                setSuccessText('Sucesso!');
+            }, 1000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [showSuccessMessage]);
 
     const showLoadingOverlay = () => {
         document.getElementById('loading-overlay').style.display = 'flex';
@@ -177,6 +188,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         const visibilidade = document.querySelector('input[name="visibilidade"]:checked');
         const anexo = document.querySelector('#anexoAtividade').files[0]?.name || 'Nenhum anexo';
 
+        
         if (!descricao || !destinatario || !visibilidade) {
             alert("Por favor, preencha todos os campos obrigatórios.");
             return;
@@ -699,12 +711,15 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                     </div>
                 </div>
             )}
-
-            {showSuccessMessage && (
-                <div className={`success-message ${showSuccessMessage ? 'show' : 'hide'}`}>
-                    Ticket salvo com sucesso!
+                        {showSuccessMessage && (
+                <div className={`success-message ${showSuccessMessage ? 'show' : ''}`}>
+                    <div className="loading-wrapper">
+                        <div className="loading-bar"></div>
+                    </div>
+                    <div className="message-text">{successText}</div>
                 </div>
             )}
+
         </div>
     );
 };
