@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import '../styles/Sidebar.css';
-import { FaChartPie, FaChartBar, FaPlus, FaHome, FaHeadset, FaChevronDown, FaSignOutAlt } from 'react-icons/fa'; 
+import { FaChartPie, FaChartBar, FaPlus, FaHome, FaHeadset, FaChevronDown, FaSignOutAlt } from 'react-icons/fa';
 import logokora from '../assets/images/logokora.png';
 import SemFoto from '../assets/images/Sem_foto.png';
 import { useAuth } from '../context/AuthContext';
@@ -32,7 +32,7 @@ const Sidebar = () => {
     const menuLateral = document.querySelector('.menu-lateral');
     const conteudoPrincipal = document.querySelector('main');
     const cabecalho = document.querySelector('header');
-    
+
     if (menuLateral && conteudoPrincipal && cabecalho) {
       menuLateral.classList.toggle('visible');
       conteudoPrincipal.classList.toggle('mover');
@@ -73,16 +73,25 @@ const Sidebar = () => {
         <div className="secao-perfil">
           <div className="foto-perfil-container">
             <div className="foto-perfil">
-              <img 
-                id="fotoPerfil" 
-                border="none" 
+              <img
+                id="fotoPerfil"
+                border="none"
                 src={user?.picture || SemFoto}
-                alt="Foto de Perfil" 
+                alt="Foto de Perfil"
               />
             </div>
           </div>
           <div className="informacoes-usuario">
             <p id="usuario">{user?.name || 'Nome do Usuário'}</p>
+            {user?.cargo?.length > 0 ? (
+              user.cargo.map((item, index) => (
+                <p key={index} id="cargo">
+                  {item}
+                </p>
+              ))
+            ) : (
+              <p id="cargo">Sem grupo</p>
+            )}
           </div>
         </div>
         <div className="titulo-botoes">Menu</div>

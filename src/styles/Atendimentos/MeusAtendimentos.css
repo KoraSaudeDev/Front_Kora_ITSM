@@ -7,7 +7,6 @@ body {
     padding: 0;
 }
 
-/* Estilos para a tabela e modal */
 .container-meus-atendimentos {
     padding: 20px;
     background-color: #f9f9f9;
@@ -93,18 +92,6 @@ body {
 
 .sla-inline .vermelha {
     background-color: red;
-}
-
-.tabela-atendimentos {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-
-
-
-.tabela-atendimentos th {
-    background-color: #f2f2f2;
 }
 
 .modal-overlay {
@@ -256,16 +243,17 @@ h2 {
     background-color: red;
 }
 
+.tabela-container {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
 .tabela-atendimentos {
     width: 100%;
     border-collapse: collapse;
-}
-
-.tabela-atendimentos th, .tabela-atendimentos td {
-    padding: 10px 15px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-    font-weight: 300;
+    margin: 0;
+    border-spacing: 0 10px;
 }
 
 .tabela-atendimentos th {
@@ -273,11 +261,18 @@ h2 {
     color: #3E4676;
     font-weight: 400;
     font-size: 16px;
+    padding: 12px 15px;
+    text-align: left;
+    white-space: nowrap;
 }
 
 .tabela-atendimentos td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
     font-weight: 300;
     font-size: 15px;
+    white-space: nowrap;
 }
 
 .tabela-atendimentos tr:hover {

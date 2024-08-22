@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import dadosTickets from './dadosTickets';
 import 'styles/Atendimentos/MeusAtendimentos.css';
 import { FaSearch, FaTimes, FaFileAlt, FaPlus, FaEdit } from 'react-icons/fa';
+import { useAuth } from '../../context/AuthContext';
+import axios from 'axios';
 
 const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
-    const [atendimentos] = useState(dadosTickets.filter(ticket => ticket.equipe === 'TI'));
+    const { user } = useAuth();
+    const [atendimentos, setAtendimentos] = useState([]);
     const [ticketSelecionado, setTicketSelecionado] = useState(null);
     const [filtroStatus, setFiltroStatus] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
@@ -34,6 +36,34 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
     const prioridades = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7'];
 
     useEffect(() => {
+        const fetchAtendimentos = async () => {
+            try {
+                let data = JSON.stringify({
+                    "grupos": user.cargo
+                });
+
+                let config = {
+                    method: 'post',
+                    maxBodyLength: Infinity,
+                    url: `${process.env.REACT_APP_API_BASE_URL}/tickets/minha-equipe?page=1&per_page=15`,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    data: data
+                };
+
+                const response = await axios.request(config);
+                console.log(response.data)
+                setAtendimentos(response.data.tickets);
+            } catch (error) {
+                console.error('Erro ao buscar atendimentos:', error);
+            }
+        };
+
+        fetchAtendimentos();
+    }, [user.cargo]);
+
+    useEffect(() => {
         if (selectedTicket) {
             handleClick(selectedTicket);
         }
@@ -56,7 +86,7 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
         setIsClosing(true);
         setTimeout(() => {
             setTicketSelecionado(null);
-            if (onResetTicket) onResetTicket(); 
+            if (onResetTicket) onResetTicket();
         }, 500);
     };
 
@@ -75,7 +105,7 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
     };
 
     const handleAbrirAtividadesModal = () => {
-        setAtividadeSelecionada(null); 
+        setAtividadeSelecionada(null);
         setIsEditMode(true);
         setShowAtividadesModal(true);
     };
@@ -117,7 +147,7 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
 
     const handleAbrirDetalhesAtividade = (atividade) => {
         setAtividadeSelecionada(atividade);
-        setIsEditMode(false); 
+        setIsEditMode(false);
         setShowAtividadesModal(true);
     };
 
@@ -136,7 +166,7 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
 
     const atendimentosFiltrados = atendimentos
         .filter(atendimento => !filtroStatus || atendimento.status === filtroStatus)
-        .filter(atendimento => !searchTerm || atendimento.numeroTicket.includes(searchTerm));
+        .filter(atendimento => !searchTerm || atendimento.cod_fluxo.includes(searchTerm));
 
     return (
         <div className="container-meus-atendimentos" onClick={handleClearFiltro}>
@@ -159,31 +189,52 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
                     <span className={`status-bolinha cancelado ${filtroStatus === 'Cancelado' ? 'active' : ''}`} onClick={() => handleFiltroClick('Cancelado')}></span>
                 </div>
             </div>
+            
             {atendimentosFiltrados.length === 0 ? (
                 <p>Sem atendimentos no momento.</p>
             ) : (
-                <table className="tabela-atendimentos">
-                    <thead>
-                        <tr>
-                            <th>Número do Ticket</th>
-                            <th>Relator</th>
-                            <th>Status</th>
-                            <th>Data de Criação</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {atendimentosFiltrados.map(atendimento => (
-                            <tr key={atendimento.numeroTicket} onClick={() => handleClick(atendimento)}>
-                                <td>{atendimento.numeroTicket}</td>
-                                <td>{atendimento.nomeCompleto}</td>
-                                <td className={`status ${atendimento.status.replace(/\s/g, '-').toLowerCase()}`}>
-                                    {atendimento.status}
-                                </td>
-                                <td>{atendimento.abertura}</td>
+                <div className="tabela-container">
+                    <table className="tabela-atendimentos">
+                        <thead>
+                            <tr>
+                                <th>N° Ticket</th>
+                                <th>Abertura</th>
+                                <th>Status</th>
+                                <th>SLA (Útil)</th>
+                                <th>Data Limite</th>
+                                <th>Grupo | Destinatário</th>
+                                <th>Nome</th>
+                                <th>Área de Negócio</th>
+                                <th>HUB</th>
+                                <th>Unidade de Negócio</th>
+                                <th>Categoria</th>
+                                <th>Subcategoria</th>
+                                <th>Assunto</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {atendimentosFiltrados.map(atendimento => (
+                                <tr key={atendimento.cod_fluxo} onClick={() => handleClick(atendimento)}>
+                                    <td>{atendimento.cod_fluxo}</td>
+                                    <td>{new Date(atendimento.abertura).toLocaleString().replace(',', '')}</td>
+                                    <td className={`status ${atendimento.status.replace(/\s/g, '-').toLowerCase()}`}>
+                                        {atendimento.status}
+                                    </td>
+                                    <td>{atendimento.sla_util}</td>
+                                    <td>{new Date(atendimento.data_limite).toLocaleString().replace(',', '')}</td>
+                                    <td>{atendimento.grupo}</td>
+                                    <td>{atendimento.nome}</td>
+                                    <td>{atendimento.area_negocio}</td>
+                                    <td>{atendimento.hub}</td>
+                                    <td>{atendimento.unidade}</td>
+                                    <td>{atendimento.categoria}</td>
+                                    <td>{atendimento.subcategoria}</td>
+                                    <td>{atendimento.assunto}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             )}
 
             {ticketSelecionado && (
@@ -201,14 +252,14 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
                             <div className="conteudo-modal-esquerda">
                                 <h3>Detalhes do Ticket #{ticketSelecionado.numeroTicket}</h3>
                                 <p><strong>Status:</strong> <span className={`status-inline ${ticketSelecionado.status.replace(/\s/g, '-').toLowerCase()}`}>{ticketSelecionado.status}</span></p>
-                                
+
                                 {ticketSelecionado.status !== 'Concluido' && ticketSelecionado.status !== 'Cancelado' && (
                                     <>
-                                        <p><strong>HUB:</strong> 
+                                        <p><strong>HUB:</strong>
                                             {isEditing.hub ? (
-                                                <select 
-                                                    value={ticketSelecionado.hub} 
-                                                    onChange={(e) => handleFieldChange('hub', e.target.value)} 
+                                                <select
+                                                    value={ticketSelecionado.hub}
+                                                    onChange={(e) => handleFieldChange('hub', e.target.value)}
                                                     onBlur={() => handleFieldChange('hub', ticketSelecionado.hub)}
                                                 >
                                                     {options.hub.map((option, index) => (
@@ -220,8 +271,8 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
                                             ) : (
                                                 <>
                                                     {ticketSelecionado.hub}
-                                                    <FaEdit 
-                                                        className="edit-icon" 
+                                                    <FaEdit
+                                                        className="edit-icon"
                                                         onClick={() => handleEditClick('hub')}
                                                         style={{ marginLeft: '10px', cursor: 'pointer' }}
                                                     />
@@ -229,11 +280,11 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
                                             )}
                                         </p>
 
-                                        <p><strong>Unidade de Negócio:</strong> 
+                                        <p><strong>Unidade de Negócio:</strong>
                                             {isEditing.unidadeNegocio ? (
-                                                <select 
-                                                    value={ticketSelecionado.unidadeNegocio} 
-                                                    onChange={(e) => handleFieldChange('unidadeNegocio', e.target.value)} 
+                                                <select
+                                                    value={ticketSelecionado.unidadeNegocio}
+                                                    onChange={(e) => handleFieldChange('unidadeNegocio', e.target.value)}
                                                     onBlur={() => handleFieldChange('unidadeNegocio', ticketSelecionado.unidadeNegocio)}
                                                 >
                                                     {options.unidadeNegocio.map((option, index) => (
@@ -245,8 +296,8 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
                                             ) : (
                                                 <>
                                                     {ticketSelecionado.unidadeNegocio}
-                                                    <FaEdit 
-                                                        className="edit-icon" 
+                                                    <FaEdit
+                                                        className="edit-icon"
                                                         onClick={() => handleEditClick('unidadeNegocio')}
                                                         style={{ marginLeft: '10px', cursor: 'pointer' }}
                                                     />
@@ -254,11 +305,11 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
                                             )}
                                         </p>
 
-                                        <p><strong>Categoria:</strong> 
+                                        <p><strong>Categoria:</strong>
                                             {isEditing.categoria ? (
-                                                <select 
-                                                    value={ticketSelecionado.categoria} 
-                                                    onChange={(e) => handleFieldChange('categoria', e.target.value)} 
+                                                <select
+                                                    value={ticketSelecionado.categoria}
+                                                    onChange={(e) => handleFieldChange('categoria', e.target.value)}
                                                     onBlur={() => handleFieldChange('categoria', ticketSelecionado.categoria)}
                                                 >
                                                     {options.categoria.map((option, index) => (
@@ -270,8 +321,8 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
                                             ) : (
                                                 <>
                                                     {ticketSelecionado.categoria}
-                                                    <FaEdit 
-                                                        className="edit-icon" 
+                                                    <FaEdit
+                                                        className="edit-icon"
                                                         onClick={() => handleEditClick('categoria')}
                                                         style={{ marginLeft: '10px', cursor: 'pointer' }}
                                                     />
@@ -279,11 +330,11 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
                                             )}
                                         </p>
 
-                                        <p><strong>Subcategoria:</strong> 
+                                        <p><strong>Subcategoria:</strong>
                                             {isEditing.subcategoria ? (
-                                                <select 
-                                                    value={ticketSelecionado.subcategoria} 
-                                                    onChange={(e) => handleFieldChange('subcategoria', e.target.value)} 
+                                                <select
+                                                    value={ticketSelecionado.subcategoria}
+                                                    onChange={(e) => handleFieldChange('subcategoria', e.target.value)}
                                                     onBlur={() => handleFieldChange('subcategoria', ticketSelecionado.subcategoria)}
                                                 >
                                                     {options.subcategoria.map((option, index) => (
@@ -295,8 +346,8 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
                                             ) : (
                                                 <>
                                                     {ticketSelecionado.subcategoria}
-                                                    <FaEdit 
-                                                        className="edit-icon" 
+                                                    <FaEdit
+                                                        className="edit-icon"
                                                         onClick={() => handleEditClick('subcategoria')}
                                                         style={{ marginLeft: '10px', cursor: 'pointer' }}
                                                     />
@@ -304,11 +355,11 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
                                             )}
                                         </p>
 
-                                        <p><strong>Assunto:</strong> 
+                                        <p><strong>Assunto:</strong>
                                             {isEditing.assunto ? (
-                                                <select 
-                                                    value={ticketSelecionado.assunto} 
-                                                    onChange={(e) => handleFieldChange('assunto', e.target.value)} 
+                                                <select
+                                                    value={ticketSelecionado.assunto}
+                                                    onChange={(e) => handleFieldChange('assunto', e.target.value)}
                                                     onBlur={() => handleFieldChange('assunto', ticketSelecionado.assunto)}
                                                 >
                                                     {options.assunto.map((option, index) => (
@@ -320,8 +371,8 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
                                             ) : (
                                                 <>
                                                     {ticketSelecionado.assunto}
-                                                    <FaEdit 
-                                                        className="edit-icon" 
+                                                    <FaEdit
+                                                        className="edit-icon"
                                                         onClick={() => handleEditClick('assunto')}
                                                         style={{ marginLeft: '10px', cursor: 'pointer' }}
                                                     />
@@ -342,9 +393,9 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
                                     <a href={URL.createObjectURL(new Blob([ticketSelecionado.autorizacao]))} target="_blank" rel="noopener noreferrer" style={{ marginRight: '5px' }}>
                                         Abrir
                                     </a>
-                                    <FaFileAlt 
-                                        className="icone-anexo" 
-                                        style={{ cursor: 'pointer' }} 
+                                    <FaFileAlt
+                                        className="icone-anexo"
+                                        style={{ cursor: 'pointer' }}
                                         onClick={() => window.open(URL.createObjectURL(new Blob([ticketSelecionado.autorizacao])))}
                                     />
                                 </p>
@@ -355,9 +406,9 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
                                         <label>Prioridade:</label>
                                         <div className="botoes-prioridades">
                                             {prioridades.map(prioridade => (
-                                                <button 
-                                                    key={prioridade} 
-                                                    className={`botao-prioridade ${prioridadeSelecionada === prioridade ? 'active' : ''}`} 
+                                                <button
+                                                    key={prioridade}
+                                                    className={`botao-prioridade ${prioridadeSelecionada === prioridade ? 'active' : ''}`}
                                                     onClick={() => handlePrioridadeClick(prioridade)}
                                                 >
                                                     {prioridade}
@@ -379,9 +430,9 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
                                             <p><strong>Visibilidade:</strong> {atividade.visibilidade}</p>
                                             <p><strong>Anexo:</strong>
                                                 {atividade.anexo}&nbsp;
-                                                <FaFileAlt 
-                                                    className="icone-anexo" 
-                                                    style={{ cursor: 'pointer' }} 
+                                                <FaFileAlt
+                                                    className="icone-anexo"
+                                                    style={{ cursor: 'pointer' }}
                                                     onClick={() => window.open(URL.createObjectURL(new Blob([atividade.anexo])))}
                                                 />
                                             </p>
@@ -407,9 +458,9 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
                                     <p><strong>Visibilidade:</strong> {atividadeSelecionada.visibilidade}</p>
                                     <p><strong>Anexo:</strong>
                                         {atividadeSelecionada.anexo}&nbsp;
-                                        <FaFileAlt 
-                                            className="icone-anexo" 
-                                            style={{ cursor: 'pointer' }} 
+                                        <FaFileAlt
+                                            className="icone-anexo"
+                                            style={{ cursor: 'pointer' }}
                                             onClick={() => window.open(URL.createObjectURL(new Blob([atividadeSelecionada.anexo])))}
                                         />
                                     </p>
