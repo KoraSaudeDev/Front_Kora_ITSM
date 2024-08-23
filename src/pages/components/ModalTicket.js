@@ -106,8 +106,6 @@ const Modal = ({ data, onClose }) => {
         }
     }, [showAtividadesModal]);
 
-
-
     useEffect(() => {
         axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/status`)
             .then(response => {
@@ -156,12 +154,12 @@ const Modal = ({ data, onClose }) => {
         const descricao = document.querySelector('#descricao-task').value.trim();
         const executor = document.querySelector('#executor-task').value;
         const status = document.querySelector('#status-task').value;
-        const tipo_atividade = document.querySelector('input[name="visibilidade"]:checked').value;
+        const tipo_atividade = document.querySelector('input[name="visibilidade"]:checked');
 
-        // if (!descricao || !destinatario || !visibilidade) {
-        //     alert("Por favor, preencha todos os campos obrigatórios.");
-        //     return;
-        // }
+        if (!descricao || !status || !executor || !tipo_atividade) {
+            alert("Por favor, preencha todos os campos obrigatórios.");
+            return;
+        }
 
         const novaAtividade = {
             cod_fluxo: data.id,
@@ -171,7 +169,7 @@ const Modal = ({ data, onClose }) => {
             status,
             descricao,
             executor,
-            tipo_atividade
+            tipo_atividade: tipo_atividade?.value
         };
 
         if (atividades.length > 0) {
@@ -234,6 +232,11 @@ const Modal = ({ data, onClose }) => {
     };
 
     const handleSalvarTicket = async () => {
+        if (!selectedHub || !selectedUnidade || !selectedCategoria || !selectedSubcategoria || !selectedAssunto || !prioridadeSelecionada) {
+            alert('Por favor, preencha todos os campos obrigatórios.');
+            return;
+        }
+
         function toTitleCase(str) {
             if (str === "EM ATENDIMENTO") return "Em Andamento";
             return str
@@ -243,7 +246,7 @@ const Modal = ({ data, onClose }) => {
                 .join(' ');
         }
 
-        //showLoadingOverlay();
+        showLoadingOverlay();
 
         const update_tasks = atividades
             .filter(task => task.alterar === 1 && task.id !== undefined)
@@ -264,10 +267,18 @@ const Modal = ({ data, onClose }) => {
             subcategoria: selectedSubcategoria,
             assunto: selectedAssunto,
             ds_nivel: prioridadeSelecionada,
-            status: ultimoItem ? toTitleCase(ultimoItem.status) : null,
-            grupo: ultimoItem ? ultimoItem.executor : null,
+            status: toTitleCase(ultimoItem.status),
+            grupo: ultimoItem.executor,
             sla: prioridades.find(line => line.prioridade === prioridadeSelecionada)?.sla
         };
+
+        if (update_tickets.status === "Finalizado"){
+            update_tickets.finalizado_por = ultimoItem.aberto_por;
+            update_tickets.data_fim = ultimoItem.aberto_em;
+            update_tickets.bl_reabertura = 1;
+        }
+
+        console.log(update_tickets)
 
         const sendRequest = async (config) => {
             try {
@@ -278,54 +289,58 @@ const Modal = ({ data, onClose }) => {
             }
         };
 
-        // try {
-        //     const ticketConfig = {
-        //         method: 'patch',
-        //         url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/${data.cod_fluxo}`,
-        //         headers: {
-        //             'Content-Type': 'application/json'
-        //         },
-        //         data: JSON.stringify(update_tickets)
-        //     };
+        try {
+            const ticketConfig = {
+                method: 'patch',
+                url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/${data.cod_fluxo}`,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                data: JSON.stringify(update_tickets)
+            };
 
-        //     await sendRequest(ticketConfig);
+            await sendRequest(ticketConfig);
 
-        //     for (const task of update_tasks) {
-        //         const taskConfig = {
-        //             method: 'patch',
-        //             url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/task/${task.cod_task}`,
-        //             headers: {
-        //                 'Content-Type': 'application/json'
-        //             },
-        //             data: JSON.stringify(task)
-        //         };
+            for (const task of update_tasks) {
+                const taskConfig = {
+                    method: 'patch',
+                    url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/task/${task.cod_task}`,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    data: JSON.stringify(task)
+                };
 
-        //         await sendRequest(taskConfig);
-        //     }
+                await sendRequest(taskConfig);
+            }
 
-        //     for (const task of insert_tasks) {
-        //         const taskConfig = {
-        //             method: 'post',
-        //             url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/task`,
-        //             headers: {
-        //                 'Content-Type': 'application/json'
-        //             },
-        //             data: JSON.stringify(task)
-        //         };
+            for (const task of insert_tasks) {
+                delete task.alterar;
 
-        //         await sendRequest(taskConfig);
-        //     }
+                const taskConfig = {
+                    method: 'post',
+                    url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/task`,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    data: JSON.stringify(task)
+                };
 
-        //     hideLoadingOverlay();
+                await sendRequest(taskConfig);
+            }
 
-        //     setShowSuccessMessage(true);
-        //     setTimeout(() => {
-        //         setShowSuccessMessage(false);
-        //     }, 3000);
+            hideLoadingOverlay();
 
-        // } catch (error) {
-        //     console.error("Error saving ticket and tasks:", error);
-        // }
+            setShowSuccessMessage(true);
+            setTimeout(() => {
+                setShowSuccessMessage(false);
+                window.location.reload();
+            }, 3000);
+
+        } catch (error) {
+            hideLoadingOverlay();
+            console.error("Error saving ticket and tasks:", error);
+        }
     };
 
     const statusOptions = {
@@ -431,6 +446,7 @@ const Modal = ({ data, onClose }) => {
                                             value={selectedHub}
                                             onChange={(e) => handleFieldChange('hub', e.target.value)}
                                         >
+                                            <option></option>
                                             {options.hub.map((option, index) => (
                                                 <option key={index} value={option}>
                                                     {option}
@@ -445,6 +461,7 @@ const Modal = ({ data, onClose }) => {
                                             onChange={(e) => handleFieldChange('unidade', e.target.value)}
                                             disabled={!selectedHub}
                                         >
+                                            <option></option>
                                             {options.unidade.map((option, index) => (
                                                 <option key={index} value={option}>
                                                     {option}
@@ -458,6 +475,7 @@ const Modal = ({ data, onClose }) => {
                                             value={selectedCategoria}
                                             onChange={(e) => handleFieldChange('categoria', e.target.value)}
                                         >
+                                            <option></option>
                                             {options.categoria.map((option, index) => (
                                                 <option key={index} value={option}>
                                                     {option}
@@ -472,6 +490,7 @@ const Modal = ({ data, onClose }) => {
                                             onChange={(e) => handleFieldChange('subcategoria', e.target.value)}
                                             disabled={!selectedCategoria}
                                         >
+                                            <option></option>
                                             {options.subcategoria.map((option, index) => (
                                                 <option key={index} value={option}>
                                                     {option}
@@ -486,6 +505,7 @@ const Modal = ({ data, onClose }) => {
                                             onChange={(e) => handleFieldChange('assunto', e.target.value)}
                                             disabled={!selectedSubcategoria}
                                         >
+                                            <option></option>
                                             {options.assunto.map((option, index) => (
                                                 <option key={index} value={option}>
                                                     {option}
@@ -590,16 +610,20 @@ const Modal = ({ data, onClose }) => {
                                     <textarea className="textarea-atividade" placeholder="Descrição" id="descricao-task"></textarea>
                                     <p><strong>Status:</strong>
                                         <select id="status-task">
+                                            <option></option>
                                             {options.status.map((status, index) => (
                                                 <option key={index} value={status}>{status}</option>
                                             ))}
                                         </select>
                                     </p>
+                                    <p><strong>Destinatário:</strong>
                                     <select className="select-destinatario" id="executor-task">
+                                        <option></option>
                                         {options.destinatarios.map((destinatario, index) => (
                                             <option key={index} value={destinatario}>{destinatario}</option>
                                         ))}
                                     </select>
+                                    </p>
                                     <div className="switch-container">
                                         <label className="switch-label">
                                             <input type="radio" name="visibilidade" value="Pública" className="radio-visibilidade" />
