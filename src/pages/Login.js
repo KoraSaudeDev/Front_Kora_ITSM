@@ -31,10 +31,35 @@ const Login = () => {
 
   }, [login, navigate]);
 
-  const onSuccess = async (res) => {
+  // const onSuccess = async (res) => {
+  //   try {
+  //     const token = res?.credential;
+  //     const user = jwtDecode(token);
+
+  //     const config = {
+  //       method: 'get',
+  //       maxBodyLength: Infinity,
+  //       url: `${process.env.REACT_APP_API_BASE_URL}/access/meus-grupos?email=${user.email}`,
+  //       headers: {}
+  //     };
+
+  //     const response = await axios.request(config);
+
+  //     const roles = response.data.map(item => item.papel);
+  //     user.cargo = roles;
+
+  //     login(user);
+  //     navigate('/atendimentos/minha-equipe');
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+
+  const onSuccess = async () => {
     try {
-      const token = res?.credential;
-      const user = jwtDecode(token);
+      const user = {}
+      user.name = document.querySelector('#nome').value;
+      user.email = document.querySelector('#email').value
 
       const config = {
         method: 'get',
@@ -66,13 +91,16 @@ const Login = () => {
 
 
         <h2>Kora System</h2>
-        <GoogleLogin
+        <input type="text" id="nome" placeholder="Digite seu Nome"/>
+        <input type="text" id="email" placeholder="Digite seu Email"/>
+        <input type="button" id="btn" value="Enviar" onClick={onSuccess}/>
+        {/* <GoogleLogin
           onSuccess={onSuccess}
           onError={onFailure}
           useOneTap
           className="google-login-button"
           theme="outline"
-        />
+        /> */}
       </div>
     </div>
   );
