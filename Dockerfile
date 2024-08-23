@@ -17,14 +17,8 @@ COPY . .
 ARG REACT_APP_API_BASE_URL
 ENV REACT_APP_API_BASE_URL=$REACT_APP_API_BASE_URL
 
-# Compila o projeto para produção
-RUN npm run build
-
-# Instala um servidor web estático para servir os arquivos
-RUN npm install -g serve
-
-# Expõe a porta onde o servidor irá rodar
+# Exponha a porta em que a aplicação irá rodar
 EXPOSE 3000
 
-# Comando para rodar o servidor web estático
-CMD ["serve", "-s", "build"]
+# Comando para iniciar a aplicação com npm start
+CMD ["npm", "start"]
