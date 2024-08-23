@@ -422,6 +422,10 @@ textarea {
 .botao-salvar-ticket:hover {
     background-color: #005bb5;
 }
+a{
+    text-decoration: none;
+    color: #28a745;
+}
 
 .success-message {
     background-color: #f8f9fa;
