@@ -106,7 +106,6 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
 
     const handleSearchChange = async (e) => {
         setCurrentPage(1);
-        showLoadingOverlay();
 
         let config = {
             method: 'post',
@@ -121,7 +120,6 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         const response = await axios.request(config);
         setAtendimentos(response.data.tickets);
         setTotalPages(Math.ceil(response.data.total_items / itemsPerPage));
-        hideLoadingOverlay();
     };
 
     const handlePageClick = (pageNumber) => {
