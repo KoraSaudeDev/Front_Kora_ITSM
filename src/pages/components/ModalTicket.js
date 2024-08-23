@@ -7,6 +7,7 @@ const Modal = ({ data, onClose }) => {
     const { user } = useAuth();
     const [inicio, setInicio] = useState('');
     const [showAtividadesModal, setShowAtividadesModal] = useState(false);
+    const [activeTab, setActiveTab] = useState('tickets');
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
     const [isClosingAtividadesModal, setIsClosingAtividadesModal] = useState(false);
     const [atividades, setAtividades] = useState([]);
@@ -24,8 +25,9 @@ const Modal = ({ data, onClose }) => {
         categoria: [],
         subcategoria: [],
         assunto: [],
+        status: [],
+        destinatarios: []
     });
-    const [activeTab, setActiveTab] = useState('tickets'); // New state for tabs
 
     useEffect(() => {
         axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/hub`)
@@ -83,21 +85,56 @@ const Modal = ({ data, onClose }) => {
     }, [data.id]);
 
     useEffect(() => {
+        const formatCustomDate = (date) => {
+            const padToTwoDigits = (num) => String(num).padStart(2, '0');
+
+            const year = date.getFullYear();
+            const month = padToTwoDigits(date.getMonth() + 1);
+            const day = padToTwoDigits(date.getDate());
+            const hours = padToTwoDigits(date.getHours());
+            const minutes = padToTwoDigits(date.getMinutes());
+            const seconds = padToTwoDigits(date.getSeconds());
+
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        };
+
+
         if (showAtividadesModal) {
-          const now = new Date();
-          const formattedDate = now.toLocaleString('pt-BR', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-          });
-          setInicio(formattedDate.replace(',', ''));
+            const now = new Date();
+            const formattedDate = formatCustomDate(now);
+            setInicio(formattedDate);
         }
-      }, [showAtividadesModal]);
+    }, [showAtividadesModal]);
+
+
+
+    useEffect(() => {
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/status`)
+            .then(response => {
+                setOptions(prevOptions => ({ ...prevOptions, status: response.data }));
+            })
+            .catch(error => {
+                console.error('Error fetching status options:', error);
+            });
+
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/usuarios-executores`)
+            .then(response => {
+                setOptions(prevOptions => ({ ...prevOptions, destinatarios: response.data }));
+            })
+            .catch(error => {
+                console.error('Error fetching destinatarios options:', error);
+            });
+    }, []);
 
     if (!data) return null;
+
+    const showLoadingOverlay = () => {
+        document.getElementById('loading-overlay').style.display = 'flex';
+    };
+
+    const hideLoadingOverlay = () => {
+        document.getElementById('loading-overlay').style.display = 'none';
+    };
 
     const handleAbrirAtividadesModal = () => {
         setAtividadeSelecionada(null);
@@ -114,30 +151,50 @@ const Modal = ({ data, onClose }) => {
     };
 
     const handleSalvarAtividade = () => {
-        const descricao = document.querySelector('.conteudo-modal-atividades textarea').value.trim();
-        const destinatario = document.querySelector('.conteudo-modal-atividades select').value;
-        const visibilidade = document.querySelector('input[name="visibilidade"]:checked');
-        const anexo = document.querySelector('#anexoAtividade').files[0]?.name || 'Nenhum anexo';
+        const aberto_em = document.querySelector('#inicio-task').value;
+        const aberto_por = document.querySelector('#aberto-por-task').value;
+        const descricao = document.querySelector('#descricao-task').value.trim();
+        const executor = document.querySelector('#executor-task').value;
+        const status = document.querySelector('#status-task').value;
+        const tipo_atividade = document.querySelector('input[name="visibilidade"]:checked').value;
 
-        if (!descricao || !destinatario || !visibilidade) {
-            alert("Por favor, preencha todos os campos obrigatórios.");
-            return;
-        }
+        // if (!descricao || !destinatario || !visibilidade) {
+        //     alert("Por favor, preencha todos os campos obrigatórios.");
+        //     return;
+        // }
 
         const novaAtividade = {
+            cod_fluxo: data.id,
+            alterar: 1,
+            aberto_em,
+            aberto_por,
+            status,
             descricao,
-            destinatario,
-            visibilidade: visibilidade.value,
-            anexo
+            executor,
+            tipo_atividade
         };
+
+        if (atividades.length > 0) {
+            const ultimaAtividadeIndex = atividades.length - 1;
+            const ultimaAtividade = atividades[ultimaAtividadeIndex];
+
+            ultimaAtividade.alterar = 1;
+
+            if (!ultimaAtividade.dt_fim) {
+                ultimaAtividade.dt_fim = inicio;
+            }
+            if (!ultimaAtividade.ds_concluido_por) {
+                ultimaAtividade.ds_concluido_por = aberto_por;
+            }
+
+            const updatedAtividades = [...atividades];
+            updatedAtividades[ultimaAtividadeIndex] = ultimaAtividade;
+
+            setAtividades(updatedAtividades);
+        }
 
         setAtividades([...atividades, novaAtividade]);
         handleFecharAtividadesModal();
-    };
-
-    const handleRemoverAtividade = (index) => {
-        const novasAtividades = atividades.filter((_, i) => i !== index);
-        setAtividades(novasAtividades);
     };
 
     const handleAbrirDetalhesAtividade = (atividade) => {
@@ -176,11 +233,99 @@ const Modal = ({ data, onClose }) => {
         setPrioridadeSelecionada(prioridade);
     };
 
-    const handleSalvarTicket = () => {
-        setShowSuccessMessage(true);
-        setTimeout(() => {
-            setShowSuccessMessage(false);
-        }, 3000);
+    const handleSalvarTicket = async () => {
+        function toTitleCase(str) {
+            if (str === "EM ATENDIMENTO") return "Em Andamento";
+            return str
+                .toLowerCase()
+                .split(' ')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+        }
+
+        //showLoadingOverlay();
+
+        const update_tasks = atividades
+            .filter(task => task.alterar === 1 && task.id !== undefined)
+            .map(task => ({
+                cod_task: task.cod_task,
+                ds_concluido_por: task.ds_concluido_por,
+                dt_fim: task.dt_fim,
+            }));
+
+        const insert_tasks = atividades.filter(task => task.alterar === 1 && task.id === undefined);
+
+        const ultimoItem = atividades[atividades.length - 1];
+
+        const update_tickets = {
+            hub: selectedHub,
+            unidade: selectedUnidade,
+            categoria: selectedCategoria,
+            subcategoria: selectedSubcategoria,
+            assunto: selectedAssunto,
+            ds_nivel: prioridadeSelecionada,
+            status: ultimoItem ? toTitleCase(ultimoItem.status) : null,
+            grupo: ultimoItem ? ultimoItem.executor : null,
+            sla: prioridades.find(line => line.prioridade === prioridadeSelecionada)?.sla
+        };
+
+        const sendRequest = async (config) => {
+            try {
+                const response = await axios.request(config);
+                console.log(JSON.stringify(response.data));
+            } catch (error) {
+                console.error('Request Error:', error);
+            }
+        };
+
+        // try {
+        //     const ticketConfig = {
+        //         method: 'patch',
+        //         url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/${data.cod_fluxo}`,
+        //         headers: {
+        //             'Content-Type': 'application/json'
+        //         },
+        //         data: JSON.stringify(update_tickets)
+        //     };
+
+        //     await sendRequest(ticketConfig);
+
+        //     for (const task of update_tasks) {
+        //         const taskConfig = {
+        //             method: 'patch',
+        //             url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/task/${task.cod_task}`,
+        //             headers: {
+        //                 'Content-Type': 'application/json'
+        //             },
+        //             data: JSON.stringify(task)
+        //         };
+
+        //         await sendRequest(taskConfig);
+        //     }
+
+        //     for (const task of insert_tasks) {
+        //         const taskConfig = {
+        //             method: 'post',
+        //             url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/task`,
+        //             headers: {
+        //                 'Content-Type': 'application/json'
+        //             },
+        //             data: JSON.stringify(task)
+        //         };
+
+        //         await sendRequest(taskConfig);
+        //     }
+
+        //     hideLoadingOverlay();
+
+        //     setShowSuccessMessage(true);
+        //     setTimeout(() => {
+        //         setShowSuccessMessage(false);
+        //     }, 3000);
+
+        // } catch (error) {
+        //     console.error("Error saving ticket and tasks:", error);
+        // }
     };
 
     const statusOptions = {
@@ -197,7 +342,36 @@ const Modal = ({ data, onClose }) => {
         "No Prazo": "#28a745"
     };
 
-    const prioridades = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7'];
+    const prioridades = [
+        {
+            "prioridade": "P1",
+            "sla": "240"
+        },
+        {
+            "prioridade": "P2",
+            "sla": "480"
+        },
+        {
+            "prioridade": "P3",
+            "sla": "1200"
+        },
+        {
+            "prioridade": "P4",
+            "sla": "1800"
+        },
+        {
+            "prioridade": "P5",
+            "sla": "3000"
+        },
+        {
+            "prioridade": "P6",
+            "sla": "4200"
+        },
+        {
+            "prioridade": "P7",
+            "sla": "9000"
+        }
+    ];
 
     return (
         <div>
@@ -253,6 +427,7 @@ const Modal = ({ data, onClose }) => {
                                     <p><strong>Área de Negócio:</strong> {data.area_negocio}</p>
                                     <p><strong>HUB:</strong>
                                         <select
+                                            id="hub-ticket"
                                             value={selectedHub}
                                             onChange={(e) => handleFieldChange('hub', e.target.value)}
                                         >
@@ -265,6 +440,7 @@ const Modal = ({ data, onClose }) => {
                                     </p>
                                     <p><strong>Unidade de Negócio:</strong>
                                         <select
+                                            id="unidade-ticket"
                                             value={selectedUnidade}
                                             onChange={(e) => handleFieldChange('unidade', e.target.value)}
                                             disabled={!selectedHub}
@@ -278,6 +454,7 @@ const Modal = ({ data, onClose }) => {
                                     </p>
                                     <p><strong>Categoria:</strong>
                                         <select
+                                            id="categoria"
                                             value={selectedCategoria}
                                             onChange={(e) => handleFieldChange('categoria', e.target.value)}
                                         >
@@ -290,6 +467,7 @@ const Modal = ({ data, onClose }) => {
                                     </p>
                                     <p><strong>Subcategoria:</strong>
                                         <select
+                                            id="subcategoria"
                                             value={selectedSubcategoria}
                                             onChange={(e) => handleFieldChange('subcategoria', e.target.value)}
                                             disabled={!selectedCategoria}
@@ -303,6 +481,7 @@ const Modal = ({ data, onClose }) => {
                                     </p>
                                     <p><strong>Assunto:</strong>
                                         <select
+                                            id="assunto"
                                             value={selectedAssunto}
                                             onChange={(e) => handleFieldChange('assunto', e.target.value)}
                                             disabled={!selectedSubcategoria}
@@ -332,11 +511,11 @@ const Modal = ({ data, onClose }) => {
                                         <div className="botoes-prioridades">
                                             {prioridades.map(prioridade => (
                                                 <button
-                                                    key={prioridade}
-                                                    className={`botao-prioridade ${prioridadeSelecionada === prioridade ? 'active' : ''}`}
-                                                    onClick={() => handlePrioridadeClick(prioridade)}
+                                                    key={prioridade.prioridade}
+                                                    className={`botao-prioridade ${prioridadeSelecionada === prioridade.prioridade ? 'active' : ''}`}
+                                                    onClick={() => handlePrioridadeClick(prioridade.prioridade)}
                                                 >
-                                                    {prioridade}
+                                                    {prioridade.prioridade}
                                                 </button>
                                             ))}
                                         </div>
@@ -349,12 +528,8 @@ const Modal = ({ data, onClose }) => {
                                 <button className="botao-atividades" onClick={handleAbrirAtividadesModal}>
                                     <FaPlus style={{ marginRight: '8px' }} /> Nova Atividade
                                 </button>
-                                {atividades.map((atividade, index) => (
+                                {atividades.slice().reverse().map((atividade, index) => (
                                     <div className="card-atividade" key={index} onClick={() => handleAbrirDetalhesAtividade(atividade)}>
-                                        <button className="remover-atividade" onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleRemoverAtividade(index);
-                                        }}>×</button>
                                         <p><strong>Cód. Task:</strong> {atividade.cod_task}</p>
                                         <p><strong>Status:</strong> {atividade.status}</p>
                                         <p><strong>Início:</strong> {atividade.aberto_em}</p>
@@ -410,32 +585,28 @@ const Modal = ({ data, onClose }) => {
                             ) : (
                                 <>
                                     <h3>Atividades do Ticket #{data.cod_fluxo}</h3>
-                                    <p><strong>Início:</strong> {inicio}</p>
-                                    <p><strong>Aberto Por:</strong> {user.name}</p>
-                                    <textarea className="textarea-atividade" placeholder="Descrição"></textarea>
+                                    <p><strong>Início:</strong><input type="text" id="inicio-task" value={inicio} readOnly /> </p>
+                                    <p><strong>Aberto Por:</strong><input type="text" id="aberto-por-task" value={user.name} readOnly /> </p>
+                                    <textarea className="textarea-atividade" placeholder="Descrição" id="descricao-task"></textarea>
                                     <p><strong>Status:</strong>
-                                        <select>
-                                            <option>AGENDADA</option>
-                                            <option>AGUARDANDO RETORNO</option>
-                                            <option>AGUARDANDO RETORNO FORNECEDOR</option>
-                                            <option>EM ABERTO</option>
-                                            <option>EM ATENDIMENTO</option>
-                                            <option>FINALIZADO</option>
+                                        <select id="status-task">
+                                            {options.status.map((status, index) => (
+                                                <option key={index} value={status}>{status}</option>
+                                            ))}
                                         </select>
                                     </p>
-                                    <select className="select-destinatario">
-                                        <option value="">Selecionar Destinatário</option>
-                                        {[...Array(10).keys()].map(i => (
-                                            <option key={i} value={`Opção ${i + 1}`}>Opção {i + 1}</option>
+                                    <select className="select-destinatario" id="executor-task">
+                                        {options.destinatarios.map((destinatario, index) => (
+                                            <option key={index} value={destinatario}>{destinatario}</option>
                                         ))}
                                     </select>
                                     <div className="switch-container">
                                         <label className="switch-label">
-                                            <input type="radio" name="visibilidade" value="publica" className="radio-visibilidade" />
+                                            <input type="radio" name="visibilidade" value="Pública" className="radio-visibilidade" />
                                             Pública
                                         </label>
                                         <label className="switch-label">
-                                            <input type="radio" name="visibilidade" value="privada" className="radio-visibilidade" checked />
+                                            <input type="radio" name="visibilidade" value="Privada" className="radio-visibilidade" />
                                             Privada
                                         </label>
                                     </div>
