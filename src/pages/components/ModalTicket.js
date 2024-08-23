@@ -10,6 +10,7 @@ const Modal = ({ data, onClose }) => {
     const [activeTab, setActiveTab] = useState('tickets');
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
     const [isClosingAtividadesModal, setIsClosingAtividadesModal] = useState(false);
+    const [isClosingModal, setIsClosingModal] = useState(false); 
     const [atividades, setAtividades] = useState([]);
     const [atividadeSelecionada, setAtividadeSelecionada] = useState(null);
     const [isEditMode, setIsEditMode] = useState(false);
@@ -272,13 +273,13 @@ const Modal = ({ data, onClose }) => {
             sla: prioridades.find(line => line.prioridade === prioridadeSelecionada)?.sla
         };
 
-        if (update_tickets.status === "Finalizado"){
+        if (update_tickets.status === "Finalizado") {
             update_tickets.finalizado_por = ultimoItem.aberto_por;
             update_tickets.data_fim = ultimoItem.aberto_em;
             update_tickets.bl_reabertura = 1;
         }
 
-        console.log(update_tickets)
+        console.log(update_tickets);
 
         const sendRequest = async (config) => {
             try {
@@ -343,6 +344,14 @@ const Modal = ({ data, onClose }) => {
         }
     };
 
+    const handleCloseModal = () => {
+        setIsClosingModal(true); 
+        setTimeout(() => {
+            onClose(); 
+            setIsClosingModal(false); 
+        }, 500);
+    };
+
     const statusOptions = {
         "Em Andamento": "#ffc107",
         "Aguardando Retorno Fornecedor": "#17a2b8",
@@ -391,8 +400,8 @@ const Modal = ({ data, onClose }) => {
     return (
         <div>
             <div className="modal-overlay">
-                <div className="modal">
-                    <button className="fechar-modal" onClick={onClose}><FaTimes /></button>
+                <div className={`modal ${isClosingModal ? 'fechar' : ''}`}>
+                    <button className="fechar-modal" onClick={handleCloseModal}><FaTimes /></button>
                     <div className="modal-tabs">
                         <button
                             className={`tab ${activeTab === 'tickets' ? 'active' : ''}`}
@@ -440,79 +449,6 @@ const Modal = ({ data, onClose }) => {
                                     <p><strong>E-mail Solicitante:</strong> {data.email_solicitante}</p>
                                     <p><strong>Cargo:</strong> {data.cargo_solic}</p>
                                     <p><strong>Área de Negócio:</strong> {data.area_negocio}</p>
-                                    <p><strong>HUB:</strong>
-                                        <select
-                                            id="hub-ticket"
-                                            value={selectedHub}
-                                            onChange={(e) => handleFieldChange('hub', e.target.value)}
-                                        >
-                                            <option></option>
-                                            {options.hub.map((option, index) => (
-                                                <option key={index} value={option}>
-                                                    {option}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </p>
-                                    <p><strong>Unidade de Negócio:</strong>
-                                        <select
-                                            id="unidade-ticket"
-                                            value={selectedUnidade}
-                                            onChange={(e) => handleFieldChange('unidade', e.target.value)}
-                                            disabled={!selectedHub}
-                                        >
-                                            <option></option>
-                                            {options.unidade.map((option, index) => (
-                                                <option key={index} value={option}>
-                                                    {option}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </p>
-                                    <p><strong>Categoria:</strong>
-                                        <select
-                                            id="categoria"
-                                            value={selectedCategoria}
-                                            onChange={(e) => handleFieldChange('categoria', e.target.value)}
-                                        >
-                                            <option></option>
-                                            {options.categoria.map((option, index) => (
-                                                <option key={index} value={option}>
-                                                    {option}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </p>
-                                    <p><strong>Subcategoria:</strong>
-                                        <select
-                                            id="subcategoria"
-                                            value={selectedSubcategoria}
-                                            onChange={(e) => handleFieldChange('subcategoria', e.target.value)}
-                                            disabled={!selectedCategoria}
-                                        >
-                                            <option></option>
-                                            {options.subcategoria.map((option, index) => (
-                                                <option key={index} value={option}>
-                                                    {option}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </p>
-                                    <p><strong>Assunto:</strong>
-                                        <select
-                                            id="assunto"
-                                            value={selectedAssunto}
-                                            onChange={(e) => handleFieldChange('assunto', e.target.value)}
-                                            disabled={!selectedSubcategoria}
-                                        >
-                                            <option></option>
-                                            {options.assunto.map((option, index) => (
-                                                <option key={index} value={option}>
-                                                    {option}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </p>
                                     <p><strong>Descrição:</strong> {data.descricao}</p>
                                     <p style={{ display: 'flex', alignItems: 'center' }}><strong>Anexo:</strong>&nbsp;
                                         <a href={URL.createObjectURL(new Blob([data.autorizacao]))} target="_blank" rel="noopener noreferrer" style={{ marginRight: '5px' }}>
@@ -540,11 +476,88 @@ const Modal = ({ data, onClose }) => {
                                             ))}
                                         </div>
                                     </div>
+
+                                    {/* Mover os campos editáveis para cá */}
+                                    <div className="campos-editaveis">
+                                        <p><strong>HUB:</strong>
+                                            <select
+                                                id="hub-ticket"
+                                                value={selectedHub}
+                                                onChange={(e) => handleFieldChange('hub', e.target.value)}
+                                            >
+                                                <option></option>
+                                                {options.hub.map((option, index) => (
+                                                    <option key={index} value={option}>
+                                                        {option}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </p>
+                                        <p><strong>Unidade de Negócio:</strong>
+                                            <select
+                                                id="unidade-ticket"
+                                                value={selectedUnidade}
+                                                onChange={(e) => handleFieldChange('unidade', e.target.value)}
+                                                disabled={!selectedHub}
+                                            >
+                                                <option></option>
+                                                {options.unidade.map((option, index) => (
+                                                    <option key={index} value={option}>
+                                                        {option}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </p>
+                                        <p><strong>Categoria:</strong>
+                                            <select
+                                                id="categoria"
+                                                value={selectedCategoria}
+                                                onChange={(e) => handleFieldChange('categoria', e.target.value)}
+                                            >
+                                                <option></option>
+                                                {options.categoria.map((option, index) => (
+                                                    <option key={index} value={option}>
+                                                        {option}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </p>
+                                        <p><strong>Subcategoria:</strong>
+                                            <select
+                                                id="subcategoria"
+                                                value={selectedSubcategoria}
+                                                onChange={(e) => handleFieldChange('subcategoria', e.target.value)}
+                                                disabled={!selectedCategoria}
+                                            >
+                                                <option></option>
+                                                {options.subcategoria.map((option, index) => (
+                                                    <option key={index} value={option}>
+                                                        {option}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </p>
+                                        <p><strong>Assunto:</strong>
+                                            <select
+                                                id="assunto"
+                                                value={selectedAssunto}
+                                                onChange={(e) => handleFieldChange('assunto', e.target.value)}
+                                                disabled={!selectedSubcategoria}
+                                            >
+                                                <option></option>
+                                                {options.assunto.map((option, index) => (
+                                                    <option key={index} value={option}>
+                                                        {option}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </p>
+                                    </div>
                                 </div>
                             </>
                         )}
                         {activeTab === 'atividades' && (
-                            <div className="conteudo-modal-esquerda"> {/* Mantido o tamanho com conteudo-modal-esquerda */}
+                            <div className="conteudo-modal-esquerda">
                                 <button className="botao-atividades" onClick={handleAbrirAtividadesModal}>
                                     <FaPlus style={{ marginRight: '8px' }} /> Nova Atividade
                                 </button>
@@ -605,8 +618,14 @@ const Modal = ({ data, onClose }) => {
                             ) : (
                                 <>
                                     <h3>Atividades do Ticket #{data.cod_fluxo}</h3>
-                                    <p><strong>Início:</strong><input type="text" id="inicio-task" value={inicio} readOnly /> </p>
-                                    <p><strong>Aberto Por:</strong><input type="text" id="aberto-por-task" value={user.name} readOnly /> </p>
+                                    <div className="campo-detalhe">
+                                        <label htmlFor="inicio-task"><strong>Início:</strong></label>
+                                        <input type="text" id="inicio-task" value={inicio} readOnly />
+                                    </div>
+                                    <div className="campo-detalhe">
+                                        <label htmlFor="aberto-por-task"><strong>Aberto Por:</strong></label>
+                                        <input type="text" id="aberto-por-task" value={user.name} readOnly />
+                                    </div>
                                     <textarea className="textarea-atividade" placeholder="Descrição" id="descricao-task"></textarea>
                                     <p><strong>Status:</strong>
                                         <select id="status-task">
@@ -617,12 +636,12 @@ const Modal = ({ data, onClose }) => {
                                         </select>
                                     </p>
                                     <p><strong>Destinatário:</strong>
-                                    <select className="select-destinatario" id="executor-task">
-                                        <option></option>
-                                        {options.destinatarios.map((destinatario, index) => (
-                                            <option key={index} value={destinatario}>{destinatario}</option>
-                                        ))}
-                                    </select>
+                                        <select className="select-destinatario" id="executor-task">
+                                            <option></option>
+                                            {options.destinatarios.map((destinatario, index) => (
+                                                <option key={index} value={destinatario}>{destinatario}</option>
+                                            ))}
+                                        </select>
                                     </p>
                                     <div className="switch-container">
                                         <label className="switch-label">
