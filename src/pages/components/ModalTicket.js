@@ -65,7 +65,7 @@ const Modal = ({ data, onClose }) => {
 
     useEffect(() => {
         if (selectedSubcategoria) {
-            axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/assuntos?categoria=${selectedCategoria}&subcategoria={selectedSubcategoria}`)
+            axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/assuntos?categoria=${selectedCategoria}&subcategoria=${selectedSubcategoria}`)
                 .then(response => setOptions(prev => ({ ...prev, assunto: response.data.map(ass => ass.assunto) })))
                 .catch(error => console.error('Erro ao carregar assuntos:', error));
         } else {
@@ -420,8 +420,8 @@ const Modal = ({ data, onClose }) => {
 
     return (
         <div>
-            <div className="modal-overlay show">
-                <div className={`modal ${isClosingModal ? 'fechar' : 'show'}`}>
+            <div className="modal-overlay">
+                <div className={`modal ${isClosingModal ? 'fechar' : ''}`}>
                     <button className="fechar-modal" onClick={handleCloseModal}><FaTimes /></button>
                     
                     <div className="modal-header">
@@ -435,7 +435,7 @@ const Modal = ({ data, onClose }) => {
 
                     <div className="modal-filters">
                         <div className="campo-selecao">
-                            <label id='topo-button' onClick={() => handleToggleDropdown('categoria')} style={{ fontWeight: 'bold', cursor: 'pointer' }}>
+                            <label className="link-label" onClick={() => handleToggleDropdown('categoria')}>
                                 Categoria
                             </label>
                             {showCategoriaDropdown && (
@@ -453,7 +453,7 @@ const Modal = ({ data, onClose }) => {
                             )}
                         </div>
                         <div className="campo-selecao">
-                            <label id='topo-button' onClick={() => handleToggleDropdown('subcategoria')} style={{ fontWeight: 'bold', cursor: 'pointer' }}>
+                            <label className="link-label" onClick={() => handleToggleDropdown('subcategoria')}>
                                 Subcategoria
                             </label>
                             {showSubcategoriaDropdown && (
@@ -472,7 +472,7 @@ const Modal = ({ data, onClose }) => {
                             )}
                         </div>
                         <div className="campo-selecao">
-                            <label id='topo-button' onClick={() => handleToggleDropdown('assunto')} style={{ fontWeight: 'bold', cursor: 'pointer' }}>
+                            <label className="link-label" onClick={() => handleToggleDropdown('assunto')}>
                                 Assunto
                             </label>
                             {showAssuntoDropdown && (
@@ -610,8 +610,8 @@ const Modal = ({ data, onClose }) => {
             </div>
 
             {showAtividadesModal && (
-                <div className="modal-overlay show">
-                    <div className={`modal atividades-modal ${isClosingAtividadesModal ? 'fechar' : 'show'}`}>
+                <div className="modal-overlay">
+                    <div className={`modal atividades-modal ${isClosingAtividadesModal ? 'fechar' : ''}`}>
                         <button className="fechar-modal" onClick={handleFecharAtividadesModal}>×</button>
                         <div className="conteudo-modal-atividades">
                             {atividadeSelecionada ? (
