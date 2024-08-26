@@ -10,7 +10,7 @@ const Modal = ({ data, onClose }) => {
     const [activeTab, setActiveTab] = useState('tickets');
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
     const [isClosingAtividadesModal, setIsClosingAtividadesModal] = useState(false);
-    const [isClosingModal, setIsClosingModal] = useState(false); 
+    const [isClosingModal, setIsClosingModal] = useState(false);
     const [atividades, setAtividades] = useState([]);
     const [atividadeSelecionada, setAtividadeSelecionada] = useState(null);
     const [isEditMode, setIsEditMode] = useState(false);
@@ -98,7 +98,6 @@ const Modal = ({ data, onClose }) => {
 
             return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
         };
-
 
         if (showAtividadesModal) {
             const now = new Date();
@@ -279,8 +278,6 @@ const Modal = ({ data, onClose }) => {
             update_tickets.bl_reabertura = 1;
         }
 
-        console.log(update_tickets);
-
         const sendRequest = async (config) => {
             try {
                 const response = await axios.request(config);
@@ -420,7 +417,7 @@ const Modal = ({ data, onClose }) => {
                         {activeTab === 'tickets' && (
                             <>
                                 <div className="conteudo-modal-esquerda">
-                                    <h3>Detalhes do Ticket #{data.cod_fluxo}</h3>
+                                    <h3>Ticket #{data.cod_fluxo}</h3>
                                     <p><strong>Abertura:</strong> {data.abertura}</p>
                                     <p><strong>Status:</strong>
                                         <span
@@ -463,25 +460,27 @@ const Modal = ({ data, onClose }) => {
                                 </div>
                                 <div className="conteudo-modal-direita">
                                     <div className="campo-prioridades">
-                                        <label>Prioridade:</label>
-                                        <div className="botoes-prioridades">
+                                        <label className="campo-label">Prioridade:</label>
+                                        <select
+                                            className="campo-select combobox-prioridade"
+                                            value={prioridadeSelecionada}
+                                            onChange={(e) => handlePrioridadeClick(e.target.value)}
+                                        >
+                                            <option value="">Selecione a Prioridade</option>
                                             {prioridades.map(prioridade => (
-                                                <button
-                                                    key={prioridade.prioridade}
-                                                    className={`botao-prioridade ${prioridadeSelecionada === prioridade.prioridade ? 'active' : ''}`}
-                                                    onClick={() => handlePrioridadeClick(prioridade.prioridade)}
-                                                >
+                                                <option key={prioridade.prioridade} value={prioridade.prioridade}>
                                                     {prioridade.prioridade}
-                                                </button>
+                                                </option>
                                             ))}
-                                        </div>
+                                        </select>
                                     </div>
 
-                                    {/* Mover os campos editáveis para cá */}
                                     <div className="campos-editaveis">
-                                        <p><strong>HUB:</strong>
+                                        <div>
+                                            <label className="campo-label"><strong>HUB:</strong></label>
                                             <select
                                                 id="hub-ticket"
+                                                className="campo-select"
                                                 value={selectedHub}
                                                 onChange={(e) => handleFieldChange('hub', e.target.value)}
                                             >
@@ -492,10 +491,13 @@ const Modal = ({ data, onClose }) => {
                                                     </option>
                                                 ))}
                                             </select>
-                                        </p>
-                                        <p><strong>Unidade de Negócio:</strong>
+                                        </div>
+
+                                        <div>
+                                            <label className="campo-label"><strong>Unidade de Negócio:</strong></label>
                                             <select
                                                 id="unidade-ticket"
+                                                className="campo-select"
                                                 value={selectedUnidade}
                                                 onChange={(e) => handleFieldChange('unidade', e.target.value)}
                                                 disabled={!selectedHub}
@@ -507,10 +509,13 @@ const Modal = ({ data, onClose }) => {
                                                     </option>
                                                 ))}
                                             </select>
-                                        </p>
-                                        <p><strong>Categoria:</strong>
+                                        </div>
+
+                                        <div>
+                                            <label className="campo-label"><strong>Categoria:</strong></label>
                                             <select
                                                 id="categoria"
+                                                className="campo-select"
                                                 value={selectedCategoria}
                                                 onChange={(e) => handleFieldChange('categoria', e.target.value)}
                                             >
@@ -521,10 +526,13 @@ const Modal = ({ data, onClose }) => {
                                                     </option>
                                                 ))}
                                             </select>
-                                        </p>
-                                        <p><strong>Subcategoria:</strong>
+                                        </div>
+
+                                        <div>
+                                            <label className="campo-label"><strong>Subcategoria:</strong></label>
                                             <select
                                                 id="subcategoria"
+                                                className="campo-select"
                                                 value={selectedSubcategoria}
                                                 onChange={(e) => handleFieldChange('subcategoria', e.target.value)}
                                                 disabled={!selectedCategoria}
@@ -536,10 +544,13 @@ const Modal = ({ data, onClose }) => {
                                                     </option>
                                                 ))}
                                             </select>
-                                        </p>
-                                        <p><strong>Assunto:</strong>
+                                        </div>
+
+                                        <div>
+                                            <label className="campo-label"><strong>Assunto:</strong></label>
                                             <select
                                                 id="assunto"
+                                                className="campo-select"
                                                 value={selectedAssunto}
                                                 onChange={(e) => handleFieldChange('assunto', e.target.value)}
                                                 disabled={!selectedSubcategoria}
@@ -551,7 +562,7 @@ const Modal = ({ data, onClose }) => {
                                                     </option>
                                                 ))}
                                             </select>
-                                        </p>
+                                        </div>
                                     </div>
                                 </div>
                             </>
