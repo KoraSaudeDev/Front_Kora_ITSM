@@ -28,6 +28,9 @@ const Modal = ({ data, onClose }) => {
         status: [],
         destinatarios: []
     });
+    const [showCategoriaDropdown, setShowCategoriaDropdown] = useState(false);
+    const [showSubcategoriaDropdown, setShowSubcategoriaDropdown] = useState(false);
+    const [showAssuntoDropdown, setShowAssuntoDropdown] = useState(false);
 
     useEffect(() => {
         axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/hub`)
@@ -230,6 +233,28 @@ const Modal = ({ data, onClose }) => {
         setPrioridadeSelecionada(prioridade);
     };
 
+    const handleToggleDropdown = (dropdown) => {
+        switch (dropdown) {
+            case 'categoria':
+                setShowCategoriaDropdown(!showCategoriaDropdown);
+                setShowSubcategoriaDropdown(false);
+                setShowAssuntoDropdown(false);
+                break;
+            case 'subcategoria':
+                setShowSubcategoriaDropdown(!showSubcategoriaDropdown);
+                setShowCategoriaDropdown(false);
+                setShowAssuntoDropdown(false);
+                break;
+            case 'assunto':
+                setShowAssuntoDropdown(!showAssuntoDropdown);
+                setShowCategoriaDropdown(false);
+                setShowSubcategoriaDropdown(false);
+                break;
+            default:
+                break;
+        }
+    };
+
     const handleSalvarTicket = async () => {
         if (!selectedHub || !selectedUnidade || !selectedCategoria || !selectedSubcategoria || !selectedAssunto || !prioridadeSelecionada) {
             alert('Por favor, preencha todos os campos obrigatórios.');
@@ -410,48 +435,60 @@ const Modal = ({ data, onClose }) => {
 
                     <div className="modal-filters">
                         <div className="campo-selecao">
-                            <label>Categoria</label>
-                            <select
-                                value={selectedCategoria}
-                                onChange={(e) => handleFieldChange('categoria', e.target.value)}
-                            >
-                                <option></option>
-                                {options.categoria.map((option, index) => (
-                                    <option key={index} value={option}>
-                                        {option}
-                                    </option>
-                                ))}
-                            </select>
+                            <label id='topo-button' onClick={() => handleToggleDropdown('categoria')} style={{ fontWeight: 'bold', cursor: 'pointer' }}>
+                                Categoria
+                            </label>
+                            {showCategoriaDropdown && (
+                                <select
+                                    value={selectedCategoria}
+                                    onChange={(e) => handleFieldChange('categoria', e.target.value)}
+                                >
+                                    <option></option>
+                                    {options.categoria.map((option, index) => (
+                                        <option key={index} value={option}>
+                                            {option}
+                                        </option>
+                                    ))}
+                                </select>
+                            )}
                         </div>
                         <div className="campo-selecao">
-                            <label>Subcategoria</label>
-                            <select
-                                value={selectedSubcategoria}
-                                onChange={(e) => handleFieldChange('subcategoria', e.target.value)}
-                                disabled={!selectedCategoria}
-                            >
-                                <option></option>
-                                {options.subcategoria.map((option, index) => (
-                                    <option key={index} value={option}>
-                                        {option}
-                                    </option>
-                                ))}
-                            </select>
+                            <label id='topo-button' onClick={() => handleToggleDropdown('subcategoria')} style={{ fontWeight: 'bold', cursor: 'pointer' }}>
+                                Subcategoria
+                            </label>
+                            {showSubcategoriaDropdown && (
+                                <select
+                                    value={selectedSubcategoria}
+                                    onChange={(e) => handleFieldChange('subcategoria', e.target.value)}
+                                    disabled={!selectedCategoria}
+                                >
+                                    <option></option>
+                                    {options.subcategoria.map((option, index) => (
+                                        <option key={index} value={option}>
+                                            {option}
+                                        </option>
+                                    ))}
+                                </select>
+                            )}
                         </div>
                         <div className="campo-selecao">
-                            <label>Assunto</label>
-                            <select
-                                value={selectedAssunto}
-                                onChange={(e) => handleFieldChange('assunto', e.target.value)}
-                                disabled={!selectedSubcategoria}
-                            >
-                                <option></option>
-                                {options.assunto.map((option, index) => (
-                                    <option key={index} value={option}>
-                                        {option}
-                                    </option>
-                                ))}
-                            </select>
+                            <label id='topo-button' onClick={() => handleToggleDropdown('assunto')} style={{ fontWeight: 'bold', cursor: 'pointer' }}>
+                                Assunto
+                            </label>
+                            {showAssuntoDropdown && (
+                                <select
+                                    value={selectedAssunto}
+                                    onChange={(e) => handleFieldChange('assunto', e.target.value)}
+                                    disabled={!selectedSubcategoria}
+                                >
+                                    <option></option>
+                                    {options.assunto.map((option, index) => (
+                                        <option key={index} value={option}>
+                                            {option}
+                                        </option>
+                                    ))}
+                                </select>
+                            )}
                         </div>
                     </div>
 
