@@ -5,8 +5,8 @@ import './index.css';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 const rootElement = document.getElementById('root');
-//ReactDOM.render(<GoogleOAuthProvider clientId="759061524098-2lds7su9bpuoij6tapvq425s2hormnnd.apps.googleusercontent.com"><App /></GoogleOAuthProvider>, rootElement);
-ReactDOM.render(<App />, rootElement);
+ReactDOM.render(<GoogleOAuthProvider clientId="759061524098-2lds7su9bpuoij6tapvq425s2hormnnd.apps.googleusercontent.com"><App /></GoogleOAuthProvider>, rootElement);
+//ReactDOM.render(<App />, rootElement);
 
 
 window.addEventListener('load', () => {
