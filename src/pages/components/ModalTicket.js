@@ -501,7 +501,7 @@ const Modal = ({ data, onClose }) => {
                             </p>
 
                             <div className="campo-editavel">
-                                <strong>Prioridade</strong>
+                                <strong>Prioridade:</strong>
                                 <select
                                     value={prioridadeSelecionada}
                                     onChange={(e) => handlePrioridadeClick(e.target.value)}
@@ -514,7 +514,7 @@ const Modal = ({ data, onClose }) => {
                                 </select>
                             </div>
                             <div className="campo-editavel">
-                                <strong>Hub</strong>
+                                <strong>Hub:</strong>
                                 <select
                                     value={selectedHub}
                                     onChange={(e) => handleFieldChange('hub', e.target.value)}
@@ -528,7 +528,7 @@ const Modal = ({ data, onClose }) => {
                                 </select>
                             </div>
                             <div className="campo-editavel">
-                                <strong>Unidade de Negócio</strong>
+                                <strong>Unidade de Negócio:</strong>
                                 <select
                                     value={selectedUnidade}
                                     onChange={(e) => handleFieldChange('unidade', e.target.value)}
