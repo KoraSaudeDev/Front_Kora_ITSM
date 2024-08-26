@@ -75,21 +75,30 @@ body {
     padding: 20px;
     border-radius: 8px;
     width: 80%;
+    max-width: 1200px;
     height: 80%;
-    max-width: 80%;
     max-height: 80%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; 
     overflow-y: auto; 
-    overflow-x: hidden; 
     position: relative;
-    animation: scaleUp 0.5s ease-in-out;
-    transition: transform 0.5s ease-in-out, opacity 0.3s ease;
+    scrollbar-width: thin; /* Largura fina no Firefox */
+    scrollbar-color: #c2c2c2 transparent; /* Cor da bolinha e do track */
 }
+
+
+
 
 .modal.fechar {
     animation: scaleDown 0.5s ease-in-out forwards;
 }
 
-
+h3{
+    color: #3E4676;
+    font-weight: 100;
+    font-size: 30px;
+}
 
 .modal.atividades-modal {
     width: 80%;
@@ -148,10 +157,14 @@ body {
     border: 1px solid #ddd;
     border-top: none;
     border-radius: 0 5px 5px 5px;
+    
 }
 
 .conteudo-modal-esquerda {
     flex: 0.5;
+    background-color:#eeeeee;
+    
+    border-radius: 4px;
 }
 
 .conteudo-modal-direita {
@@ -380,6 +393,7 @@ textarea {
     font-weight: 300;
     width: 140px;
     margin-top: 20px;
+    margin-bottom: 20px;
     border: none;
     background-color: #007aff;
     border-radius: 8px;
@@ -411,7 +425,7 @@ textarea {
     background-color: #007aff;
     color: white;
     border-radius: 4px;
-    height: 50px;
+    height: 40px;
     width: 150px;
     cursor: pointer;
     transition: background-color 0.3s ease;
@@ -657,8 +671,8 @@ a{
     display: flex;
     flex-direction: column;
     gap: 3px;
-    width: auto;
-    max-width: 1200px;
+    width: 98%;
+    
     cursor: pointer;
     height: auto;
     min-height: 40px;
@@ -824,16 +838,227 @@ svg {
 
 .campo-label {
     display: block;
-    margin-bottom: 4px; 
+    margin-bottom: 4px;
     font-weight: bold;
 }
 
-.campo-select {
+.campo-select, .textarea-atividade, .input-anexo, .select-destinatario {
     display: block;
-    width: 100%; 
-    padding: 8px; 
-    margin-bottom: 16px; 
-    border-radius: 4px; 
-    border: 1px solid #ccc; 
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 16px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
     font-size: 14px;
 }
+
+.botao-salvar-container {
+    text-align: right;
+    margin-top: 20px;
+}
+
+.botao-salvar-ticket {
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.botao-salvar-ticket:hover {
+    background-color: #218838;
+}
+
+.modal-overlay {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+
+
+.fechar-modal {
+    background: none;
+    border: none;
+    font-size: 24px;
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    cursor: pointer;
+}
+
+.modal-tabs {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.tab {
+    background: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    flex-grow: 1;
+    text-align: center;
+    margin-right: 10px;
+}
+
+.tab:last-child {
+    margin-right: 0;
+}
+
+.tab.active {
+    background: #0056b3;
+}
+
+.campo-atividades {
+    margin-top: -20px;
+}
+
+.card-atividade {
+    background-color: #f8f9fa;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.icone-anexo {
+    font-size: 18px;
+    color: #007bff;
+}
+a{
+    color:#007bff;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+.botao-salvar-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-right: 20px;
+}
+
+.modal-filters {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+.campo-selecao {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    padding: 0 10px;
+}
+
+.campo-selecao label {
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.campo-selecao select {
+    padding: 5px;
+    width: 100%;
+}
+
+.conteudo-modal {
+    display: flex;
+    padding: 20px;
+}
+
+.conteudo-modal-esquerda,
+.conteudo-modal-direita {
+    flex: 1;
+    padding: 10px 20px;
+}
+
+.campo-editavel {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+.campo-editavel label {
+    margin-bottom: 5px;
+}
+
+.campo-editavel select {
+    padding: 5px;
+    width: 100%;
+}
+
+.campo-atividades {
+    padding: 20px;
+}
+
+.card-atividade {
+    width: 100%;
+    background-color: #f8f9fa;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.card-atividade:hover {
+    background-color: #e9ecef;
+}
+
+.botao-salvar-ticket {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.botao-salvar-ticket:hover {
+    background-color: #0056b3;
+}
+
+.botao-atividades {
+    padding: 8px 16px;
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.botao-atividades:hover {
+    background-color: #218838;
+}
+
+.status-bolinha,
+.sla-bolinha {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
