@@ -89,14 +89,64 @@ body {
     animation: scaleUp 0.5s ease-in-out forwards;
 }
 
-.modal.fechar {
-    animation: scaleDown 0.5s ease-in-out forwards;
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    border-bottom: 1px solid #ddd;
+    position: relative;
 }
 
 h3 {
     color: #3E4676;
     font-weight: 100;
     font-size: 30px;
+    margin: 0;
+}
+
+.botao-salvar-container {
+    margin-left: auto;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.botao-salvar-ticket {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+    align-self: center;
+    margin:0px 20px;
+}
+
+.botao-salvar-ticket:hover {
+    background-color: #0056b3;
+}
+
+.fechar-modal {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    position: relative;
+    align-self: center;
+    align-items: center;
+    display: flex;
+}
+
+.fechar-modal:hover svg {
+    color: rgb(201, 23, 23);
+    transform: scale(1.1);
+}
+
+.modal.fechar {
+    animation: scaleDown 0.5s ease-in-out forwards;
 }
 
 .modal.atividades-modal {
@@ -113,14 +163,8 @@ h3 {
     overflow-y: auto;
 }
 
-.fechar-modal {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
+.conteudo-modal-atividades{
+    padding-top: 15px;
 }
 
 .botoes-modal {
@@ -433,25 +477,6 @@ textarea {
     background-color: #004494;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     transform: translateY(1px);
-}
-
-.botao-salvar-ticket {
-    font-weight: 500;
-    border: none;
-    background-color: #007aff;
-    color: white;
-    border-radius: 4px;
-    height: 40px;
-    width: 150px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    align-self: flex-end;
-    margin-top: 20px;
-    float: right;
-}
-
-.botao-salvar-ticket:hover {
-    background-color: #005bb5;
 }
 
 a {
@@ -805,12 +830,6 @@ svg {
     transition: background-color 0.3s ease;
 }
 
-.fechar-modal:hover svg,
-.atividades-modal .fechar-modal:hover svg {
-    color: rgb(201, 23, 23);
-    transform: scale(1.1);
-}
-
 .campo-detalhe {
     margin-bottom: 15px;
 }
@@ -870,25 +889,6 @@ svg {
     font-size: 14px;
 }
 
-.botao-salvar-container {
-    text-align: right;
-    margin-top: 20px;
-}
-
-.botao-salvar-ticket {
-    padding: 10px 20px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-.botao-salvar-ticket:hover {
-    background-color: #218838;
-}
-
 .modal-overlay {
     display: flex;
     justify-content: center;
@@ -901,16 +901,6 @@ svg {
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 1000;
     transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-.fechar-modal {
-    background: none;
-    border: none;
-    font-size: 24px;
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    cursor: pointer;
 }
 
 .modal-tabs {
@@ -957,20 +947,6 @@ svg {
 
 a {
     color: #007bff;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    border-bottom: 1px solid #ddd;
-}
-
-.botao-salvar-container {
-    display: flex;
-    justify-content: flex-end;
-    margin-right: 20px;
 }
 
 .modal-filters {
@@ -1041,20 +1017,6 @@ a {
 
 .card-atividade:hover {
     background-color: #e9ecef;
-}
-
-.botao-salvar-ticket {
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.botao-salvar-ticket:hover {
-    background-color: #0056b3;
 }
 
 .botao-atividades {

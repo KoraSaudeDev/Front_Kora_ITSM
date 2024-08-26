@@ -366,10 +366,10 @@ const Modal = ({ data, onClose }) => {
     };
 
     const handleCloseModal = () => {
-        setIsClosingModal(true); 
+        setIsClosingModal(true);
         setTimeout(() => {
-            onClose(); 
-            setIsClosingModal(false); 
+            onClose();
+            setIsClosingModal(false);
         }, 500);
     };
 
@@ -422,8 +422,8 @@ const Modal = ({ data, onClose }) => {
         <div>
             <div className="modal-overlay">
                 <div className={`modal ${isClosingModal ? 'fechar' : ''}`}>
-                    <button className="fechar-modal" onClick={handleCloseModal}><FaTimes /></button>
-                    
+
+
                     <div className="modal-header">
                         <h3>Ticket #{data.cod_fluxo}</h3>
                         <div className="botao-salvar-container">
@@ -431,6 +431,7 @@ const Modal = ({ data, onClose }) => {
                                 Salvar
                             </button>
                         </div>
+                        <button className="fechar-modal" onClick={handleCloseModal}><FaTimes /></button>
                     </div>
 
                     <div className="modal-filters">
@@ -612,11 +613,15 @@ const Modal = ({ data, onClose }) => {
             {showAtividadesModal && (
                 <div className="modal-overlay">
                     <div className={`modal atividades-modal ${isClosingAtividadesModal ? 'fechar' : ''}`}>
-                        <button className="fechar-modal" onClick={handleFecharAtividadesModal}>×</button>
-                        <div className="conteudo-modal-atividades">
-                            {atividadeSelecionada ? (
-                                <>
+                        {atividadeSelecionada ? (
+                            <>
+                                <div className="modal-header">
                                     <h3>Detalhes da Atividade</h3>
+                                    <button className="fechar-modal" onClick={handleFecharAtividadesModal}>
+                                        <FaTimes />
+                                    </button>
+                                </div>
+                                <div className="conteudo-modal-atividades">
                                     <p><label>Cód. Task:</label> {atividadeSelecionada.cod_task}</p>
                                     <p><label>Aberto Por:</label> {atividadeSelecionada.aberto_por}</p>
                                     <p><label>Concluído Por:</label> {atividadeSelecionada.ds_concluido_por}</p>
@@ -629,7 +634,8 @@ const Modal = ({ data, onClose }) => {
                                     <p><label>Duração (Útil):</label> {atividadeSelecionada.tempo}</p>
                                     <p><label>Duração (Corrida):</label> {atividadeSelecionada.tempo_corrido}</p>
                                     <p><label>Observações:</label> {atividadeSelecionada.ds_obs}</p>
-                                    <p><label>Anexo:</label>
+                                    <p>
+                                        <label>Anexo:</label>
                                         {atividadeSelecionada.ds_anexo}&nbsp;
                                         <FaFileAlt
                                             className="icone-anexo"
@@ -637,20 +643,28 @@ const Modal = ({ data, onClose }) => {
                                             onClick={() => window.open(URL.createObjectURL(new Blob([atividadeSelecionada.anexo])))}
                                         />
                                     </p>
-                                </>
-                            ) : (
-                                <>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <div className="modal-header">
                                     <h3>Atividades do Ticket #{data.cod_fluxo}</h3>
+                                    <button className="fechar-modal" onClick={handleFecharAtividadesModal}>
+                                        <FaTimes />
+                                    </button>
+                                </div>
+                                <div className="conteudo-modal-atividades">
                                     <div className="campo-detalhe">
-                                        <label htmlFor="inicio-task"><label>Início:</label></label>
+                                        <label htmlFor="inicio-task">Início:</label>
                                         <input type="text" id="inicio-task" value={inicio} readOnly />
                                     </div>
                                     <div className="campo-detalhe">
-                                        <label htmlFor="aberto-por-task"><label>Aberto Por:</label></label>
+                                        <label htmlFor="aberto-por-task">Aberto Por:</label>
                                         <input type="text" id="aberto-por-task" value={user.name} readOnly />
                                     </div>
                                     <textarea className="textarea-atividade" placeholder="Descrição" id="descricao-task"></textarea>
-                                    <p><label>Status:</label>
+                                    <p>
+                                        <label>Status:</label>
                                         <select id="status-task">
                                             <option></option>
                                             {options.status.map((status, index) => (
@@ -658,7 +672,8 @@ const Modal = ({ data, onClose }) => {
                                             ))}
                                         </select>
                                     </p>
-                                    <p><label>Destinatário:</label>
+                                    <p>
+                                        <label>Destinatário:</label>
                                         <select className="select-destinatario" id="executor-task">
                                             <option></option>
                                             {options.destinatarios.map((destinatario, index) => (
@@ -681,9 +696,9 @@ const Modal = ({ data, onClose }) => {
                                         <input type="file" id="anexoAtividade" className="input-anexo" />
                                     </div>
                                     <button className="botao-salvar-atividade" onClick={handleSalvarAtividade}>Salvar</button>
-                                </>
-                            )}
-                        </div>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
             )}
