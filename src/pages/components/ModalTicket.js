@@ -436,9 +436,9 @@ const Modal = ({ data, onClose }) => {
 
                     <div className="modal-filters">
                         <div className="campo-selecao">
-                            <label className="link-label" onClick={() => handleToggleDropdown('categoria')}>
+                            <strong className="link-label" onClick={() => handleToggleDropdown('categoria')}>
                                 Categoria
-                            </label>
+                            </strong>
                             {showCategoriaDropdown && (
                                 <select
                                     value={selectedCategoria}
@@ -454,9 +454,9 @@ const Modal = ({ data, onClose }) => {
                             )}
                         </div>
                         <div className="campo-selecao">
-                            <label className="link-label" onClick={() => handleToggleDropdown('subcategoria')}>
+                            <strong className="link-label" onClick={() => handleToggleDropdown('subcategoria')}>
                                 Subcategoria
-                            </label>
+                            </strong>
                             {showSubcategoriaDropdown && (
                                 <select
                                     value={selectedSubcategoria}
@@ -473,9 +473,9 @@ const Modal = ({ data, onClose }) => {
                             )}
                         </div>
                         <div className="campo-selecao">
-                            <label className="link-label" onClick={() => handleToggleDropdown('assunto')}>
+                            <strong className="link-label" onClick={() => handleToggleDropdown('assunto')}>
                                 Assunto
-                            </label>
+                            </strong>
                             {showAssuntoDropdown && (
                                 <select
                                     value={selectedAssunto}
