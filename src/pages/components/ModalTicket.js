@@ -148,12 +148,21 @@ const Modal = ({ data, onClose }) => {
 
     const handleFileChange = (event, uploadType) => {
         const files = Array.from(event.target.files);
-        const updatedFiles = files.map((file) => ({
+        let updatedFiles = files.map((file) => ({
             file,
             uploadType: uploadType,
         }));
-        setSelectedFiles((prevFiles) => [...prevFiles, ...updatedFiles]);
+    
+        setSelectedFiles((prevFiles) => {
+            if (uploadType === 1) {
+                const filteredFiles = prevFiles.filter((fileObj) => fileObj.uploadType !== 1);
+                return [...filteredFiles, ...updatedFiles];
+            } else {
+                return [...prevFiles, ...updatedFiles];
+            }
+        });
     };
+    
 
     const handleAbrirAtividadesModal = () => {
         setAtividadeSelecionada(null);
@@ -175,9 +184,16 @@ const Modal = ({ data, onClose }) => {
         const descricao = document.querySelector('#descricao-task').value.trim();
         const executor = document.querySelector('#executor-task').value;
         const status = document.querySelector('#status-task').value;
-        const tipo_atividade = document.querySelector('input[name="visibilidade"]:checked');
+        var tipo_atividade = document.querySelector('input[name="visibilidade"]:checked');
 
-        if (!descricao || !status || !executor || !tipo_atividade) {
+        if (!tipo_atividade){
+            tipo_atividade = 'Privada';
+        }
+        else{
+            tipo_atividade = 'Pública';
+        }
+
+        if (!descricao || !status || !executor ) {
             alert("Por favor, preencha todos os campos obrigatórios.");
             return;
         }
@@ -190,7 +206,7 @@ const Modal = ({ data, onClose }) => {
             status,
             descricao,
             executor,
-            tipo_atividade: tipo_atividade?.value,
+            tipo_atividade,
             ds_anexo: null
         };
 
@@ -338,14 +354,15 @@ const Modal = ({ data, onClose }) => {
                     },
                 });
 
-                if (response.status === 200) {
+                if (response.status === 202) {
+                    console.log(response.data.filename)
                     if (selectedFiles[i].uploadType === 1) {
-                        update_tickets.anexo_resposta = response?.data
+                        update_tickets.anexo_resposta = response?.data?.filename;
                     }
                     else if (selectedFiles[i].uploadType === 2) {
                         const matchedAtividade = insert_tasks.find(task => task.ds_anexo === selectedFiles[i].file.name);
                         if (matchedAtividade) {
-                            matchedAtividade.ds_anexo = response?.data;
+                            matchedAtividade.ds_anexo = response?.data?.filename;
                         }
                     }
                 } else {
@@ -631,7 +648,7 @@ const Modal = ({ data, onClose }) => {
 
                             <p>
                                 <strong id="campor-resp-chamado">Reposta Chamado:</strong>
-                                <textarea id="resp-chamado">{data.resposta_chamado}</textarea>
+                                <textarea id="resp-chamado" defaultValue={data.resposta_chamado}></textarea>
                             </p>
                             <p style={{ display: 'flex', alignItems: 'center' }}>
                                 <strong>Anexo Reposta:</strong>
