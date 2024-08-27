@@ -431,31 +431,38 @@ const Modal = ({ data, onClose }) => {
     const prioridades = [
         {
             "prioridade": "P1",
-            "sla": "240"
+            "sla": "240",
+            "tipo_tempo": "Corrido"
         },
         {
             "prioridade": "P2",
-            "sla": "480"
+            "sla": "480",
+            "tipo_tempo": "Corrido"
         },
         {
             "prioridade": "P3",
-            "sla": "1200"
+            "sla": "1200",
+            "tipo_tempo": "Útil"
         },
         {
             "prioridade": "P4",
-            "sla": "1800"
+            "sla": "1800",
+            "tipo_tempo": "Útil"
         },
         {
             "prioridade": "P5",
-            "sla": "3000"
+            "sla": "3000",
+            "tipo_tempo": "Útil"
         },
         {
             "prioridade": "P6",
-            "sla": "4200"
+            "sla": "4200",
+            "tipo_tempo": "Útil"
         },
         {
             "prioridade": "P7",
-            "sla": "9000"
+            "sla": "9000",
+            "tipo_tempo": "Útil"
         }
     ];
 
@@ -575,7 +582,10 @@ const Modal = ({ data, onClose }) => {
 
                             <p><strong className="data">Abertura:</strong> {data.abertura}</p>
                             <p><strong className="data">Data Limite:</strong> {data.data_limite}</p>
+                            <p><strong className="data">Tipo da SLA:</strong> {prioridades.find(p => p.prioridade === prioridadeSelecionada)?.tipo_tempo.toUpperCase() || ''}</p>
 
+
+           
                             <div className="campo-editavel">
                                 <strong>Prioridade:</strong>
                                 <select
