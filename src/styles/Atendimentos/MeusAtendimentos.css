@@ -123,10 +123,12 @@ h3 {
     transition: background-color 0.3s ease;
     align-self: center;
     margin:0px 20px;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .botao-salvar-ticket:hover {
     background-color: #0056b3;
+    transform: translateY(-2px);
 }
 
 .fechar-modal {
@@ -813,6 +815,7 @@ select {
     background-position: right 8px center;
     background-size: 10px;
     cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
     width: 100%;
     margin-bottom: 10px;
 }
@@ -1014,6 +1017,7 @@ a {
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    
 }
 
 .card-atividade:hover {
@@ -1028,10 +1032,12 @@ a {
     border-radius: 5px;
     cursor: pointer;
     margin-bottom: 10px;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .botao-atividades:hover {
     background-color: #218838;
+    transform: translateY(-2px);
 }
 
 .status-bolinha,
@@ -1045,9 +1051,11 @@ a {
 
 #topo-button {
     color: #0056b3;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 #topo-button:hover {
+    transform: translateY(-2px);
     color: #043972;
 }
 .modal-header {
@@ -1184,4 +1192,24 @@ textarea {
 
 .status-container{
     margin-right: 20px;
+}
+#editar {
+    background-color: #f7924f;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    display: inline-block;
+    text-align: center;
+}
+
+#editar:hover {
+    background-color: #fc7c27;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }

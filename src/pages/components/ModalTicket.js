@@ -640,6 +640,7 @@ const Modal = ({ data, onClose }) => {
                                         <button
                                             onClick={() => setEditMode(true)}
                                             style={{ marginLeft: '10px', cursor: 'pointer' }}
+                                            id='editar'
                                         >
                                             Editar
                                         </button>
