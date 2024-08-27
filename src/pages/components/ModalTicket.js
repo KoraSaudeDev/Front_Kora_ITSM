@@ -6,6 +6,7 @@ import axios from 'axios';
 const Modal = ({ data, onClose }) => {
     const { user } = useAuth();
     const [inicio, setInicio] = useState('');
+    const [selectedFiles, setSelectedFiles] = useState([]);
     const [showAtividadesModal, setShowAtividadesModal] = useState(false);
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
     const [isClosingAtividadesModal, setIsClosingAtividadesModal] = useState(false);
@@ -143,6 +144,14 @@ const Modal = ({ data, onClose }) => {
             console.error("Erro ao abrir o anexo:", error);
         }
     };
+    const handleFileChange = (event, uploadType) => {
+        const files = Array.from(event.target.files);
+        const updatedFiles = files.map((file) => ({
+            file,
+            uploadType: uploadType,
+        }));
+        setSelectedFiles((prevFiles) => [...prevFiles, ...updatedFiles]);
+    };
 
     const handleAbrirAtividadesModal = () => {
         setAtividadeSelecionada(null);
@@ -179,8 +188,23 @@ const Modal = ({ data, onClose }) => {
             status,
             descricao,
             executor,
-            tipo_atividade: tipo_atividade?.value
+            tipo_atividade: tipo_atividade?.value,
+            ds_anexo: null
         };
+
+        const fileInput = document.getElementById('anexoAtividade');
+        const files = fileInput.files;
+
+        if (files.length > 0) {
+            novaAtividade.ds_anexo = files[0].name;
+
+            const updatedFiles = Array.from(files).map((file) => ({
+                file,
+                uploadType: 2,
+            }));
+
+            setSelectedFiles((prevFiles) => [...prevFiles, ...updatedFiles]);
+        }
 
         if (atividades.length > 0) {
             const ultimaAtividadeIndex = atividades.length - 1;
@@ -204,6 +228,7 @@ const Modal = ({ data, onClose }) => {
         setAtividades([...atividades, novaAtividade]);
         handleFecharAtividadesModal();
     };
+
 
     const handleAbrirDetalhesAtividade = (atividade) => {
         setAtividadeSelecionada(atividade);
@@ -298,6 +323,32 @@ const Modal = ({ data, onClose }) => {
         };
 
         try {
+            for (let i = 0; i < selectedFiles.length; i++) {
+                const formData = new FormData();
+                formData.append('file', selectedFiles[i].file);
+                formData.append('uploadType', selectedFiles[i].uploadType);
+
+                const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/tickets/file/upload`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+
+                if (response.status === 200) {
+                    if (selectedFiles[i].uploadType === 1) {
+                        update_tickets.anexo_resposta = response?.data
+                    }
+                    else if (selectedFiles[i].uploadType === 2) {
+                        const matchedAtividade = insert_tasks.find(task => task.ds_anexo === selectedFiles[i].file.name);
+                        if (matchedAtividade) {
+                            matchedAtividade.ds_anexo = response?.data;
+                        }
+                    }
+                } else {
+                    console.error(`Erro ao enviar o arquivo ${selectedFiles[i].name}:`, response);
+                }
+            }
+
             const ticketConfig = {
                 method: 'patch',
                 url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/${data.cod_fluxo}`,
@@ -350,6 +401,7 @@ const Modal = ({ data, onClose }) => {
             console.error("Error saving ticket and tasks:", error);
         }
     };
+
 
     const handleCloseModal = () => {
         setIsClosingModal(true);
@@ -581,7 +633,7 @@ const Modal = ({ data, onClose }) => {
                                         </a>
                                     </>
                                 ) : (
-                                    <input type="file" id="anexo_resposta" />
+                                    <input type="file" id="anexo_resposta" onChange={(e) => handleFileChange(e, 1)}  />
                                 )}
                             </p>
                         </div>
