@@ -52,8 +52,8 @@ const App = () => {
                     element={
                       <ProtectedRoute
                         element={
-                          <Main title="Minha Equipe" description="Atendimentos / Minha Equipe">
-                            <MinhaEquipe selectedTicket={selectedTicket} onResetTicket={handleResetTicket} />
+                          <Main title="Meus Atendimentos" description="Atendimentos / Meus Atendimentos">
+                            <MeusAtendimentos selectedTicket={selectedTicket} onResetTicket={handleResetTicket} />
                           </Main>
                         }
                       />

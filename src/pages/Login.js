@@ -15,7 +15,7 @@ const Login = () => {
     if (storedUser) {
       const user = JSON.parse(storedUser);
       login(user);
-      navigate('/atendimentos/minha-equipe');
+      navigate('/atendimentos/meus-atendimentos');
     }
 
     const button = document.querySelector('.nsm7Bb-HzV7m-LgbsSe');
@@ -74,7 +74,7 @@ const Login = () => {
       user.cargo = roles;
 
       login(user);
-      navigate('/atendimentos/minha-equipe');
+      navigate('/atendimentos/meus-atendimentos');
     } catch (error) {
       console.error(error);
     }

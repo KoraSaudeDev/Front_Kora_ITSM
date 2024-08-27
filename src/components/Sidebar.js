@@ -5,12 +5,39 @@ import { FaChartPie, FaChartBar, FaPlus, FaHome, FaHeadset, FaChevronDown, FaSig
 import logokora from '../assets/images/logokora.png';
 import SemFoto from '../assets/images/Sem_foto.png';
 import { useAuth } from '../context/AuthContext';
+import axios from 'axios';
 
 const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [activeDropdown, setActiveDropdown] = useState('');
+  const [activeDropdown, setActiveDropdown] = useState('dropdownAtendimentos');
   const { user, logout } = useAuth();
+  const [meusAtendimentosCount] = useState(0);
+  const [minhaEquipeCount, setMinhaEquipeCount] = useState(0);
+
+  useEffect(() => {
+    if (user && user.cargo) { 
+      const fetchMinhaEquipeCount = async () => {
+        try {
+          const response = await axios.post(
+            `${process.env.REACT_APP_API_BASE_URL}/tickets/minha-equipe?page=1&per_page=1`,
+            { grupos: user.cargo },
+            {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+          setMinhaEquipeCount(response.data.total_items);
+          console.log(response.data.total_items);
+        } catch (error) {
+          console.error("Erro ao buscar contagem de Minha Equipe", error);
+        }
+      };
+
+      fetchMinhaEquipeCount();
+    }
+  }, [user]); 
 
   useEffect(() => {
     const menu = document.querySelector('.menu-lateral');
@@ -94,7 +121,7 @@ const Sidebar = () => {
             )}
           </div>
         </div>
-        <div className="titulo-botoes">Menu</div>
+        {/* <div className="titulo-botoes">Menu</div> */}
         <ul className="botoes-navegacao">
           {/* <li className={`item-navegacao ${location.pathname === '/' ? 'active' : ''}`}>
             <Link to="/" className={`link-navegacao ${location.pathname === '/' ? 'active' : ''}`} onClick={resetDropdowns}>
@@ -109,17 +136,19 @@ const Sidebar = () => {
               <FaChevronDown className={`seta ${activeDropdown === 'dropdownAtendimentos' ? 'rotacionar' : ''}`} />
             </a>
             <ul id="dropdownAtendimentos" className={`conteudo-dropdown ${activeDropdown === 'dropdownAtendimentos' ? 'mostrar' : ''}`}>
-              {/* <li className={location.pathname === '/atendimentos/novo-ticket' ? 'active' : ''}>
-                <Link to="/atendimentos/novo-ticket" className={location.pathname === '/atendimentos/novo-ticket' ? 'active' : ''}>
-
-                  <span>Novo Ticket</span>
-                </Link>
-              </li> */}
               <li className={location.pathname === '/atendimentos/meus-atendimentos' ? 'active' : ''}>
-                <Link to="/atendimentos/meus-atendimentos" className={location.pathname === '/atendimentos/meus-atendimentos' ? 'active' : ''}>Meus Atendimentos</Link>
+                <Link to="/atendimentos/meus-atendimentos" className={location.pathname === '/atendimentos/meus-atendimentos' ? 'active' : ''}>
+                  Meus Atendimentos
+                  <span className="badge">{meusAtendimentosCount}</span>
+                </Link>
               </li>
               <li className={location.pathname === '/atendimentos/minha-equipe' ? 'active' : ''}>
-                <Link to="/atendimentos/minha-equipe" className={location.pathname === '/atendimentos/minha-equipe' ? 'active' : ''}>Minha Equipe</Link>
+                <Link to="/atendimentos/minha-equipe" className={location.pathname === '/atendimentos/minha-equipe' ? 'active' : ''}>
+                  Minha Equipe
+                  {minhaEquipeCount > 0 && (
+                    <span className="badge">{minhaEquipeCount}</span>
+                  )}
+                </Link>
               </li>
             </ul>
           </li>

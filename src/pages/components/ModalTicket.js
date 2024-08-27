@@ -28,9 +28,6 @@ const Modal = ({ data, onClose }) => {
         status: [],
         destinatarios: []
     });
-    const [showCategoriaDropdown, setShowCategoriaDropdown] = useState(false);
-    const [showSubcategoriaDropdown, setShowSubcategoriaDropdown] = useState(false);
-    const [showAssuntoDropdown, setShowAssuntoDropdown] = useState(false);
 
     useEffect(() => {
         axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/hub`)
@@ -136,6 +133,17 @@ const Modal = ({ data, onClose }) => {
         document.getElementById('loading-overlay').style.display = 'none';
     };
 
+    const handleAnexoClick = async (anexoPath) => {
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/file/open-url?path=${anexoPath}`);
+            if (response.data) {
+                window.open(response.data);
+            }
+        } catch (error) {
+            console.error("Erro ao abrir o anexo:", error);
+        }
+    };
+
     const handleAbrirAtividadesModal = () => {
         setAtividadeSelecionada(null);
         setIsEditMode(true);
@@ -231,28 +239,6 @@ const Modal = ({ data, onClose }) => {
 
     const handlePrioridadeClick = (prioridade) => {
         setPrioridadeSelecionada(prioridade);
-    };
-
-    const handleToggleDropdown = (dropdown) => {
-        switch (dropdown) {
-            case 'categoria':
-                setShowCategoriaDropdown(!showCategoriaDropdown);
-                setShowSubcategoriaDropdown(false);
-                setShowAssuntoDropdown(false);
-                break;
-            case 'subcategoria':
-                setShowSubcategoriaDropdown(!showSubcategoriaDropdown);
-                setShowCategoriaDropdown(false);
-                setShowAssuntoDropdown(false);
-                break;
-            case 'assunto':
-                setShowAssuntoDropdown(!showAssuntoDropdown);
-                setShowCategoriaDropdown(false);
-                setShowSubcategoriaDropdown(false);
-                break;
-            default:
-                break;
-        }
     };
 
     const handleSalvarTicket = async () => {
@@ -422,8 +408,6 @@ const Modal = ({ data, onClose }) => {
         <div>
             <div className="modal-overlay">
                 <div className={`modal ${isClosingModal ? 'fechar' : ''}`}>
-
-
                     <div className="modal-header">
                         <h3>Ticket #{data.cod_fluxo}</h3>
                         <div className="botao-salvar-container">
@@ -436,60 +420,48 @@ const Modal = ({ data, onClose }) => {
 
                     <div className="modal-filters">
                         <div className="campo-selecao">
-                            <strong className="link-label" onClick={() => handleToggleDropdown('categoria')}>
-                                Categoria
-                            </strong>
-                            {showCategoriaDropdown && (
-                                <select
-                                    value={selectedCategoria}
-                                    onChange={(e) => handleFieldChange('categoria', e.target.value)}
-                                >
-                                    <option></option>
-                                    {options.categoria.map((option, index) => (
-                                        <option key={index} value={option}>
-                                            {option}
-                                        </option>
-                                    ))}
-                                </select>
-                            )}
+                            <strong className="link-label">Categoria</strong>
+                            <select
+                                value={selectedCategoria}
+                                onChange={(e) => handleFieldChange('categoria', e.target.value)}
+                            >
+                                <option></option>
+                                {options.categoria.map((option, index) => (
+                                    <option key={index} value={option}>
+                                        {option}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                         <div className="campo-selecao">
-                            <strong className="link-label" onClick={() => handleToggleDropdown('subcategoria')}>
-                                Subcategoria
-                            </strong>
-                            {showSubcategoriaDropdown && (
-                                <select
-                                    value={selectedSubcategoria}
-                                    onChange={(e) => handleFieldChange('subcategoria', e.target.value)}
-                                    disabled={!selectedCategoria}
-                                >
-                                    <option></option>
-                                    {options.subcategoria.map((option, index) => (
-                                        <option key={index} value={option}>
-                                            {option}
-                                        </option>
-                                    ))}
-                                </select>
-                            )}
+                            <strong className="link-label">Subcategoria</strong>
+                            <select
+                                value={selectedSubcategoria}
+                                onChange={(e) => handleFieldChange('subcategoria', e.target.value)}
+                                disabled={!selectedCategoria}
+                            >
+                                <option></option>
+                                {options.subcategoria.map((option, index) => (
+                                    <option key={index} value={option}>
+                                        {option}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                         <div className="campo-selecao">
-                            <strong className="link-label" onClick={() => handleToggleDropdown('assunto')}>
-                                Assunto
-                            </strong>
-                            {showAssuntoDropdown && (
-                                <select
-                                    value={selectedAssunto}
-                                    onChange={(e) => handleFieldChange('assunto', e.target.value)}
-                                    disabled={!selectedSubcategoria}
-                                >
-                                    <option></option>
-                                    {options.assunto.map((option, index) => (
-                                        <option key={index} value={option}>
-                                            {option}
-                                        </option>
-                                    ))}
-                                </select>
-                            )}
+                            <strong className="link-label">Assunto</strong>
+                            <select
+                                value={selectedAssunto}
+                                onChange={(e) => handleFieldChange('assunto', e.target.value)}
+                                disabled={!selectedSubcategoria}
+                            >
+                                <option></option>
+                                {options.assunto.map((option, index) => (
+                                    <option key={index} value={option}>
+                                        {option}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                     </div>
 
@@ -502,41 +474,72 @@ const Modal = ({ data, onClose }) => {
                             <p><strong>Cargo:</strong> {data.cargo_solic}</p>
                             <p><strong>Área de Negócio:</strong> {data.area_negocio}</p>
                             <p><strong>Descrição:</strong> {data.descricao}</p>
-                            <p style={{ display: 'flex', alignItems: 'center' }}><strong>Anexo:</strong>&nbsp;
-                                <a href={URL.createObjectURL(new Blob([data.autorizacao]))} target="_blank" rel="noopener noreferrer" style={{ marginRight: '5px' }}>
-                                    Abrir
-                                </a>
-                                <FaFileAlt
-                                    className="icone-anexo"
-                                    style={{ cursor: 'pointer' }}
-                                    onClick={() => window.open(URL.createObjectURL(new Blob([data.autorizacao])))}
-                                />
+                            <p style={{ display: 'flex', alignItems: 'center' }}>
+                                <strong>Anexo:</strong> 
+                                {data.anexo ? (
+                                    <>
+                                        <a onClick={() => handleAnexoClick(data.anexo)} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                            {data.anexo.split('/').pop()}
+                                            <FaFileAlt
+                                                className="icone-anexo"
+                                                style={{ marginLeft: '5px' }}
+                                            />
+                                        </a>
+                                    </>
+                                ) : (
+                                    'Nenhum anexo'
+                                )}
+                            </p>
+                            <p>
+                                <strong>Reposta Chamado:</strong>
+                                <textarea>{data.resposta_chamado}</textarea>
+                            </p>
+                            <p>
+                                <strong>Anexo Reposta:</strong>
+                                {data.anexo_resposta ? (
+                                    <>
+                                        <a onClick={() => handleAnexoClick(data.anexo_resposta)} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                            {data.anexo_resposta.split('/').pop()}
+                                            <FaFileAlt
+                                                className="icone-anexo"
+                                                style={{ marginLeft: '5px' }}
+                                            />
+                                        </a>
+                                    </>
+                                ) : (
+                                    <input type="file" id="anexo_resposta" />
+                                )}
                             </p>
                         </div>
 
                         <div className="conteudo-modal-direita">
+                            <div className="header-status-sla">
+                                <div className="status-container">
+                                    <strong>Status:</strong>
+                                    <span
+                                        className="status-bolinha"
+                                        style={{
+                                            backgroundColor: statusOptions[data.status] || '#000',
+                                            marginLeft: '8px'
+                                        }}
+                                    ></span>
+                                    {data.status}
+                                </div>
+                                <div className="sla-container">
+                                    <strong>SLA (Útil):</strong>
+                                    <span
+                                        className="sla-bolinha"
+                                        style={{
+                                            backgroundColor: slaOptions[data.st_sla] || '#000',
+                                            marginLeft: '8px'
+                                        }}
+                                    ></span>
+                                    {data.st_sla}
+                                </div>
+                            </div>
+
                             <p><strong>Abertura:</strong> {data.abertura}</p>
                             <p><strong>Data Limite:</strong> {data.data_limite}</p>
-                            <p><strong>Status:</strong>
-                                <span
-                                    className="status-bolinha"
-                                    style={{
-                                        backgroundColor: statusOptions[data.status] || '#000',
-                                        marginRight: '8px'
-                                    }}
-                                ></span>
-                                {data.status}
-                            </p>
-                            <p><strong>SLA (Útil):</strong>
-                                <span
-                                    className="sla-bolinha"
-                                    style={{
-                                        backgroundColor: slaOptions[data.st_sla] || '#000',
-                                        marginRight: '8px'
-                                    }}
-                                ></span>
-                                {data.st_sla}
-                            </p>
 
                             <div className="campo-editavel">
                                 <strong>Prioridade:</strong>
@@ -586,7 +589,7 @@ const Modal = ({ data, onClose }) => {
                     <div className="campo-atividades">
                         <h4>Atividades</h4>
                         <button className="botao-atividades" onClick={handleAbrirAtividadesModal}>
-                            <FaPlus style={{ marginRight: '8px' }} /> Nova Atividade
+                            <FaPlus style={{ marginRight: '8px' }} /> Atividade
                         </button>
                         {atividades.slice().reverse().map((atividade, index) => (
                             <div className="card-atividade" key={index} onClick={() => handleAbrirDetalhesAtividade(atividade)}>
@@ -596,13 +599,21 @@ const Modal = ({ data, onClose }) => {
                                 <p><label>Fim:</label> {atividade.dt_fim}</p>
                                 <p><label>Destinatário:</label> {atividade.executor}</p>
                                 <p><label>Visibilidade:</label> {atividade.tipo_atividade}</p>
-                                <p><label>Anexo:</label>
-                                    {atividade.ds_anexo}&nbsp;
-                                    <FaFileAlt
-                                        className="icone-anexo"
-                                        style={{ cursor: 'pointer' }}
-                                        onClick={() => window.open(URL.createObjectURL(new Blob([atividade.anexo])))}
-                                    />
+                                <p style={{ display: 'flex', alignItems: 'center' }}>
+                                    <label>Anexo:</label> 
+                                    {atividade.ds_anexo ? (
+                                        <>
+                                            <a onClick={() => handleAnexoClick(atividade.ds_anexo)} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                                {atividade.ds_anexo.split('/').pop()}
+                                                <FaFileAlt
+                                                    className="icone-anexo"
+                                                    style={{ marginLeft: '5px' }}
+                                                />
+                                            </a>
+                                        </>
+                                    ) : (
+                                        'Nenhum anexo'
+                                    )}
                                 </p>
                             </div>
                         ))}
@@ -622,7 +633,7 @@ const Modal = ({ data, onClose }) => {
                                     </button>
                                 </div>
                                 <div className="conteudo-modal-atividades">
-                                    <p><label>Cód. Task:</label> {atividadeSelecionada.cod_task}</p>
+                                    <p><label>Task:</label> {atividadeSelecionada.cod_task}</p>
                                     <p><label>Aberto Por:</label> {atividadeSelecionada.aberto_por}</p>
                                     <p><label>Concluído Por:</label> {atividadeSelecionada.ds_concluido_por}</p>
                                     <p><label>Status:</label> {atividadeSelecionada.status}</p>
@@ -634,21 +645,28 @@ const Modal = ({ data, onClose }) => {
                                     <p><label>Duração (Útil):</label> {atividadeSelecionada.tempo}</p>
                                     <p><label>Duração (Corrida):</label> {atividadeSelecionada.tempo_corrido}</p>
                                     <p><label>Observações:</label> {atividadeSelecionada.ds_obs}</p>
-                                    <p>
-                                        <label>Anexo:</label>
-                                        {atividadeSelecionada.ds_anexo}&nbsp;
-                                        <FaFileAlt
-                                            className="icone-anexo"
-                                            style={{ cursor: 'pointer' }}
-                                            onClick={() => window.open(URL.createObjectURL(new Blob([atividadeSelecionada.anexo])))}
-                                        />
+                                    <p style={{ display: 'flex', alignItems: 'center' }}>
+                                        <label>Anexo:</label> 
+                                        {atividadeSelecionada.ds_anexo ? (
+                                            <>
+                                                <a onClick={() => handleAnexoClick(atividadeSelecionada.ds_anexo)} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                                    {atividadeSelecionada.ds_anexo.split('/').pop()}
+                                                    <FaFileAlt
+                                                        className="icone-anexo"
+                                                        style={{ marginLeft: '5px' }}
+                                                    />
+                                                </a>
+                                            </>
+                                        ) : (
+                                            'Nenhum anexo'
+                                        )}
                                     </p>
                                 </div>
                             </>
                         ) : (
                             <>
                                 <div className="modal-header">
-                                    <h3>Atividades do Ticket #{data.cod_fluxo}</h3>
+                                    <h3>Ticket #{data.cod_fluxo}</h3>
                                     <button className="fechar-modal" onClick={handleFecharAtividadesModal}>
                                         <FaTimes />
                                     </button>

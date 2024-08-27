@@ -1049,3 +1049,32 @@ a {
 #topo-button:hover {
     color: #043972;
 }
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #ddd;
+}
+
+.conteudo-modal-direita {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.header-status-sla {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+    margin-bottom: 1rem; 
+    gap: 20px; 
+}
+
+.status-container, .sla-container {
+    display: flex;
+    align-items: center;
+   
+}

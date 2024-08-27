@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import SearchBar from './SearchBar';
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/Header.css';
 import { FaBell } from 'react-icons/fa';
@@ -64,6 +65,9 @@ const Header = ({ onSelectTicket }) => {
       <div className="conteudo-cabecalho">
         <div className="toggle-menu" onClick={alternarMenu} data-tooltip="Menu">
           &#9776;
+        </div>
+        <div className="barra-busca">
+          <SearchBar />
         </div>
         <div className="cabecalho2">
           <div className="conteudo-cabecalho2">
