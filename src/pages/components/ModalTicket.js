@@ -14,6 +14,7 @@ const Modal = ({ data, onClose }) => {
     const [atividades, setAtividades] = useState([]);
     const [atividadeSelecionada, setAtividadeSelecionada] = useState(null);
     const [isEditMode, setIsEditMode] = useState(false);
+    const [editMode, setEditMode] = useState(false);
     const [prioridadeSelecionada, setPrioridadeSelecionada] = useState(data.ds_nivel);
     const [selectedHub, setSelectedHub] = useState(data.hub || '');
     const [selectedCategoria, setSelectedCategoria] = useState(data.categoria || '');
@@ -144,6 +145,7 @@ const Modal = ({ data, onClose }) => {
             console.error("Erro ao abrir o anexo:", error);
         }
     };
+
     const handleFileChange = (event, uploadType) => {
         const files = Array.from(event.target.files);
         const updatedFiles = files.map((file) => ({
@@ -229,7 +231,6 @@ const Modal = ({ data, onClose }) => {
         handleFecharAtividadesModal();
     };
 
-
     const handleAbrirDetalhesAtividade = (atividade) => {
         setAtividadeSelecionada(atividade);
         setIsEditMode(false);
@@ -295,6 +296,8 @@ const Modal = ({ data, onClose }) => {
 
         const ultimoItem = atividades[atividades.length - 1];
 
+        const resposta_chamado = document.querySelector("#resp-chamado").value;
+
         const update_tickets = {
             hub: selectedHub,
             unidade: selectedUnidade,
@@ -304,7 +307,8 @@ const Modal = ({ data, onClose }) => {
             ds_nivel: prioridadeSelecionada,
             status: toTitleCase(ultimoItem.status),
             grupo: ultimoItem.executor,
-            sla: prioridades.find(line => line.prioridade === prioridadeSelecionada)?.sla
+            sla: prioridades.find(line => line.prioridade === prioridadeSelecionada)?.sla,
+            resposta_chamado: resposta_chamado === '' ? null : resposta_chamado
         };
 
         if (update_tickets.status === "Finalizado") {
@@ -401,7 +405,6 @@ const Modal = ({ data, onClose }) => {
             console.error("Error saving ticket and tasks:", error);
         }
     };
-
 
     const handleCloseModal = () => {
         setIsClosingModal(true);
@@ -527,7 +530,7 @@ const Modal = ({ data, onClose }) => {
                             <p><strong>Área de Negócio:</strong> {data.area_negocio}</p>
                             <p><strong>Descrição:</strong> {data.descricao}</p>
                             <p style={{ display: 'flex', alignItems: 'center' }}>
-                                <strong>Anexo:</strong> 
+                                <strong>Anexo:</strong>
                                 {data.anexo ? (
                                     <>
                                         <a onClick={() => handleAnexoClick(data.anexo)} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
@@ -570,8 +573,8 @@ const Modal = ({ data, onClose }) => {
                                 </div>
                             </div>
 
-                            <p><strong class="data">Abertura:</strong> {data.abertura}</p>
-                            <p><strong class="data">Data Limite:</strong> {data.data_limite}</p>
+                            <p><strong className="data">Abertura:</strong> {data.abertura}</p>
+                            <p><strong className="data">Data Limite:</strong> {data.data_limite}</p>
 
                             <div className="campo-editavel">
                                 <strong>Prioridade:</strong>
@@ -618,24 +621,45 @@ const Modal = ({ data, onClose }) => {
 
                             <p>
                                 <strong id="campor-resp-chamado">Reposta Chamado:</strong>
-                                <textarea>{data.resposta_chamado}</textarea>
+                                <textarea id="resp-chamado">{data.resposta_chamado}</textarea>
                             </p>
-                            <p>
+                            <p style={{ display: 'flex', alignItems: 'center' }}>
                                 <strong>Anexo Reposta:</strong>
                                 {data.anexo_resposta ? (
                                     <>
-                                        <a onClick={() => handleAnexoClick(data.anexo_resposta)} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                        <a
+                                            onClick={() => handleAnexoClick(data.anexo_resposta)}
+                                            style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+                                        >
                                             {data.anexo_resposta.split('/').pop()}
                                             <FaFileAlt
                                                 className="icone-anexo"
                                                 style={{ marginLeft: '5px' }}
                                             />
                                         </a>
+                                        <button
+                                            onClick={() => setEditMode(true)}
+                                            style={{ marginLeft: '10px', cursor: 'pointer' }}
+                                        >
+                                            Editar
+                                        </button>
                                     </>
                                 ) : (
-                                    <input type="file" id="anexo_resposta" onChange={(e) => handleFileChange(e, 1)}  />
+                                    <input
+                                        type="file"
+                                        id="anexo_resposta"
+                                        onChange={(e) => handleFileChange(e, 1)}
+                                    />
                                 )}
                             </p>
+                            {editMode && (
+                                <input
+                                    type="file"
+                                    id="anexo_resposta"
+                                    onChange={(e) => handleFileChange(e, 1)}
+                                    style={{ display: 'block', marginTop: '10px' }}
+                                />
+                            )}
                         </div>
                     </div>
 
@@ -653,7 +677,7 @@ const Modal = ({ data, onClose }) => {
                                 <p><label>Destinatário:</label> {atividade.executor}</p>
                                 <p><label>Visibilidade:</label> {atividade.tipo_atividade}</p>
                                 <p style={{ display: 'flex', alignItems: 'center' }}>
-                                    <label>Anexo:</label> 
+                                    <label>Anexo:</label>
                                     {atividade.ds_anexo ? (
                                         <>
                                             <a onClick={() => handleAnexoClick(atividade.ds_anexo)} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
@@ -699,7 +723,7 @@ const Modal = ({ data, onClose }) => {
                                     <p><label>Duração (Corrida):</label> {atividadeSelecionada.tempo_corrido}</p>
                                     <p><label>Observações:</label> {atividadeSelecionada.ds_obs}</p>
                                     <p style={{ display: 'flex', alignItems: 'center' }}>
-                                        <label>Anexo:</label> 
+                                        <label>Anexo:</label>
                                         {atividadeSelecionada.ds_anexo ? (
                                             <>
                                                 <a onClick={() => handleAnexoClick(atividadeSelecionada.ds_anexo)} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
@@ -757,7 +781,7 @@ const Modal = ({ data, onClose }) => {
                                             <input type="radio" name="visibilidade" value="Pública" className="radio-visibilidade" />
                                             Pública
                                         </label>
-                                        
+
                                     </div>
                                     <div className="campo-anexo">
                                         <label htmlFor="anexoAtividade" className="label-anexo">Anexar Arquivo:</label>

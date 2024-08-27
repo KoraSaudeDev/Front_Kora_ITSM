@@ -29,7 +29,6 @@ const Sidebar = () => {
             }
           );
           setMinhaEquipeCount(response.data.total_items);
-          console.log(response.data.total_items);
         } catch (error) {
           console.error("Erro ao buscar contagem de Minha Equipe", error);
         }
