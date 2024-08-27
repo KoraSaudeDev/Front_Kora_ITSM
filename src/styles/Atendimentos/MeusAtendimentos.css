@@ -163,7 +163,7 @@ h3 {
     overflow-y: auto;
 }
 
-.conteudo-modal-atividades{
+.conteudo-modal-atividades {
     padding-top: 15px;
 }
 
@@ -813,8 +813,8 @@ select {
     background-position: right 8px center;
     background-size: 10px;
     cursor: pointer;
-    width: auto;
-    margin-bottom: 5px;
+    width: 100%;
+    margin-bottom: 10px;
 }
 
 select:focus {
@@ -989,7 +989,8 @@ a {
 .campo-editavel {
     display: flex;
     flex-direction: column;
-    margin-bottom: 15px;
+    width: 98%;
+    
 }
 
 .campo-editavel label {
@@ -1070,11 +1071,117 @@ a {
     align-items: flex-start;
     width: 100%;
     margin-bottom: 1rem; 
+    font-size: 17px;
     gap: 20px; 
 }
 
-.status-container, .sla-container {
+h4{
+    font-size: 20px;
+}
+
+.link-label {
+    margin-bottom: 5px;
+}
+
+textarea, select, input[type="file"] {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+textarea, select, .campo-anexo {
+    margin-top: 5px;
+}
+#anexo_resposta{
+    margin-top: 10px;
+}
+
+#campo-limite{
+    margin-top: 0px;
+}
+
+.campo-editavel{
+    margin-top: 5px;
+}
+
+.data{
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding: 0;
+}
+#campor-resp-chamado{
+    width: 600px;
+}
+
+.conteudo-modal-direita {
     display: flex;
-    align-items: center;
-   
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 5px; /* Espaçamento reduzido entre os elementos */
+}
+
+.header-status-sla {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+    margin-bottom: 5px; 
+    gap: 10px; /* Mantendo um espaçamento um pouco maior para os status */
+}
+
+.campo-editavel {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 0px; /* Mantendo consistência */
+}
+
+.campo-editavel select {
+    padding: 8px;
+    width: 100%;
+}
+
+textarea, select, input[type="file"] {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+textarea, select, .campo-anexo {
+    margin-top: 5px; /* Espaçamento consistente */
+}
+
+#anexo_resposta {
+    margin-top: 5px;
+}
+
+.data {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding: 0;
+}
+
+#campo-resp-chamado {
+    width: 100%;
+}
+
+textarea {
+    width: 520px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-top: 5px; 
+}
+
+.campo-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.campo-editavel label {
+    margin-bottom: 5px;
+}
+
+.status-container{
+    margin-right: 20px;
 }

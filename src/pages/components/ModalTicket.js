@@ -490,26 +490,6 @@ const Modal = ({ data, onClose }) => {
                                     'Nenhum anexo'
                                 )}
                             </p>
-                            <p>
-                                <strong>Reposta Chamado:</strong>
-                                <textarea>{data.resposta_chamado}</textarea>
-                            </p>
-                            <p>
-                                <strong>Anexo Reposta:</strong>
-                                {data.anexo_resposta ? (
-                                    <>
-                                        <a onClick={() => handleAnexoClick(data.anexo_resposta)} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                                            {data.anexo_resposta.split('/').pop()}
-                                            <FaFileAlt
-                                                className="icone-anexo"
-                                                style={{ marginLeft: '5px' }}
-                                            />
-                                        </a>
-                                    </>
-                                ) : (
-                                    <input type="file" id="anexo_resposta" />
-                                )}
-                            </p>
                         </div>
 
                         <div className="conteudo-modal-direita">
@@ -526,7 +506,7 @@ const Modal = ({ data, onClose }) => {
                                     {data.status}
                                 </div>
                                 <div className="sla-container">
-                                    <strong>SLA (Útil):</strong>
+                                    <strong>SLA:</strong>
                                     <span
                                         className="sla-bolinha"
                                         style={{
@@ -538,8 +518,8 @@ const Modal = ({ data, onClose }) => {
                                 </div>
                             </div>
 
-                            <p><strong>Abertura:</strong> {data.abertura}</p>
-                            <p><strong>Data Limite:</strong> {data.data_limite}</p>
+                            <p><strong class="data">Abertura:</strong> {data.abertura}</p>
+                            <p><strong class="data">Data Limite:</strong> {data.data_limite}</p>
 
                             <div className="campo-editavel">
                                 <strong>Prioridade:</strong>
@@ -583,6 +563,27 @@ const Modal = ({ data, onClose }) => {
                                     ))}
                                 </select>
                             </div>
+
+                            <p>
+                                <strong id="campor-resp-chamado">Reposta Chamado:</strong>
+                                <textarea>{data.resposta_chamado}</textarea>
+                            </p>
+                            <p>
+                                <strong>Anexo Reposta:</strong>
+                                {data.anexo_resposta ? (
+                                    <>
+                                        <a onClick={() => handleAnexoClick(data.anexo_resposta)} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                            {data.anexo_resposta.split('/').pop()}
+                                            <FaFileAlt
+                                                className="icone-anexo"
+                                                style={{ marginLeft: '5px' }}
+                                            />
+                                        </a>
+                                    </>
+                                ) : (
+                                    <input type="file" id="anexo_resposta" />
+                                )}
+                            </p>
                         </div>
                     </div>
 
@@ -593,7 +594,7 @@ const Modal = ({ data, onClose }) => {
                         </button>
                         {atividades.slice().reverse().map((atividade, index) => (
                             <div className="card-atividade" key={index} onClick={() => handleAbrirDetalhesAtividade(atividade)}>
-                                <p><label>Cód. Task:</label> {atividade.cod_task}</p>
+                                <p><label>Task:</label> {atividade.cod_task}</p>
                                 <p><label>Status:</label> {atividade.status}</p>
                                 <p><label>Início:</label> {atividade.aberto_em}</p>
                                 <p><label>Fim:</label> {atividade.dt_fim}</p>
@@ -704,10 +705,7 @@ const Modal = ({ data, onClose }) => {
                                             <input type="radio" name="visibilidade" value="Pública" className="radio-visibilidade" />
                                             Pública
                                         </label>
-                                        <label className="switch-label">
-                                            <input type="radio" name="visibilidade" value="Privada" className="radio-visibilidade" />
-                                            Privada
-                                        </label>
+                                        
                                     </div>
                                     <div className="campo-anexo">
                                         <label htmlFor="anexoAtividade" className="label-anexo">Anexar Arquivo:</label>
