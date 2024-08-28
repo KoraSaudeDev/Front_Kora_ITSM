@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
 import Autosuggest from 'react-autosuggest';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import '../styles/SearchBar.css';
-
-const paths = [
-  
-];
 
 const SearchBar = ({ onSearch }) => {
   const [value, setValue] = useState('');
@@ -16,22 +13,38 @@ const SearchBar = ({ onSearch }) => {
     setValue(newValue);
   };
 
-  const onSuggestionsFetchRequested = ({ value }) => {
-    setSuggestions(getSuggestions(value));
+  const onSuggestionsFetchRequested = async ({ value }) => {
+    const fetchedSuggestions = await getSuggestions(value);
+    setSuggestions(fetchedSuggestions);
   };
 
   const onSuggestionsClearRequested = () => {
     setSuggestions([]);
   };
 
-  const getSuggestions = (value) => {
+  const getSuggestions = async (value) => {
     const inputValue = value.trim().toLowerCase();
     const inputLength = inputValue.length;
 
-    return inputLength === 0 ? [] : paths.filter(path =>
-      path.name.toLowerCase().includes(inputValue) ||
-      path.category.toLowerCase().includes(inputValue)
-    );
+    if (inputLength === 0) {
+      return [];
+    }
+
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/tickets-preview`, {
+        params: {
+          query: inputValue, 
+        },
+      });
+
+      return response.data.map((ticket) => ({
+        name: `Ticket #${ticket.cod_fluxo} - ${ticket.nome}`,
+        path: `/tickets/${ticket.cod_fluxo}`,
+      }));
+    } catch (error) {
+      console.error('Erro ao buscar tickets:', error);
+      return [];
+    }
   };
 
   const getSuggestionValue = (suggestion) => suggestion.name;
@@ -44,7 +57,7 @@ const SearchBar = ({ onSearch }) => {
 
   const onSuggestionSelected = (event, { suggestion }) => {
     if (onSearch) {
-      onSearch(); 
+      onSearch();
     }
     navigate(suggestion.path);
   };
