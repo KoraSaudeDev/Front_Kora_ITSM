@@ -718,7 +718,7 @@ a {
     display: flex;
     flex-direction: column;
     gap: 3px;
-    width: 98%;
+    width: 500px;
     cursor: pointer;
     height: auto;
     min-height: 40px;
@@ -980,13 +980,25 @@ a {
 
 .conteudo-modal {
     display: flex;
+    justify-content: space-between;
     padding: 20px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-top: none;
+    border-radius: 0 5px 5px 5px;
+    gap: 20px; 
 }
 
 .conteudo-modal-esquerda,
 .conteudo-modal-direita {
-    flex: 1;
-    padding: 10px 20px;
+    flex: 0.5; 
+    background-color: #eeeeee;
+    border-radius: 4px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
 }
 
 .campo-editavel {
@@ -1010,13 +1022,15 @@ a {
 }
 
 .card-atividade {
-    width: 100%;
+    width: 530px;
     background-color: #f8f9fa;
     padding: 10px;
     margin-top: 10px;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    flex: 0.5;
+    margin-right: 22px;
     
 }
 
@@ -1125,7 +1139,7 @@ textarea, select, .campo-anexo {
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
-    gap: 5px; /* Espaçamento reduzido entre os elementos */
+    gap: 5px; 
 }
 
 .header-status-sla {
@@ -1134,14 +1148,14 @@ textarea, select, .campo-anexo {
     align-items: flex-start;
     width: 100%;
     margin-bottom: 5px; 
-    gap: 10px; /* Mantendo um espaçamento um pouco maior para os status */
+    gap: 10px; 
 }
 
 .campo-editavel {
     display: flex;
     flex-direction: column;
     width: 100%;
-    margin-top: 0px; /* Mantendo consistência */
+    margin-top: 0px; 
 }
 
 .campo-editavel select {
@@ -1155,7 +1169,7 @@ textarea, select, input[type="file"] {
 }
 
 textarea, select, .campo-anexo {
-    margin-top: 5px; /* Espaçamento consistente */
+    margin-top: 5px; 
 }
 
 #anexo_resposta {
@@ -1212,4 +1226,154 @@ textarea {
     background-color: #fc7c27;
     transform: translateY(-2px);
     box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+/* Divisão dos botões "Atividade" e "Anexo" */
+.campo-atividades {
+    margin-top: -20px;
+}
+
+.campo-atividades h4 {
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+.campo-atividades > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.botao-atividades,
+.botao-anexo {
+    width: 48%;
+    font-weight: 300;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border: none;
+    background-color: #007aff;
+    border-radius: 8px;
+    height: 40px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.botao-atividades:hover,
+.botao-anexo:hover {
+    background-color: #005bb5;
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.botao-atividades:active,
+.botao-anexo:active {
+    background-color: #004494;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transform: translateY(1px);
+}
+
+
+.modal.anexos-modal {
+    width: 80%;
+    height: 80%;
+    max-height: 80vh;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    animation: scaleUp 0.5s ease-in-out;
+    transition: transform 0.5s ease-in-out;
+    overflow-y: auto;
+}
+
+.modal.anexos-modal.fechar {
+    animation: scaleDown 0.5s ease-in-out forwards;
+}
+
+.conteudo-modal-anexos {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 15px;
+}
+
+.campo-detalhe {
+    margin-bottom: 15px;
+}
+
+.campo-detalhe label {
+    font-size: 15px;
+    color: #3E4676;
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.campo-detalhe input,
+.campo-detalhe textarea {
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-family: 'Jost', -apple-system, sans-serif;
+    font-size: 15px;
+    color: #3E4676;
+}
+
+#nome-anexo,
+#data-abertura-anexo {
+    background-color: #d6d6d6;
+    cursor: not-allowed;
+}
+
+.botao-salvar-anexo {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+    align-self: flex-end;
+}
+
+.botao-salvar-anexo:hover {
+    background-color: #0056b3;
+}
+
+/* Animações */
+@keyframes scaleUp {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes scaleDown {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0);
+        opacity: 0;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
