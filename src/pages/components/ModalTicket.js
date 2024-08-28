@@ -409,6 +409,8 @@ const Modal = ({ data, onClose }) => {
                 await sendRequest(taskConfig);
             }
 
+            //axios.post(`${process.env.REACT_APP_API_BASE_URL}/tickets/update/sla?cod_fluxo=${data.cod_fluxo}`);
+
             hideLoadingOverlay();
 
             setShowSuccessMessage(true);
