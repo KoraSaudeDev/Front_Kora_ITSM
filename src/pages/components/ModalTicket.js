@@ -91,6 +91,20 @@ const Modal = ({ data, onClose }) => {
     }, [data.id]);
 
     useEffect(() => {
+        const fetchFiles = async () => {
+            try {
+                const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/ticket-files?id=${data.id}`);
+                const sortedFiles = response.data.sort((a, b) => new Date(a.dataAbertura) - new Date(b.dataAbertura));
+                setAnexos(sortedFiles);
+            } catch (error) {
+                console.error('Erro ao buscar os anexos:', error);
+            }
+        };
+
+        fetchFiles();
+    }, [data.id]);
+
+    useEffect(() => {
         const formatCustomDate = (date) => {
             const padToTwoDigits = (num) => String(num).padStart(2, '0');
             const year = date.getFullYear();
@@ -261,24 +275,38 @@ const Modal = ({ data, onClose }) => {
     };
 
     const handleSalvarAnexo = () => {
-        const nome = user.name;
-        const dataAbertura = document.querySelector('#data-abertura-anexo').value;
+        const ds_adicionado_por = user.name;
+        const abertura = document.querySelector('#data-abertura-anexo').value;
+        const ds_texto = document.querySelector('#descricao-anexo').value;
         const fileInput = document.getElementById('anexo-file');
         const files = fileInput.files;
 
-        if (!dataAbertura || files.length === 0) {
+        if (!abertura || files.length === 0) {
             alert("Por favor, preencha todos os campos obrigatórios.");
             return;
         }
 
         const novoAnexo = {
-            nome,
-            dataAbertura,
-            file: files[0]
+            cod_fluxo: data.id,
+            ds_adicionado_por,
+            abertura,
+            ds_texto,
+            ds_anexo: files[0].name,
+            alterar: 1
         };
 
+        if (files.length > 0) {
+            novoAnexo.ds_anexo = files[0].name;
+
+            const updatedFiles = Array.from(files).map((file) => ({
+                file,
+                uploadType: 3,
+            }));
+
+            setSelectedFiles((prevFiles) => [...prevFiles, ...updatedFiles]);
+        }
+
         setAnexos(prevAnexos => [...prevAnexos, novoAnexo]);
-        setSelectedFiles((prevFiles) => [...prevFiles, novoAnexo]);
         handleFecharAnexosModal();
     };
 
@@ -340,6 +368,8 @@ const Modal = ({ data, onClose }) => {
         }
 
         showLoadingOverlay();
+
+        const insert_anexos = anexos.filter(task => task.alterar === 1 && task.id === undefined);
 
         const update_tasks = atividades
             .filter(task => task.alterar === 1 && task.id !== undefined)
@@ -403,6 +433,11 @@ const Modal = ({ data, onClose }) => {
                         if (matchedAtividade) {
                             matchedAtividade.ds_anexo = response?.data?.filename;
                         }
+                    } else if (selectedFiles[i].uploadType === 3) {
+                        const matchedFile = insert_anexos.find(task => task.ds_anexo === selectedFiles[i].file.name);
+                        if (matchedFile) {
+                            matchedFile.ds_anexo = response?.data?.filename;
+                        }
                     }
                 } else {
                     console.error(`Erro ao enviar o arquivo ${selectedFiles[i].name}:`, response);
@@ -446,6 +481,21 @@ const Modal = ({ data, onClose }) => {
                 };
 
                 await sendRequest(taskConfig);
+            }
+
+            for (const file of insert_anexos) {
+                delete file.alterar;
+
+                const fileConfig = {
+                    method: 'post',
+                    url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/file`,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    data: JSON.stringify(file)
+                };
+
+                await sendRequest(fileConfig);
             }
 
             hideLoadingOverlay();
@@ -770,11 +820,12 @@ const Modal = ({ data, onClose }) => {
                             <div style={{ flex: 1 }}>
                                 {anexos.slice().reverse().map((anexo, index) => (
                                     <div className="card-atividade" key={index} onClick={() => handleAbrirDetalhesAnexo(anexo)}>
-                                        <p><strong>Nome:</strong> {anexo.nome}</p>
-                                        <p><strong>Data de Abertura:</strong> {anexo.dataAbertura}</p>
-                                        <p><strong>Arquivo:</strong>
-                                            <a onClick={() => handleAnexoClick(anexo.file.name)} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                                                {anexo.file.name}
+                                        <p><strong>Nome:</strong> {anexo.ds_adicionado_por}</p>
+                                        <p><strong>Data de Abertura:</strong> {anexo.abertura}</p>
+                                        <p><strong>Descrição:</strong> {anexo.ds_texto}</p>
+                                        <p style={{ display: 'flex', alignItems: 'center'}}><strong>Arquivo:</strong>
+                                            <a onClick={() => handleAnexoClick(anexo.ds_anexo)} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                                {anexo.ds_anexo.split('/').pop()}
                                                 <FaFileAlt
                                                     className="icone-anexo"
                                                     style={{ marginLeft: '5px' }}
@@ -898,12 +949,13 @@ const Modal = ({ data, onClose }) => {
                                     </button>
                                 </div>
                                 <div className="conteudo-modal-anexos">
-                                    <p><label>Nome:</label> {anexoSelecionado.nome}</p>
-                                    <p><label>Data de Abertura:</label> {anexoSelecionado.dataAbertura}</p>
+                                    <p><label>Nome:</label> {anexoSelecionado.ds_adicionado_por}</p>
+                                    <p><label>Data de Abertura:</label> {anexoSelecionado.abertura}</p>
+                                    <p><label>Descrição:</label> {anexoSelecionado.ds_texto}</p>
                                     <p style={{ display: 'flex', alignItems: 'center' }}>
                                         <label>Arquivo:</label>
-                                        <a onClick={() => handleAnexoClick(anexoSelecionado.file.name)} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                                            {anexoSelecionado.file.name}
+                                        <a onClick={() => handleAnexoClick(anexoSelecionado.ds_anexo)} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                            {anexoSelecionado.ds_anexo.split('/').pop()}
                                             <FaFileAlt
                                                 className="icone-anexo"
                                                 style={{ marginLeft: '5px' }}
@@ -928,6 +980,10 @@ const Modal = ({ data, onClose }) => {
                                     <div className="campo-detalhe">
                                         <label htmlFor="data-abertura-anexo">Data de Abertura:</label>
                                         <input type="text" id="data-abertura-anexo" value={inicio} readOnly />
+                                    </div>
+                                    <div className="campo-detalhe">
+                                        <label htmlFor="descricao-anexo">Descrição:</label>
+                                        <textarea id="descricao-anexo"></textarea>
                                     </div>
                                     <div className="campo-anexo">
                                         <label htmlFor="anexo-file" className="label-anexo">Anexar Arquivo:</label>
