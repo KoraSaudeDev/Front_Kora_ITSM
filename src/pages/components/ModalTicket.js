@@ -8,10 +8,13 @@ const Modal = ({ data, onClose }) => {
     const [inicio, setInicio] = useState('');
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [showAtividadesModal, setShowAtividadesModal] = useState(false);
+    const [showAnexosModal, setShowAnexosModal] = useState(false);
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
     const [isClosingAtividadesModal, setIsClosingAtividadesModal] = useState(false);
+    const [isClosingAnexosModal, setIsClosingAnexosModal] = useState(false);
     const [isClosingModal, setIsClosingModal] = useState(false);
     const [atividades, setAtividades] = useState([]);
+    const [anexos, setAnexos] = useState([]); // Estado para armazenar os anexos
     const [atividadeSelecionada, setAtividadeSelecionada] = useState(null);
     const [isEditMode, setIsEditMode] = useState(false);
     const [editMode, setEditMode] = useState(false);
@@ -89,23 +92,21 @@ const Modal = ({ data, onClose }) => {
     useEffect(() => {
         const formatCustomDate = (date) => {
             const padToTwoDigits = (num) => String(num).padStart(2, '0');
-
             const year = date.getFullYear();
             const month = padToTwoDigits(date.getMonth() + 1);
             const day = padToTwoDigits(date.getDate());
             const hours = padToTwoDigits(date.getHours());
             const minutes = padToTwoDigits(date.getMinutes());
             const seconds = padToTwoDigits(date.getSeconds());
-
             return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
         };
 
-        if (showAtividadesModal) {
+        if (showAtividadesModal || showAnexosModal) {
             const now = new Date();
             const formattedDate = formatCustomDate(now);
             setInicio(formattedDate);
         }
-    }, [showAtividadesModal]);
+    }, [showAtividadesModal, showAnexosModal]);
 
     useEffect(() => {
         axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/status`)
@@ -152,7 +153,7 @@ const Modal = ({ data, onClose }) => {
             file,
             uploadType: uploadType,
         }));
-    
+
         setSelectedFiles((prevFiles) => {
             if (uploadType === 1) {
                 const filteredFiles = prevFiles.filter((fileObj) => fileObj.uploadType !== 1);
@@ -162,7 +163,6 @@ const Modal = ({ data, onClose }) => {
             }
         });
     };
-    
 
     const handleAbrirAtividadesModal = () => {
         setAtividadeSelecionada(null);
@@ -178,6 +178,18 @@ const Modal = ({ data, onClose }) => {
         }, 500);
     };
 
+    const handleAbrirAnexosModal = () => {
+        setShowAnexosModal(true);
+    };
+
+    const handleFecharAnexosModal = () => {
+        setIsClosingAnexosModal(true);
+        setTimeout(() => {
+            setShowAnexosModal(false);
+            setIsClosingAnexosModal(false);
+        }, 500);
+    };
+
     const handleSalvarAtividade = () => {
         const aberto_em = document.querySelector('#inicio-task').value;
         const aberto_por = document.querySelector('#aberto-por-task').value;
@@ -186,14 +198,13 @@ const Modal = ({ data, onClose }) => {
         const status = document.querySelector('#status-task').value;
         var tipo_atividade = document.querySelector('input[name="visibilidade"]:checked');
 
-        if (!tipo_atividade){
+        if (!tipo_atividade) {
             tipo_atividade = 'Privada';
-        }
-        else{
+        } else {
             tipo_atividade = 'Pública';
         }
 
-        if (!descricao || !status || !executor ) {
+        if (!descricao || !status || !executor) {
             alert("Por favor, preencha todos os campos obrigatórios.");
             return;
         }
@@ -245,6 +256,28 @@ const Modal = ({ data, onClose }) => {
 
         setAtividades([...atividades, novaAtividade]);
         handleFecharAtividadesModal();
+    };
+
+    const handleSalvarAnexo = () => {
+        const nome = user.name; // Nome do anexo será o nome do usuário
+        const dataAbertura = document.querySelector('#data-abertura-anexo').value;
+        const fileInput = document.getElementById('anexo-file');
+        const files = fileInput.files;
+
+        if (!dataAbertura || files.length === 0) {
+            alert("Por favor, preencha todos os campos obrigatórios.");
+            return;
+        }
+
+        const novoAnexo = {
+            nome,
+            dataAbertura,
+            file: files[0]
+        };
+
+        setAnexos(prevAnexos => [...prevAnexos, novoAnexo]);
+        setSelectedFiles((prevFiles) => [...prevFiles, novoAnexo]);
+        handleFecharAnexosModal();
     };
 
     const handleAbrirDetalhesAtividade = (atividade) => {
@@ -355,11 +388,9 @@ const Modal = ({ data, onClose }) => {
                 });
 
                 if (response.status === 202) {
-                    console.log(response.data.filename)
                     if (selectedFiles[i].uploadType === 1) {
                         update_tickets.anexo_resposta = response?.data?.filename;
-                    }
-                    else if (selectedFiles[i].uploadType === 2) {
+                    } else if (selectedFiles[i].uploadType === 2) {
                         const matchedAtividade = insert_tasks.find(task => task.ds_anexo === selectedFiles[i].file.name);
                         if (matchedAtividade) {
                             matchedAtividade.ds_anexo = response?.data?.filename;
@@ -603,8 +634,6 @@ const Modal = ({ data, onClose }) => {
                             <p><strong className="data">Data Limite:</strong> {data.data_limite}</p>
                             <p><strong className="data">Tipo da SLA:</strong> {prioridades.find(p => p.prioridade === prioridadeSelecionada)?.tipo_tempo.toUpperCase() || ''}</p>
 
-
-           
                             <div className="campo-editavel">
                                 <strong>Prioridade:</strong>
                                 <select
@@ -694,36 +723,62 @@ const Modal = ({ data, onClose }) => {
                     </div>
 
                     <div className="campo-atividades">
-                        <h4>Atividades</h4>
-                        <button className="botao-atividades" onClick={handleAbrirAtividadesModal}>
-                            <FaPlus style={{ marginRight: '8px' }} /> Atividade
-                        </button>
-                        {atividades.slice().reverse().map((atividade, index) => (
-                            <div className="card-atividade" key={index} onClick={() => handleAbrirDetalhesAtividade(atividade)}>
-                                <p><label>Task:</label> {atividade.cod_task}</p>
-                                <p><label>Status:</label> {atividade.status}</p>
-                                <p><label>Início:</label> {atividade.aberto_em}</p>
-                                <p><label>Fim:</label> {atividade.dt_fim}</p>
-                                <p><label>Destinatário:</label> {atividade.executor}</p>
-                                <p><label>Visibilidade:</label> {atividade.tipo_atividade}</p>
-                                <p style={{ display: 'flex', alignItems: 'center' }}>
-                                    <label>Anexo:</label>
-                                    {atividade.ds_anexo ? (
-                                        <>
-                                            <a onClick={() => handleAnexoClick(atividade.ds_anexo)} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                                                {atividade.ds_anexo.split('/').pop()}
+                        <h4>Atividades e Anexos</h4>
+                        <div style={{ display: 'flex', gap: '10px' }}>
+                            <button className="botao-atividades" onClick={handleAbrirAtividadesModal}>
+                                <FaPlus style={{ marginRight: '8px' }} /> Atividade
+                            </button>
+                            <button className="botao-anexo" onClick={handleAbrirAnexosModal}>
+                                <FaPlus style={{ marginRight: '8px' }} /> Anexo
+                            </button>
+                        </div>
+                        <div style={{ display: 'flex', gap: '20px' }}>
+                            <div style={{ flex: 1 }}>
+                                {atividades.slice().reverse().map((atividade, index) => (
+                                    <div className="card-atividade" key={index} onClick={() => handleAbrirDetalhesAtividade(atividade)}>
+                                        <p><label>Task:</label> {atividade.cod_task}</p>
+                                        <p><label>Status:</label> {atividade.status}</p>
+                                        <p><label>Início:</label> {atividade.aberto_em}</p>
+                                        <p><label>Fim:</label> {atividade.dt_fim}</p>
+                                        <p><label>Destinatário:</label> {atividade.executor}</p>
+                                        <p><label>Visibilidade:</label> {atividade.tipo_atividade}</p>
+                                        <p style={{ display: 'flex', alignItems: 'center' }}>
+                                            <label>Anexo:</label>
+                                            {atividade.ds_anexo ? (
+                                                <>
+                                                    <a onClick={() => handleAnexoClick(atividade.ds_anexo)} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                                        {atividade.ds_anexo.split('/').pop()}
+                                                        <FaFileAlt
+                                                            className="icone-anexo"
+                                                            style={{ marginLeft: '5px' }}
+                                                        />
+                                                    </a>
+                                                </>
+                                            ) : (
+                                                'Nenhum anexo'
+                                            )}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                            <div style={{ flex: 1 }}>
+                                {anexos.slice().reverse().map((anexo, index) => (
+                                    <div className="card-atividade" key={index}>
+                                        <p><strong>Nome:</strong> {anexo.nome}</p>
+                                        <p><strong>Data de Abertura:</strong> {anexo.dataAbertura}</p>
+                                        <p><strong>Arquivo:</strong>
+                                            <a onClick={() => handleAnexoClick(anexo.file.name)} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                                {anexo.file.name}
                                                 <FaFileAlt
                                                     className="icone-anexo"
                                                     style={{ marginLeft: '5px' }}
                                                 />
                                             </a>
-                                        </>
-                                    ) : (
-                                        'Nenhum anexo'
-                                    )}
-                                </p>
+                                        </p>
+                                    </div>
+                                ))}
                             </div>
-                        ))}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -821,6 +876,34 @@ const Modal = ({ data, onClose }) => {
                                 </div>
                             </>
                         )}
+                    </div>
+                </div>
+            )}
+
+            {showAnexosModal && (
+                <div className="modal-overlay">
+                    <div className={`modal anexos-modal ${isClosingAnexosModal ? 'fechar' : ''}`}>
+                        <div className="modal-header">
+                            <h3>Adicionar Anexo</h3>
+                            <button className="fechar-modal" onClick={handleFecharAnexosModal}>
+                                <FaTimes />
+                            </button>
+                        </div>
+                        <div className="conteudo-modal-anexos">
+                            <div className="campo-detalhe">
+                                <label htmlFor="nome-anexo">Nome:</label>
+                                <input type="text" id="nome-anexo" value={user.name} readOnly />
+                            </div>
+                            <div className="campo-detalhe">
+                                <label htmlFor="data-abertura-anexo">Data de Abertura:</label>
+                                <input type="text" id="data-abertura-anexo" value={inicio} readOnly />
+                            </div>
+                            <div className="campo-anexo">
+                                <label htmlFor="anexo-file" className="label-anexo">Anexar Arquivo:</label>
+                                <input type="file" id="anexo-file" className="input-anexo" />
+                            </div>
+                            <button className="botao-salvar-anexo" onClick={handleSalvarAnexo}>Salvar</button>
+                        </div>
                     </div>
                 </div>
             )}
