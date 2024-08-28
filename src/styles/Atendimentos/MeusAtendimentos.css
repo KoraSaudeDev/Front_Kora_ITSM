@@ -989,8 +989,7 @@ a {
     gap: 20px; 
 }
 
-.conteudo-modal-esquerda,
-.conteudo-modal-direita {
+.conteudo-modal-esquerda {
     flex: 0.5; 
     background-color: #eeeeee;
     border-radius: 4px;
@@ -999,6 +998,17 @@ a {
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
+}
+
+.conteudo-modal-direita{
+        flex: 0.5; 
+        border-radius: 4px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+    
 }
 
 .campo-editavel {
