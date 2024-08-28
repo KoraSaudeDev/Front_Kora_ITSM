@@ -7,4 +7,4 @@ services:
     ports:
       - "33963:3000"
     environment:
-      - REACT_APP_API_BASE_URL=http://10.27.254.161:5555
+      - REACT_APP_API_BASE_URL=${REACT_APP_API_BASE_URL}
