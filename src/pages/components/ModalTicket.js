@@ -35,6 +35,8 @@ const Modal = ({ data, onClose }) => {
         destinatarios: []
     });
 
+    
+
     useEffect(() => {
         axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/hub`)
             .then(response => setOptions(prev => ({ ...prev, hub: response.data })))
@@ -44,6 +46,8 @@ const Modal = ({ data, onClose }) => {
             .then(response => setOptions(prev => ({ ...prev, categoria: response.data })))
             .catch(error => console.error('Erro ao carregar categorias:', error));
     }, []);
+
+    
 
     useEffect(() => {
         if (selectedHub) {
@@ -140,6 +144,8 @@ const Modal = ({ data, onClose }) => {
                 console.error('Error fetching destinatarios options:', error);
             });
     }, []);
+
+    
 
     if (!data) return null;
 

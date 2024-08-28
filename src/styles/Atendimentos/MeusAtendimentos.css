@@ -193,15 +193,7 @@ h3 {
     margin-right: 10px;
 }
 
-.conteudo-modal {
-    display: flex;
-    justify-content: space-between;
-    padding: 20px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-top: none;
-    border-radius: 0 5px 5px 5px;
-}
+
 
 .conteudo-modal-esquerda {
     flex: 0.5;
@@ -209,10 +201,7 @@ h3 {
     border-radius: 4px;
 }
 
-.conteudo-modal-direita {
-    flex: 0.62;
-    margin-left: 20px;
-}
+
 
 strong {
     margin-right: 10px;
@@ -707,22 +696,26 @@ a {
 }
 
 .card-atividade {
-    background-color: #fff;
+    background-color: #f8f9fa;
     border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 4px 8px;
+    border-radius: 5px;
+    padding: 10px;
     position: relative;
-    margin-top: 15px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-right: 22px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.2s ease;
     display: flex;
     flex-direction: column;
     gap: 3px;
-    width: 500px;
+    width: 94%;
     cursor: pointer;
     height: auto;
     min-height: 40px;
+    flex: 0.1;
 }
+
 
 .switch-container {
     margin-top: 15px;
@@ -935,13 +928,6 @@ svg {
     margin-top: -20px;
 }
 
-.card-atividade {
-    background-color: #f8f9fa;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 4px;
-    cursor: pointer;
-}
 
 .icone-anexo {
     font-size: 18px;
@@ -986,11 +972,16 @@ a {
     border: 1px solid #ddd;
     border-top: none;
     border-radius: 0 5px 5px 5px;
-    gap: 20px; 
+    gap: 20px;
+    width: 100%;
+    box-sizing: border-box;
+    max-height: 100%; 
+  
 }
 
-.conteudo-modal-esquerda {
-    flex: 0.5; 
+.conteudo-modal-esquerda,
+.conteudo-modal-direita {
+    flex: 1; /* Ambos os lados ocupam o mesmo espaço */
     background-color: #eeeeee;
     border-radius: 4px;
     padding: 20px;
@@ -998,17 +989,11 @@ a {
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
+    overflow: hidden;
 }
 
 .conteudo-modal-direita{
-        flex: 0.5; 
-        border-radius: 4px;
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: flex-start;
-    
+    background-color: white;
 }
 
 .campo-editavel {
@@ -1031,18 +1016,6 @@ a {
     padding: 20px;
 }
 
-.card-atividade {
-    width: 530px;
-    background-color: #f8f9fa;
-    padding: 10px;
-    margin-top: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    flex: 0.5;
-    margin-right: 22px;
-    
-}
 
 .card-atividade:hover {
     background-color: #e9ecef;
@@ -1090,12 +1063,7 @@ a {
     border-bottom: 1px solid #ddd;
 }
 
-.conteudo-modal-direita {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
-}
+
 
 .header-status-sla {
     display: flex;
@@ -1144,13 +1112,7 @@ textarea, select, .campo-anexo {
     width: 600px;
 }
 
-.conteudo-modal-direita {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
-    gap: 5px; 
-}
+
 
 .header-status-sla {
     display: flex;
@@ -1298,6 +1260,15 @@ textarea {
     animation: scaleUp 0.5s ease-in-out;
     transition: transform 0.5s ease-in-out;
     overflow-y: auto;
+    
+}
+label[for="nome-anexo"] {
+    margin-top: 30px;
+}
+
+
+#nome-anexo, #data-abertura-anexo{
+    width: 98%;
 }
 
 .modal.anexos-modal.fechar {
@@ -1386,4 +1357,22 @@ textarea {
     to {
         opacity: 1;
     }
+}
+.modal-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 999;
+    border-radius: 8px;
+}
+
+.modal-loading-overlay img {
+    width: 50px;
+    height: 50px;
 }
