@@ -14,8 +14,9 @@ const Modal = ({ data, onClose }) => {
     const [isClosingAnexosModal, setIsClosingAnexosModal] = useState(false);
     const [isClosingModal, setIsClosingModal] = useState(false);
     const [atividades, setAtividades] = useState([]);
-    const [anexos, setAnexos] = useState([]); // Estado para armazenar os anexos
+    const [anexos, setAnexos] = useState([]);
     const [atividadeSelecionada, setAtividadeSelecionada] = useState(null);
+    const [anexoSelecionado, setAnexoSelecionado] = useState(null);
     const [isEditMode, setIsEditMode] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [prioridadeSelecionada, setPrioridadeSelecionada] = useState(data.ds_nivel);
@@ -179,6 +180,7 @@ const Modal = ({ data, onClose }) => {
     };
 
     const handleAbrirAnexosModal = () => {
+        setAnexoSelecionado(null);
         setShowAnexosModal(true);
     };
 
@@ -259,7 +261,7 @@ const Modal = ({ data, onClose }) => {
     };
 
     const handleSalvarAnexo = () => {
-        const nome = user.name; // Nome do anexo será o nome do usuário
+        const nome = user.name;
         const dataAbertura = document.querySelector('#data-abertura-anexo').value;
         const fileInput = document.getElementById('anexo-file');
         const files = fileInput.files;
@@ -284,6 +286,12 @@ const Modal = ({ data, onClose }) => {
         setAtividadeSelecionada(atividade);
         setIsEditMode(false);
         setShowAtividadesModal(true);
+    };
+
+    const handleAbrirDetalhesAnexo = (anexo) => {
+        setAnexoSelecionado(anexo);
+        setIsEditMode(false);
+        setShowAnexosModal(true);
     };
 
     const handleFieldChange = (field, value) => {
@@ -439,8 +447,6 @@ const Modal = ({ data, onClose }) => {
 
                 await sendRequest(taskConfig);
             }
-
-            //axios.post(`${process.env.REACT_APP_API_BASE_URL}/tickets/update/sla?cod_fluxo=${data.cod_fluxo}`);
 
             hideLoadingOverlay();
 
@@ -763,7 +769,7 @@ const Modal = ({ data, onClose }) => {
                             </div>
                             <div style={{ flex: 1 }}>
                                 {anexos.slice().reverse().map((anexo, index) => (
-                                    <div className="card-atividade" key={index}>
+                                    <div className="card-atividade" key={index} onClick={() => handleAbrirDetalhesAnexo(anexo)}>
                                         <p><strong>Nome:</strong> {anexo.nome}</p>
                                         <p><strong>Data de Abertura:</strong> {anexo.dataAbertura}</p>
                                         <p><strong>Arquivo:</strong>
@@ -883,27 +889,54 @@ const Modal = ({ data, onClose }) => {
             {showAnexosModal && (
                 <div className="modal-overlay">
                     <div className={`modal anexos-modal ${isClosingAnexosModal ? 'fechar' : ''}`}>
-                        <div className="modal-header">
-                            <h3>Adicionar Anexo</h3>
-                            <button className="fechar-modal" onClick={handleFecharAnexosModal}>
-                                <FaTimes />
-                            </button>
-                        </div>
-                        <div className="conteudo-modal-anexos">
-                            <div className="campo-detalhe">
-                                <label htmlFor="nome-anexo">Nome:</label>
-                                <input type="text" id="nome-anexo" value={user.name} readOnly />
-                            </div>
-                            <div className="campo-detalhe">
-                                <label htmlFor="data-abertura-anexo">Data de Abertura:</label>
-                                <input type="text" id="data-abertura-anexo" value={inicio} readOnly />
-                            </div>
-                            <div className="campo-anexo">
-                                <label htmlFor="anexo-file" className="label-anexo">Anexar Arquivo:</label>
-                                <input type="file" id="anexo-file" className="input-anexo" />
-                            </div>
-                            <button className="botao-salvar-anexo" onClick={handleSalvarAnexo}>Salvar</button>
-                        </div>
+                        {anexoSelecionado ? (
+                            <>
+                                <div className="modal-header">
+                                    <h3>Detalhes do Anexo</h3>
+                                    <button className="fechar-modal" onClick={handleFecharAnexosModal}>
+                                        <FaTimes />
+                                    </button>
+                                </div>
+                                <div className="conteudo-modal-anexos">
+                                    <p><label>Nome:</label> {anexoSelecionado.nome}</p>
+                                    <p><label>Data de Abertura:</label> {anexoSelecionado.dataAbertura}</p>
+                                    <p style={{ display: 'flex', alignItems: 'center' }}>
+                                        <label>Arquivo:</label>
+                                        <a onClick={() => handleAnexoClick(anexoSelecionado.file.name)} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                            {anexoSelecionado.file.name}
+                                            <FaFileAlt
+                                                className="icone-anexo"
+                                                style={{ marginLeft: '5px' }}
+                                            />
+                                        </a>
+                                    </p>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <div className="modal-header">
+                                    <h3>Adicionar Anexo</h3>
+                                    <button className="fechar-modal" onClick={handleFecharAnexosModal}>
+                                        <FaTimes />
+                                    </button>
+                                </div>
+                                <div className="conteudo-modal-anexos">
+                                    <div className="campo-detalhe">
+                                        <label htmlFor="nome-anexo">Nome:</label>
+                                        <input type="text" id="nome-anexo" value={user.name} readOnly />
+                                    </div>
+                                    <div className="campo-detalhe">
+                                        <label htmlFor="data-abertura-anexo">Data de Abertura:</label>
+                                        <input type="text" id="data-abertura-anexo" value={inicio} readOnly />
+                                    </div>
+                                    <div className="campo-anexo">
+                                        <label htmlFor="anexo-file" className="label-anexo">Anexar Arquivo:</label>
+                                        <input type="file" id="anexo-file" className="input-anexo" />
+                                    </div>
+                                    <button className="botao-salvar-anexo" onClick={handleSalvarAnexo}>Salvar</button>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
             )}

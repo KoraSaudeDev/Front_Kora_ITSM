@@ -4,11 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import '../styles/SearchBar.css';
 
 const paths = [
-  { name: 'Novo Ticket', category: 'ITSM', path: '/itsm/novo-ticket' },
-  { name: 'Meus Atendimentos', category: 'ITSM', path: '/itsm/meus-atendimentos' },
-  { name: 'Minha Equipe', category: 'ITSM', path: '/itsm/minha-equipe' },
-  { name: 'Todos os Tickets', category: 'ITSM', path: '/itsm/all-tickets' },
-  { name: 'Dashboard', category: 'Dashboard', path: '/dashboard/tickets' },
+  
 ];
 
 const SearchBar = ({ onSearch }) => {
