@@ -25,6 +25,10 @@ const Modal = ({ data, onClose }) => {
     const [selectedSubcategoria, setSelectedSubcategoria] = useState(data.subcategoria || '');
     const [selectedUnidade, setSelectedUnidade] = useState(data.unidade || '');
     const [selectedAssunto, setSelectedAssunto] = useState(data.assunto || '');
+    const [emailDomains, setEmailDomains] = useState([]);
+    const [isEmailDomainEditable, setIsEmailDomainEditable] = useState(false);
+    const [selectedDomain, setSelectedDomain] = useState('');
+    const [organizacaoDomains, setOrganizacaoDomains] = useState(data.organizacao_dominio || '');
     const [options, setOptions] = useState({
         hub: [],
         unidade: [],
@@ -34,8 +38,147 @@ const Modal = ({ data, onClose }) => {
         status: [],
         destinatarios: []
     });
-
-
+    const formsEspecificos = {
+        "novo_usuario": data.novo_usuario,
+        "primeiro_nome_user": data.primeiro_nome_user,
+        "sobrenome_user": data.sobrenome_user,
+        "email_user": data.email_user,
+        "usuario_mv": data.usuario_mv,
+        "dt_nascimento": data.dt_nascimento,
+        "cpf": data.cpf,
+        "matricula_senior": data.matricula_senior,
+        "matricula_final": data.matricula_final,
+        "n_tel_usuario": data.n_tel_usuario,
+        "usuario_modelo": data.usuario_modelo,
+        "ds_tipo_colaborador": data.ds_tipo_colaborador,
+        "hub_novo_usu": data.hub_novo_usu,
+        "unidade_novo_usu": data.unidade_novo_usu,
+        "centro_custo": data.centro_custo,
+        "cargo": data.cargo,
+        "departamento_novo_usuario": data.departamento_novo_usuario,
+        "ds_entidade": data.ds_entidade,
+        "ds_acesso_solic": data.ds_acesso_solic,
+        "cod_prest_mv": data.cod_prest_mv,
+        "tipo_usuario": data.tipo_usuario,
+        "ds_vinc_empr": data.ds_vinc_empr,
+        "empresa_colab_cadastrado": data.empresa_colab_cadastrado,
+        "sigla_cp": data.sigla_cp,
+        "registro_cp": data.registro_cp,
+        "ds_tipo_cargo": data.ds_tipo_cargo,
+        "dominio_email": data.dominio_email,
+        "organizacao_dominio": data.organizacao_dominio,
+        "ds_licenca": data.ds_licenca,
+        "ds_custo_novo_usu": data.ds_custo_novo_usu,
+        "ds_gestor": data.ds_gestor,
+        "ds_email_gestor": data.ds_email_gestor,
+        "ds_gerente": data.ds_gerente,
+        "ds_email_gerente": data.ds_email_gerente,
+        "aprovador_sap": data.aprovador_sap,
+        "public_alvo": data.public_alvo,
+        "obj_comunicacao": data.obj_comunicacao,
+        "n_verba": data.n_verba,
+        "material_referencia": data.material_referencia,
+        "urgencia": data.urgencia,
+        "ds_endereco": data.ds_endereco,
+        "email_receb_alias": data.email_receb_alias,
+        "endereco_alias": data.endereco_alias,
+        "ds_obs": data.ds_obs,
+    };
+    const formsEspecificosLabels = {
+        "novo_usuario": "Nome Completo Usuário",
+        "primeiro_nome_user": "Primeiro Nome do Usuário",
+        "sobrenome_user": "Sobrenome do Usuário",
+        "email_user": "Email do Usuário",
+        "usuario_mv": "Usuário MV",
+        "dt_nascimento": "Data de Nascimento",
+        "cpf": "CPF",
+        "matricula_senior": "Matrícula Senior",
+        "matricula_final": "Matrícula Final",
+        "n_tel_usuario": "Telefone do Usuário",
+        "usuario_modelo": "Usuário Modelo",
+        "ds_tipo_colaborador": "Tipo de Colaborador",
+        "hub_novo_usu": "Hub do Novo Usuário",
+        "unidade_novo_usu": "Unidade do Novo Usuário",
+        "centro_custo": "Centro de Custo",
+        "cargo": "Cargo",
+        "departamento_novo_usuario": "Departamento do Novo Usuário",
+        "ds_entidade": "Entidade",
+        "ds_acesso_solic": "Acesso Solicitado",
+        "cod_prest_mv": "Código do Prestador MV",
+        "tipo_usuario": "Tipo de Usuário",
+        "ds_vinc_empr": "Vínculo Empregatício",
+        "empresa_colab_cadastrado": "Empresa do Colaborador Cadastrado",
+        "sigla_cp": "Sigla CP",
+        "registro_cp": "Registro CP",
+        "ds_tipo_cargo": "Tipo de Cargo",
+        "dominio_email": "Domínio de Email",
+        "organizacao_dominio": "Organização do Domínio",
+        "ds_licenca": "Licença",
+        "ds_custo_novo_usu": "Custo do Novo Usuário",
+        "ds_gestor": "Gestor",
+        "ds_email_gestor": "Email do Gestor",
+        "ds_gerente": "Gerente",
+        "ds_email_gerente": "Email do Gerente",
+        "aprovador_sap": "Aprovador SAP",
+        "public_alvo": "Público Alvo",
+        "obj_comunicacao": "Objetivo de Comunicação",
+        "n_verba": "Número de Verba",
+        "material_referencia": "Material de Referência",
+        "urgencia": "Urgência",
+        "ds_endereco": "Endereço",
+        "email_receb_alias": "Email Recebido pelo Alias",
+        "endereco_alias": "Endereço do Alias",
+        "ds_obs": "Observações",
+    };
+    const statusOptions = {
+        "Em Andamento": "#ffc107",
+        "Aguardando Retorno Fornecedor": "#17a2b8",
+        "Aguardando Retorno": "#6c757d",
+        "Em Aberto": "#007bff",
+        "Agendada": "#6610f2",
+        "Criação de Usuário": "#fd7e14"
+    };
+    const slaOptions = {
+        "Em Atraso": "#dc3545",
+        "No Prazo": "#28a745"
+    };
+    const prioridades = [
+        {
+            "prioridade": "P1",
+            "sla": "240",
+            "tipo_tempo": "Corrido"
+        },
+        {
+            "prioridade": "P2",
+            "sla": "480",
+            "tipo_tempo": "Corrido"
+        },
+        {
+            "prioridade": "P3",
+            "sla": "1200",
+            "tipo_tempo": "Útil"
+        },
+        {
+            "prioridade": "P4",
+            "sla": "1800",
+            "tipo_tempo": "Útil"
+        },
+        {
+            "prioridade": "P5",
+            "sla": "3000",
+            "tipo_tempo": "Útil"
+        },
+        {
+            "prioridade": "P6",
+            "sla": "4200",
+            "tipo_tempo": "Útil"
+        },
+        {
+            "prioridade": "P7",
+            "sla": "9000",
+            "tipo_tempo": "Útil"
+        }
+    ];
 
     useEffect(() => {
         axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/hub`)
@@ -46,8 +189,6 @@ const Modal = ({ data, onClose }) => {
             .then(response => setOptions(prev => ({ ...prev, categoria: response.data })))
             .catch(error => console.error('Erro ao carregar categorias:', error));
     }, []);
-
-
 
     useEffect(() => {
         if (selectedHub) {
@@ -145,7 +286,27 @@ const Modal = ({ data, onClose }) => {
             });
     }, []);
 
+    useEffect(() => {
+        if (
+            data.categoria === "Acesso/Rede" &&
+            data.subcategoria === "Contas de E-mail/Rede" &&
+            data.ctrl_criacao_usuario === 3 &&
+            (data.assunto.includes("E-mail") || data.assunto.includes("Rede")) &&
+            (data.status === "Em Andamento" || data.status === "Em Aberto")
+        ) {
+            setIsEmailDomainEditable(true);
 
+            axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/dominios-email`)
+                .then(response => {
+                    setEmailDomains(response.data);
+                })
+                .catch(error => {
+                    console.error('Error fetching email domains:', error);
+                });
+        } else {
+            setIsEmailDomainEditable(false);
+        }
+    }, [data]);
 
     if (!data) return null;
 
@@ -219,7 +380,7 @@ const Modal = ({ data, onClose }) => {
         const executor = document.querySelector('#executor-task').value;
         const status = document.querySelector('#status-task').value;
         var tipo_atividade_checkbox = document.querySelector('input#tipo-atividade');
-        
+
         var tipo_atividade = 'Privada';
         if (tipo_atividade_checkbox && tipo_atividade_checkbox.checked) {
             tipo_atividade = 'Pública';
@@ -351,6 +512,14 @@ const Modal = ({ data, onClose }) => {
             default:
                 break;
         }
+    };
+
+    const handleDomainChange = (event) => {
+        const selectedDomain = event.target.value;
+        setSelectedDomain(selectedDomain);
+
+        const selectedOrganization = emailDomains.find(domain => domain.dominio === selectedDomain)?.organizacao || '';
+        setOrganizacaoDomains(selectedOrganization);
     };
 
     const handlePrioridadeClick = (prioridade) => {
@@ -525,58 +694,6 @@ const Modal = ({ data, onClose }) => {
         }, 500);
     };
 
-    const statusOptions = {
-        "Em Andamento": "#ffc107",
-        "Aguardando Retorno Fornecedor": "#17a2b8",
-        "Aguardando Retorno": "#6c757d",
-        "Em Aberto": "#007bff",
-        "Agendada": "#6610f2",
-        "Criação de Usuário": "#fd7e14"
-    };
-
-    const slaOptions = {
-        "Em Atraso": "#dc3545",
-        "No Prazo": "#28a745"
-    };
-
-    const prioridades = [
-        {
-            "prioridade": "P1",
-            "sla": "240",
-            "tipo_tempo": "Corrido"
-        },
-        {
-            "prioridade": "P2",
-            "sla": "480",
-            "tipo_tempo": "Corrido"
-        },
-        {
-            "prioridade": "P3",
-            "sla": "1200",
-            "tipo_tempo": "Útil"
-        },
-        {
-            "prioridade": "P4",
-            "sla": "1800",
-            "tipo_tempo": "Útil"
-        },
-        {
-            "prioridade": "P5",
-            "sla": "3000",
-            "tipo_tempo": "Útil"
-        },
-        {
-            "prioridade": "P6",
-            "sla": "4200",
-            "tipo_tempo": "Útil"
-        },
-        {
-            "prioridade": "P7",
-            "sla": "9000",
-            "tipo_tempo": "Útil"
-        }
-    ];
-
     return (
         <div>
             <div className="modal-overlay">
@@ -663,6 +780,41 @@ const Modal = ({ data, onClose }) => {
                                     'Nenhum anexo'
                                 )}
                             </p>
+                            {Object.entries(formsEspecificos).map(([key, value]) => (
+                                key === "dominio_email" ? (
+                                    isEmailDomainEditable ? (
+                                        <div>
+                                            <p key={key} style={{ display: 'flex', alignItems: 'center' }}>
+                                                <label htmlFor="dominio_email"><strong>Domínio Email:</strong></label>
+                                                <select id="dominio_email" name="dominio_email" onChange={handleDomainChange}>
+                                                    <option value="">Selecione um domínio</option>
+                                                    {emailDomains.map((domain) => (
+                                                        <option key={domain.dominio} value={domain.dominio}>
+                                                            {domain.dominio}
+                                                        </option>
+                                                    ))}
+
+                                                </select>
+                                            </p>
+                                            {organizacaoDomains && (
+                                                <p><strong>Organização:</strong> {organizacaoDomains}</p>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        value !== null && value !== undefined && value !== '' && (
+                                            <p key={key}>
+                                                <strong>{formsEspecificosLabels[key]}:</strong> {value}
+                                            </p>
+                                        )
+                                    )
+                                ) : (
+                                    value !== null && value !== undefined && value !== '' && (
+                                        <p key={key}>
+                                            <strong>{formsEspecificosLabels[key]}:</strong> {value}
+                                        </p>
+                                    )
+                                )
+                            ))}
                         </div>
 
                         <div className="conteudo-modal-direita">
@@ -738,7 +890,7 @@ const Modal = ({ data, onClose }) => {
                                 </select>
                             </div>
 
-                            <p>
+                            {/* <p>
                                 <strong id="campor-resp-chamado">Reposta Chamado:</strong>
                                 <textarea id="resp-chamado" defaultValue={data.resposta_chamado}></textarea>
                             </p>
@@ -779,7 +931,7 @@ const Modal = ({ data, onClose }) => {
                                     onChange={(e) => handleFileChange(e, 1)}
                                     style={{ display: 'block', marginTop: '10px' }}
                                 />
-                            )}
+                            )} */}
                         </div>
                     </div>
 

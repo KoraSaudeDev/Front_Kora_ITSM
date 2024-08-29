@@ -972,7 +972,6 @@ a {
     border: 1px solid #ddd;
     border-top: none;
     border-radius: 0 5px 5px 5px;
-    gap: 20px;
     width: 100%;
     box-sizing: border-box;
     max-height: 100%; 
@@ -981,7 +980,7 @@ a {
 
 .conteudo-modal-esquerda,
 .conteudo-modal-direita {
-    flex: 1; /* Ambos os lados ocupam o mesmo espaço */
+    flex: 1; 
     background-color: #eeeeee;
     border-radius: 4px;
     padding: 20px;
@@ -989,7 +988,7 @@ a {
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
-    overflow: hidden;
+    overflow-x: auto;
 }
 
 .conteudo-modal-direita{
@@ -1003,9 +1002,6 @@ a {
     
 }
 
-.campo-editavel label {
-    margin-bottom: 5px;
-}
 
 .campo-editavel select {
     padding: 5px;
@@ -1376,94 +1372,40 @@ label[for="nome-anexo"] {
     width: 50px;
     height: 50px;
 }
-.atividades-modal p{
-    color: #284557;
+
+.badge{
+    box-shadow: none;
 }
 
-.atividades-modal label{
-    color: #284557;
-    font-weight: bold;
+.modal{
+    user-select: text;
 }
 
-#anexo_resposta{
-    width: 300px;
-    background-color: white;
-    color: #284557;
-    font-size: 12px;
+.conteudo-modal-esquerda p{
+    margin: 2px;
+    
 }
 
-#anexo-file{
-    background-color: white;
-    color: #284557;
+
+.conteudo-modal-esquerda p{
+    margin: 2px;
+    
 }
 
-.switch-container {
-    display: flex;
-    align-items: center;
-    margin: 10px 0;
-    margin-top: 20px;
+.conteudo-modal-direita {
+    margin-left: 5px;
+}
+
+.conteudo-modal-direita p{
+    margin: 4px;
+    padding: 0;
+}
+
+.header-status-sla{
     margin-bottom: 20px;
 }
 
-.switch-container label {
-    margin-right: 8px;
-    font-size: 15px;
-    color: #284557;
-}
-
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 40px;
-    height: 20px;
-}
-
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: .4s;
-    border-radius: 20px;
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 16px;
-    width: 16px;
-    left: 2px;
-    bottom: 2px;
-    background-color: white;
-    transition: .4s;
-    border-radius: 50%;
-}
-
-input:checked + .slider {
-    background-color: #2196F3;
-}
-
-input:checked + .slider:before {
-    transform: translateX(20px);
-}
-strong{
-    color: #284557;
-  }
-
-  label{
-  color: #284557;
-}
-
-#anexoAtividade{
-  background-color: white;
-  color: #284557;
+.campo-editavel{
+    margin-left: 4px;
+    width: 94%;
 }
