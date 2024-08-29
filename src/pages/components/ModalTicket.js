@@ -10,6 +10,7 @@ const Modal = ({ data, onClose }) => {
     const [showAtividadesModal, setShowAtividadesModal] = useState(false);
     const [showAnexosModal, setShowAnexosModal] = useState(false);
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+    const [successMessage, setSuccessMessage] = useState(false);
     const [isClosingAtividadesModal, setIsClosingAtividadesModal] = useState(false);
     const [isClosingAnexosModal, setIsClosingAnexosModal] = useState(false);
     const [isClosingModal, setIsClosingModal] = useState(false);
@@ -679,13 +680,16 @@ const Modal = ({ data, onClose }) => {
                 await sendRequest(fileConfig);
             }
 
+            //axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/update/sla?cod_fluxo=${data.cod_fluxo}`)
+
             hideLoadingOverlay();
 
+            setSuccessMessage('Ticket salvo com sucesso!');
             setShowSuccessMessage(true);
             setTimeout(() => {
                 setShowSuccessMessage(false);
                 window.location.reload();
-            }, 3000);
+            }, 1800);
 
         } catch (error) {
             hideLoadingOverlay();
@@ -738,18 +742,25 @@ const Modal = ({ data, onClose }) => {
             "app": "tickets"
         }
 
-        // const config = {
-        //     method: 'post',
-        //     url: `https://kora-api-gxb53d5kyq-rj.a.run.app/create`,
-        //     headers: {
-        //         'Content-Type': 'application/json'
-        //     },
-        //     data: JSON.stringify(param)
-        // };
-        // const response = await axios.request(config);
-        // console.log(response.data)
+        const config = {
+            method: 'post',
+            url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/create-user-google`,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: JSON.stringify(param)
+        };
+        const response = await axios.request(config);
+        console.log(response.data);
 
-        handleSalvarTicket('Criação de Usuário');
+        hideLoadingOverlay();
+        setSuccessMessage(response.data);
+        setShowSuccessMessage(true);
+
+        setTimeout(() => {
+            setShowSuccessMessage(false);
+            handleSalvarTicket('Criação de Usuário');
+        }, 1300);
     }
 
     const handleCloseModal = () => {
@@ -775,7 +786,6 @@ const Modal = ({ data, onClose }) => {
             .join(' ');
     };
 
-    // Handle clicking outside the modal to close it
     const handleOverlayClick = (event) => {
         if (event.target.classList.contains('modal-overlay')) {
             handleCloseModal();
@@ -788,13 +798,13 @@ const Modal = ({ data, onClose }) => {
                 <div className="modal-header">
                     <h3>Ticket #{data.cod_fluxo}</h3>
                     <div className="botao-salvar-container">
-                             {isAllowedCreateUser && (
-                                <button className="botao-salvar-ticket" style={{ display: 'flex', alignItems: 'center', gap: '8px' }} onClick={handleCreateUser}>
-                                    <FaUserPlus /> Criar Usuário
-                                </button>
-                             )}
-                        
-                        <button className="botao-salvar-ticket" onClick={handleSalvarTicket}>
+                        {isAllowedCreateUser && (
+                            <button className="botao-salvar-ticket" style={{ display: 'flex', alignItems: 'center', gap: '8px' }} onClick={handleCreateUser}>
+                                <FaUserPlus /> Criar Usuário
+                            </button>
+                        )}
+
+                        <button className="botao-salvar-ticket" onClick={() => handleSalvarTicket()}>
                             Salvar
                         </button>
 
@@ -876,54 +886,56 @@ const Modal = ({ data, onClose }) => {
                             )}
                         </p>
                         {Object.entries(formsEspecificos).map(([key, value]) => {
-                                if (key === "dominio_email" && isEmailDomainEditable) {
-                                    return (
-                                        <div key={key}>
-                                            <p style={{ display: 'flex', alignItems: 'center' }}>
-                                                <label htmlFor="dominio_email" style={{ marginRight: '10px', whiteSpace: 'nowrap' }}>
-                                                    <strong>Domínio Email:</strong>
-                                                </label>
-                                                <select
-                                                    id="dominio_email"
-                                                    name="dominio_email"
-                                                    value={selectedDomain}
-                                                    onChange={(e) => {
-                                                        setSelectedDomain(e.target.value);
-                                                        handleDomainChange(e);
-                                                    }}
-                                                >
-                                                    <option></option>
-                                                    {emailDomains.map((domain) => (
-                                                        <option key={domain.dominio} value={domain.dominio}>
-                                                            {domain.dominio}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            </p>
-                                            {organizacaoDomains && (
-                                                <p><strong>{formsEspecificosLabels['organizacao_dominio']}</strong> {organizacaoDomains}</p>
-                                            )}
-                                        </div>
-                                    );
-                                } else if (key === "organizacao_dominio" && !isEmailDomainEditable) {
-                                    return (
-                                        value !== null && value !== undefined && value !== '' && (
-                                            <p key={key}>
-                                                <strong>{formsEspecificosLabels[key]}:</strong> {value}
-                                            </p>
-                                        )
-                                    );
-                                }
-                                else {
-                                    return (
-                                        value !== null && value !== undefined && value !== '' && value !== 'R$ 0/Mês' && (
-                                            <p key={key}>
-                                                <strong>{formsEspecificosLabels[key]}:</strong> {value}
-                                            </p>
-                                        )
-                                    );
-                                }
-                            })}
+                            if (key === "dominio_email" && isEmailDomainEditable) {
+                                return (
+                                    <div key={key}>
+                                        <p style={{ display: 'flex', alignItems: 'center' }}>
+                                            <label htmlFor="dominio_email" style={{ marginRight: '10px', whiteSpace: 'nowrap' }}>
+                                                <strong>Domínio Email:</strong>
+                                            </label>
+                                            <select
+                                                id="dominio_email"
+                                                name="dominio_email"
+                                                value={selectedDomain}
+                                                onChange={(e) => {
+                                                    setSelectedDomain(e.target.value);
+                                                    handleDomainChange(e);
+                                                }}
+                                            >
+                                                <option></option>
+                                                {emailDomains.map((domain) => (
+                                                    <option key={domain.dominio} value={domain.dominio}>
+                                                        {domain.dominio}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </p>
+                                        {organizacaoDomains && (
+                                            <p><strong>{formsEspecificosLabels['organizacao_dominio']}</strong> {organizacaoDomains}</p>
+                                        )}
+                                    </div>
+                                );
+                            } else if (key === "organizacao_dominio" && !isEmailDomainEditable) {
+                                return (
+                                    value !== null && value !== undefined && value !== '' && (
+                                        <p key={key}>
+                                            <strong>{formsEspecificosLabels[key]}:</strong> {value}
+                                        </p>
+                                    )
+                                );
+                            } else if (key === "organizacao_dominio" && isEmailDomainEditable) {
+                                return;
+                            }
+                            else {
+                                return (
+                                    value !== null && value !== undefined && value !== '' && value !== 'R$ 0/Mês' && (
+                                        <p key={key}>
+                                            <strong>{formsEspecificosLabels[key]}:</strong> {value}
+                                        </p>
+                                    )
+                                );
+                            }
+                        })}
                     </div>
 
                     <div className="conteudo-modal-direita">
@@ -1067,13 +1079,13 @@ const Modal = ({ data, onClose }) => {
                                             }}
                                         ></span>
                                     </div>
-                                 
+
                                     <p id='status-bolinha'>{atividade.status}</p>
                                     <p><label>Início:</label> {atividade.aberto_em}</p>
                                     <p><label>Aberto por:</label> {atividade.aberto_por}</p>
                                     <p><label>Destinatário:</label> {atividade.executor}</p>
                                     <p><label>Descrição:</label> {truncateText(atividade.descricao, 50)}</p>
-                                    
+
                                     <p style={{ display: 'flex', alignItems: 'center' }}>
                                         <label>Anexo:</label>
                                         {atividade.ds_anexo ? (
@@ -1271,7 +1283,7 @@ const Modal = ({ data, onClose }) => {
 
             {showSuccessMessage && (
                 <div className={`success-message ${showSuccessMessage ? 'show' : 'hide'}`}>
-                    Ticket salvo com sucesso!
+                    {successMessage}
                 </div>
             )}
         </div>
