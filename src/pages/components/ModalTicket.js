@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaTimes, FaFileAlt, FaPlus } from 'react-icons/fa';
+import { FaTimes, FaFileAlt, FaPlus, FaUserPlus } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 
@@ -27,7 +27,8 @@ const Modal = ({ data, onClose }) => {
     const [selectedAssunto, setSelectedAssunto] = useState(data.assunto || '');
     const [emailDomains, setEmailDomains] = useState([]);
     const [isEmailDomainEditable, setIsEmailDomainEditable] = useState(false);
-    const [selectedDomain, setSelectedDomain] = useState('');
+    const [isAllowedCreateUser, setIsAllowedCreateUser] = useState(false);
+    const [selectedDomain, setSelectedDomain] = useState(data.dominio_email || '');
     const [organizacaoDomains, setOrganizacaoDomains] = useState(data.organizacao_dominio || '');
     const [options, setOptions] = useState({
         hub: [],
@@ -132,6 +133,7 @@ const Modal = ({ data, onClose }) => {
     };
     const statusOptions = {
         "Em Andamento": "#ffc107",
+        "Em Atendimento": "#ffc107",
         "Aguardando Retorno Fornecedor": "#17a2b8",
         "Aguardando Retorno": "#6c757d",
         "Em Aberto": "#007bff",
@@ -295,6 +297,7 @@ const Modal = ({ data, onClose }) => {
             (data.status === "Em Andamento" || data.status === "Em Aberto")
         ) {
             setIsEmailDomainEditable(true);
+            setIsAllowedCreateUser(true);
 
             axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/dominios-email`)
                 .then(response => {
@@ -305,6 +308,7 @@ const Modal = ({ data, onClose }) => {
                 });
         } else {
             setIsEmailDomainEditable(false);
+            setIsAllowedCreateUser(false);
         }
     }, [data]);
 
@@ -526,7 +530,7 @@ const Modal = ({ data, onClose }) => {
         setPrioridadeSelecionada(prioridade);
     };
 
-    const handleSalvarTicket = async () => {
+    const handleSalvarTicket = async (statusParam = null) => {
         if (!selectedHub || !selectedUnidade || !selectedCategoria || !selectedSubcategoria || !selectedAssunto || !prioridadeSelecionada) {
             alert('Por favor, preencha todos os campos obrigatórios.');
             return;
@@ -557,7 +561,7 @@ const Modal = ({ data, onClose }) => {
 
         const ultimoItem = atividades[atividades.length - 1];
 
-        const resposta_chamado = document.querySelector("#resp-chamado").value;
+        //const resposta_chamado = document.querySelector("#resp-chamado").value;
 
         const update_tickets = {
             hub: selectedHub,
@@ -566,11 +570,14 @@ const Modal = ({ data, onClose }) => {
             subcategoria: selectedSubcategoria,
             assunto: selectedAssunto,
             ds_nivel: prioridadeSelecionada,
-            status: toTitleCase(ultimoItem.status),
+            status: statusParam === null ? toTitleCase(ultimoItem.status) : statusParam,
             grupo: ultimoItem.executor,
             sla: prioridades.find(line => line.prioridade === prioridadeSelecionada)?.sla,
-            resposta_chamado: resposta_chamado === '' ? null : resposta_chamado
+            //resposta_chamado: resposta_chamado === '' ? null : resposta_chamado
         };
+
+        if (selectedDomain) update_tickets.dominio_email = selectedDomain;
+        if (organizacaoDomains) update_tickets.organizacao_dominio = organizacaoDomains
 
         if (update_tickets.status === "Finalizado") {
             update_tickets.finalizado_por = ultimoItem.aberto_por;
@@ -686,6 +693,65 @@ const Modal = ({ data, onClose }) => {
         }
     };
 
+    const handleCreateUser = async () => {
+        if (!selectedDomain || !organizacaoDomains) {
+            alert('Por favor, preencha um domínio de email que possua organização.');
+            return;
+        }
+
+        showLoadingOverlay();
+
+        const param = {
+            "Status": data.status,
+            "Abertura": data.abertura,
+            "Telefone": data.n_tel_usuario,
+            "Email": data.email_solicitante,
+            "gestor_imediato": data.ds_gestor,
+            "gestor_imediato_email": data.ds_email_gestor,
+            "gerente_area": data.ds_gerente,
+            "nome_usuario": data.novo_usuario,
+            "hub_usuario": data.hub_novo_usu,
+            "unidade_usuario": data.unidade_novo_usu,
+            "funcao_usuario": data.cargo,
+            "departamento_usuario": data.departamento_novo_usuario,
+            "senha_usuario": `${data.id}@`,
+            "tipo_licenca": data.ds_licenca,
+            "email_gerente": data.ds_email_gerente,
+            "dominio_email": selectedDomain,
+            "organizacao_dominio": organizacaoDomains,
+            "centro_custo": data.centro_custo,
+            "matricula_usuario": data.matricula_final,
+            "tipo_colaborador": data.ds_tipo_colaborador,
+            "Nome_Empresa": data.Nome_Empresa,
+            "Logon_Script": data.Logon_Script,
+            "Cidade": data.Cidade,
+            "Estado": data.Estado,
+            "CEP": data.CEP,
+            "Pais": data.Pais,
+            "Site": data.Site,
+            "Endereco": data.Endereco,
+            "cod_empresa": data.cod_empresa,
+            "telefone_empresa": data.telefone_empresa,
+            "N° Ticket": data.cod_fluxo,
+            "id": data.id,
+            "tipo_criacao": data.ctrl_criacao_usuario,
+            "app": "tickets"
+        }
+
+        // const config = {
+        //     method: 'post',
+        //     url: `https://kora-api-gxb53d5kyq-rj.a.run.app/create`,
+        //     headers: {
+        //         'Content-Type': 'application/json'
+        //     },
+        //     data: JSON.stringify(param)
+        // };
+        // const response = await axios.request(config);
+        // console.log(response.data)
+
+        handleSalvarTicket('Criação de Usuário');
+    }
+
     const handleCloseModal = () => {
         setIsClosingModal(true);
         setTimeout(() => {
@@ -694,304 +760,353 @@ const Modal = ({ data, onClose }) => {
         }, 500);
     };
 
+    const truncateText = (text, maxLength) => {
+        if (text.length <= maxLength) {
+            return text;
+        }
+        return text.substring(0, maxLength) + "...";
+    };
+
+    const convertStatusToTitleCase = (status) => {
+        return status
+            .toLowerCase()
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+    };
+
+    // Handle clicking outside the modal to close it
+    const handleOverlayClick = (event) => {
+        if (event.target.classList.contains('modal-overlay')) {
+            handleCloseModal();
+        }
+    };
+
     return (
-        <div>
-            <div className="modal-overlay">
-                <div className={`modal ${isClosingModal ? 'fechar' : ''}`}>
-                    <div className="modal-header">
-                        <h3>Ticket #{data.cod_fluxo}</h3>
-                        <div className="botao-salvar-container">
-                            <button className="botao-salvar-ticket" onClick={handleSalvarTicket}>
-                                Salvar
-                            </button>
-                        </div>
-                        <button className="fechar-modal" onClick={handleCloseModal}><FaTimes /></button>
-                    </div>
+        <div className="modal-overlay" onClick={handleOverlayClick}>
+            <div className={`modal ${isClosingModal ? 'fechar' : ''}`}>
+                <div className="modal-header">
+                    <h3>Ticket #{data.cod_fluxo}</h3>
+                    <div className="botao-salvar-container">
+                             {isAllowedCreateUser && (
+                                <button className="botao-salvar-ticket" style={{ display: 'flex', alignItems: 'center', gap: '8px' }} onClick={handleCreateUser}>
+                                    <FaUserPlus /> Criar Usuário
+                                </button>
+                             )}
+                        
+                        <button className="botao-salvar-ticket" onClick={handleSalvarTicket}>
+                            Salvar
+                        </button>
 
-                    <div className="modal-filters">
-                        <div className="campo-selecao">
-                            <strong className="link-label">Categoria</strong>
-                            <select
-                                value={selectedCategoria}
-                                onChange={(e) => handleFieldChange('categoria', e.target.value)}
-                            >
-                                <option></option>
-                                {options.categoria.map((option, index) => (
-                                    <option key={index} value={option}>
-                                        {option}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="campo-selecao">
-                            <strong className="link-label">Subcategoria</strong>
-                            <select
-                                value={selectedSubcategoria}
-                                onChange={(e) => handleFieldChange('subcategoria', e.target.value)}
-                                disabled={!selectedCategoria}
-                            >
-                                <option></option>
-                                {options.subcategoria.map((option, index) => (
-                                    <option key={index} value={option}>
-                                        {option}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="campo-selecao">
-                            <strong className="link-label">Assunto</strong>
-                            <select
-                                value={selectedAssunto}
-                                onChange={(e) => handleFieldChange('assunto', e.target.value)}
-                                disabled={!selectedSubcategoria}
-                            >
-                                <option></option>
-                                {options.assunto.map((option, index) => (
-                                    <option key={index} value={option}>
-                                        {option}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
 
-                    <div className="conteudo-modal">
-                        <div className="conteudo-modal-esquerda">
-                            <p><strong>Nome:</strong> {data.nome}</p>
-                            <p><strong>Matrícula:</strong> {data.matricula}</p>
-                            <p><strong>E-mail Solicitante:</strong> {data.email_solicitante}</p>
-                            <p><strong>Telefone:</strong> {data.telefone}</p>
-                            <p><strong>Cargo:</strong> {data.cargo_solic}</p>
-                            <p><strong>Área de Negócio:</strong> {data.area_negocio}</p>
-                            <p><strong>Descrição:</strong> {data.descricao}</p>
-                            <p style={{ display: 'flex', alignItems: 'center' }}>
-                                <strong>Anexo:</strong>
-                                {data.anexo ? (
-                                    <>
-                                        <a onClick={() => handleAnexoClick(data.anexo)} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                                            {data.anexo.split('/').pop()}
-                                            <FaFileAlt
-                                                className="icone-anexo"
-                                                style={{ marginLeft: '5px' }}
-                                            />
-                                        </a>
-                                    </>
-                                ) : (
-                                    'Nenhum anexo'
-                                )}
-                            </p>
-                            {Object.entries(formsEspecificos).map(([key, value]) => (
-                                key === "dominio_email" ? (
-                                    isEmailDomainEditable ? (
-                                        <div>
-                                            <p key={key} style={{ display: 'flex', alignItems: 'center' }}>
-                                                <label htmlFor="dominio_email"><strong>Domínio Email:</strong></label>
-                                                <select id="dominio_email" name="dominio_email" onChange={handleDomainChange}>
-                                                    <option value="">Selecione um domínio</option>
+                    </div>
+                    <button className="fechar-modal" onClick={handleCloseModal}><FaTimes /></button>
+                </div>
+
+                <div className="modal-filters">
+                    <div className="campo-selecao">
+                        <strong className="link-label">Categoria</strong>
+                        <select
+                            value={selectedCategoria}
+                            onChange={(e) => handleFieldChange('categoria', e.target.value)}
+                        >
+                            <option></option>
+                            {options.categoria.map((option, index) => (
+                                <option key={index} value={option}>
+                                    {option}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="campo-selecao">
+                        <strong className="link-label">Subcategoria</strong>
+                        <select
+                            value={selectedSubcategoria}
+                            onChange={(e) => handleFieldChange('subcategoria', e.target.value)}
+                            disabled={!selectedCategoria}
+                        >
+                            <option></option>
+                            {options.subcategoria.map((option, index) => (
+                                <option key={index} value={option}>
+                                    {option}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="campo-selecao">
+                        <strong className="link-label">Assunto</strong>
+                        <select
+                            value={selectedAssunto}
+                            onChange={(e) => handleFieldChange('assunto', e.target.value)}
+                            disabled={!selectedSubcategoria}
+                        >
+                            <option></option>
+                            {options.assunto.map((option, index) => (
+                                <option key={index} value={option}>
+                                    {option}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+
+                <div className="conteudo-modal">
+                    <div className="conteudo-modal-esquerda">
+                        <p><strong>Nome:</strong> {data.nome}</p>
+                        <p><strong>Matrícula:</strong> {data.matricula}</p>
+                        <p><strong>E-mail Solicitante:</strong> {data.email_solicitante}</p>
+                        <p><strong>Telefone:</strong> {data.telefone}</p>
+                        <p><strong>Cargo:</strong> {data.cargo_solic}</p>
+                        <p><strong>Área de Negócio:</strong> {data.area_negocio}</p>
+                        <p><strong>Descrição:</strong> {data.descricao}</p>
+                        <p style={{ display: 'flex', alignItems: 'center' }}>
+                            <strong>Anexo:</strong>
+                            {data.anexo ? (
+                                <>
+                                    <a onClick={() => handleAnexoClick(data.anexo)} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                        {data.anexo.split('/').pop()}
+                                        <FaFileAlt
+                                            className="icone-anexo"
+                                            style={{ marginLeft: '5px' }}
+                                        />
+                                    </a>
+                                </>
+                            ) : (
+                                'Nenhum anexo'
+                            )}
+                        </p>
+                        {Object.entries(formsEspecificos).map(([key, value]) => {
+                                if (key === "dominio_email" && isEmailDomainEditable) {
+                                    return (
+                                        <div key={key}>
+                                            <p style={{ display: 'flex', alignItems: 'center' }}>
+                                                <label htmlFor="dominio_email" style={{ marginRight: '10px', whiteSpace: 'nowrap' }}>
+                                                    <strong>Domínio Email:</strong>
+                                                </label>
+                                                <select
+                                                    id="dominio_email"
+                                                    name="dominio_email"
+                                                    value={selectedDomain}
+                                                    onChange={(e) => {
+                                                        setSelectedDomain(e.target.value);
+                                                        handleDomainChange(e);
+                                                    }}
+                                                >
+                                                    <option></option>
                                                     {emailDomains.map((domain) => (
                                                         <option key={domain.dominio} value={domain.dominio}>
                                                             {domain.dominio}
                                                         </option>
                                                     ))}
-
                                                 </select>
                                             </p>
                                             {organizacaoDomains && (
-                                                <p><strong>Organização:</strong> {organizacaoDomains}</p>
+                                                <p><strong>{formsEspecificosLabels['organizacao_dominio']}</strong> {organizacaoDomains}</p>
                                             )}
                                         </div>
-                                    ) : (
+                                    );
+                                } else if (key === "organizacao_dominio" && !isEmailDomainEditable) {
+                                    return (
                                         value !== null && value !== undefined && value !== '' && (
                                             <p key={key}>
                                                 <strong>{formsEspecificosLabels[key]}:</strong> {value}
                                             </p>
                                         )
-                                    )
-                                ) : (
-                                    value !== null && value !== undefined && value !== '' && (
-                                        <p key={key}>
-                                            <strong>{formsEspecificosLabels[key]}:</strong> {value}
-                                        </p>
-                                    )
-                                )
-                            ))}
+                                    );
+                                }
+                                else {
+                                    return (
+                                        value !== null && value !== undefined && value !== '' && value !== 'R$ 0/Mês' && (
+                                            <p key={key}>
+                                                <strong>{formsEspecificosLabels[key]}:</strong> {value}
+                                            </p>
+                                        )
+                                    );
+                                }
+                            })}
+                    </div>
+
+                    <div className="conteudo-modal-direita">
+                        <div className="header-status-sla">
+                            <div className="status-container">
+                                <strong>Status:</strong>
+                                <span
+                                    className="status-bolinha"
+                                    style={{
+                                        backgroundColor: statusOptions[data.status] || '#000',
+                                        marginLeft: '8px'
+                                    }}
+                                ></span>
+                                {data.status}
+                            </div>
+                            <div className="sla-container">
+                                <strong>SLA:</strong>
+                                <span
+                                    className="sla-bolinha"
+                                    style={{
+                                        backgroundColor: slaOptions[data.st_sla] || '#000',
+                                        marginLeft: '8px'
+                                    }}
+                                ></span>
+                                {data.st_sla}
+                            </div>
                         </div>
 
-                        <div className="conteudo-modal-direita">
-                            <div className="header-status-sla">
-                                <div className="status-container">
-                                    <strong>Status:</strong>
-                                    <span
-                                        className="status-bolinha"
-                                        style={{
-                                            backgroundColor: statusOptions[data.status] || '#000',
-                                            marginLeft: '8px'
-                                        }}
-                                    ></span>
-                                    {data.status}
+                        <p><strong className="data">Abertura:</strong> {data.abertura}</p>
+                        <p><strong className="data">Data Limite:</strong> {data.data_limite}</p>
+                        <p><strong className="data">Tipo da SLA:</strong> {prioridades.find(p => p.prioridade === prioridadeSelecionada)?.tipo_tempo.toUpperCase() || ''}</p>
+
+                        <div className="campo-editavel">
+                            <strong>Prioridade:</strong>
+                            <select
+                                value={prioridadeSelecionada}
+                                onChange={(e) => handlePrioridadeClick(e.target.value)}
+                            >
+                                {prioridades.map(prioridade => (
+                                    <option key={prioridade.prioridade} value={prioridade.prioridade}>
+                                        {prioridade.prioridade}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="campo-editavel">
+                            <strong>Hub:</strong>
+                            <select
+                                value={selectedHub}
+                                onChange={(e) => handleFieldChange('hub', e.target.value)}
+                            >
+                                <option></option>
+                                {options.hub.map((option, index) => (
+                                    <option key={index} value={option}>
+                                        {option}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="campo-editavel">
+                            <strong>Unidade de Negócio:</strong>
+                            <select
+                                value={selectedUnidade}
+                                onChange={(e) => handleFieldChange('unidade', e.target.value)}
+                                disabled={!selectedHub}
+                            >
+                                <option></option>
+                                {options.unidade.map((option, index) => (
+                                    <option key={index} value={option}>
+                                        {option}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* <p>
+                            <strong id="campor-resp-chamado">Reposta Chamado:</strong>
+                            <textarea id="resp-chamado" defaultValue={data.resposta_chamado}></textarea>
+                        </p>
+                        <p style={{ display: 'flex', alignItems: 'center' }}>
+                            <strong>Anexo Reposta:</strong>
+                            {data.anexo_resposta ? (
+                                <>
+                                    <a
+                                        onClick={() => handleAnexoClick(data.anexo_resposta)}
+                                        style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+                                    >
+                                        {data.anexo_resposta.split('/').pop()}
+                                        <FaFileAlt
+                                            className="icone-anexo"
+                                            style={{ marginLeft: '5px' }}
+                                        />
+                                    </a>
+                                    <button
+                                        onClick={() => setEditMode(true)}
+                                        style={{ marginLeft: '10px', cursor: 'pointer' }}
+                                        id='editar'
+                                    >
+                                        Editar
+                                    </button>
+                                </>
+                            ) : (
+                                <input
+                                    type="file"
+                                    id="anexo_resposta"
+                                    onChange={(e) => handleFileChange(e, 1)}
+                                />
+                            )}
+                        </p>
+                        {editMode && (
+                            <input
+                                type="file"
+                                id="anexo_resposta"
+                                onChange={(e) => handleFileChange(e, 1)}
+                                style={{ display: 'block', marginTop: '10px' }}
+                            />
+                        )} */}
+                    </div>
+                </div>
+
+                <div className="campo-atividades">
+                    <h4>Atividades e Anexos</h4>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                        <button className="botao-atividades" onClick={handleAbrirAtividadesModal}>
+                            <FaPlus style={{ marginRight: '8px' }} /> Atividade
+                        </button>
+                        <button className="botao-anexo" onClick={handleAbrirAnexosModal}>
+                            <FaPlus style={{ marginRight: '8px' }} /> Anexo
+                        </button>
+                    </div>
+                    <div style={{ display: 'flex', gap: '20px' }}>
+                        <div style={{ flex: 1 }}>
+                            {atividades.slice().reverse().map((atividade, index) => (
+                                <div className="card-atividade" key={index} onClick={() => handleAbrirDetalhesAtividade(atividade)}>
+                                    <div className="status-container" style={{ textAlign: 'right' }}>
+                                        <span
+                                            className="status-bolinha"
+                                            style={{
+                                                backgroundColor: statusOptions[convertStatusToTitleCase(atividade.status)] || '#000',
+                                                marginRight: '8px'
+                                            }}
+                                        ></span>
+                                    </div>
+                                 
+                                    <p id='status-bolinha'>{atividade.status}</p>
+                                    <p><label>Início:</label> {atividade.aberto_em}</p>
+                                    <p><label>Aberto por:</label> {atividade.aberto_por}</p>
+                                    <p><label>Destinatário:</label> {atividade.executor}</p>
+                                    <p><label>Descrição:</label> {truncateText(atividade.descricao, 50)}</p>
+                                    
+                                    <p style={{ display: 'flex', alignItems: 'center' }}>
+                                        <label>Anexo:</label>
+                                        {atividade.ds_anexo ? (
+                                            <>
+                                                <a onClick={() => handleAnexoClick(atividade.ds_anexo)} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                                    {atividade.ds_anexo.split('/').pop()}
+                                                    <FaFileAlt className="icone-anexo" style={{ marginLeft: '5px' }} />
+                                                </a>
+                                            </>
+                                        ) : (
+                                            'Nenhum anexo'
+                                        )}
+                                    </p>
                                 </div>
-                                <div className="sla-container">
-                                    <strong>SLA:</strong>
-                                    <span
-                                        className="sla-bolinha"
-                                        style={{
-                                            backgroundColor: slaOptions[data.st_sla] || '#000',
-                                            marginLeft: '8px'
-                                        }}
-                                    ></span>
-                                    {data.st_sla}
-                                </div>
-                            </div>
-
-                            <p><strong className="data">Abertura:</strong> {data.abertura}</p>
-                            <p><strong className="data">Data Limite:</strong> {data.data_limite}</p>
-                            <p><strong className="data">Tipo da SLA:</strong> {prioridades.find(p => p.prioridade === prioridadeSelecionada)?.tipo_tempo.toUpperCase() || ''}</p>
-
-                            <div className="campo-editavel">
-                                <strong>Prioridade:</strong>
-                                <select
-                                    value={prioridadeSelecionada}
-                                    onChange={(e) => handlePrioridadeClick(e.target.value)}
-                                >
-                                    {prioridades.map(prioridade => (
-                                        <option key={prioridade.prioridade} value={prioridade.prioridade}>
-                                            {prioridade.prioridade}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="campo-editavel">
-                                <strong>Hub:</strong>
-                                <select
-                                    value={selectedHub}
-                                    onChange={(e) => handleFieldChange('hub', e.target.value)}
-                                >
-                                    <option></option>
-                                    {options.hub.map((option, index) => (
-                                        <option key={index} value={option}>
-                                            {option}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="campo-editavel">
-                                <strong>Unidade de Negócio:</strong>
-                                <select
-                                    value={selectedUnidade}
-                                    onChange={(e) => handleFieldChange('unidade', e.target.value)}
-                                    disabled={!selectedHub}
-                                >
-                                    <option></option>
-                                    {options.unidade.map((option, index) => (
-                                        <option key={index} value={option}>
-                                            {option}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            {/* <p>
-                                <strong id="campor-resp-chamado">Reposta Chamado:</strong>
-                                <textarea id="resp-chamado" defaultValue={data.resposta_chamado}></textarea>
-                            </p>
-                            <p style={{ display: 'flex', alignItems: 'center' }}>
-                                <strong>Anexo Reposta:</strong>
-                                {data.anexo_resposta ? (
-                                    <>
-                                        <a
-                                            onClick={() => handleAnexoClick(data.anexo_resposta)}
-                                            style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
-                                        >
-                                            {data.anexo_resposta.split('/').pop()}
+                            ))}
+                        </div>
+                        <div style={{ flex: 1 }}>
+                            {anexos.slice().reverse().map((anexo, index) => (
+                                <div className="card-atividade" key={index} onClick={() => handleAbrirDetalhesAnexo(anexo)}>
+                                    <p><strong>Nome:</strong> {anexo.ds_adicionado_por}</p>
+                                    <p><strong>Data de Abertura:</strong> {anexo.abertura}</p>
+                                    <p><strong>Descrição:</strong> {anexo.ds_texto}</p>
+                                    <p style={{ display: 'flex', alignItems: 'center' }}><strong>Arquivo:</strong>
+                                        <a onClick={() => handleAnexoClick(anexo.ds_anexo)} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                            {anexo.ds_anexo.split('/').pop()}
                                             <FaFileAlt
                                                 className="icone-anexo"
                                                 style={{ marginLeft: '5px' }}
                                             />
                                         </a>
-                                        <button
-                                            onClick={() => setEditMode(true)}
-                                            style={{ marginLeft: '10px', cursor: 'pointer' }}
-                                            id='editar'
-                                        >
-                                            Editar
-                                        </button>
-                                    </>
-                                ) : (
-                                    <input
-                                        type="file"
-                                        id="anexo_resposta"
-                                        onChange={(e) => handleFileChange(e, 1)}
-                                    />
-                                )}
-                            </p>
-                            {editMode && (
-                                <input
-                                    type="file"
-                                    id="anexo_resposta"
-                                    onChange={(e) => handleFileChange(e, 1)}
-                                    style={{ display: 'block', marginTop: '10px' }}
-                                />
-                            )} */}
-                        </div>
-                    </div>
-
-                    <div className="campo-atividades">
-                        <h4>Atividades e Anexos</h4>
-                        <div style={{ display: 'flex', gap: '10px' }}>
-                            <button className="botao-atividades" onClick={handleAbrirAtividadesModal}>
-                                <FaPlus style={{ marginRight: '8px' }} /> Atividade
-                            </button>
-                            <button className="botao-anexo" onClick={handleAbrirAnexosModal}>
-                                <FaPlus style={{ marginRight: '8px' }} /> Anexo
-                            </button>
-                        </div>
-                        <div style={{ display: 'flex', gap: '20px' }}>
-                            <div style={{ flex: 1 }}>
-                                {atividades.slice().reverse().map((atividade, index) => (
-                                    <div className="card-atividade" key={index} onClick={() => handleAbrirDetalhesAtividade(atividade)}>
-                                        <p><label>Task:</label> {atividade.cod_task}</p>
-                                        <p><label>Status:</label> {atividade.status}</p>
-                                        <p><label>Início:</label> {atividade.aberto_em}</p>
-                                        <p><label>Fim:</label> {atividade.dt_fim}</p>
-                                        <p><label>Destinatário:</label> {atividade.executor}</p>
-                                        <p><label>Visibilidade:</label> {atividade.tipo_atividade}</p>
-                                        <p style={{ display: 'flex', alignItems: 'center' }}>
-                                            <label>Anexo:</label>
-                                            {atividade.ds_anexo ? (
-                                                <>
-                                                    <a onClick={() => handleAnexoClick(atividade.ds_anexo)} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                                                        {atividade.ds_anexo.split('/').pop()}
-                                                        <FaFileAlt
-                                                            className="icone-anexo"
-                                                            style={{ marginLeft: '5px' }}
-                                                        />
-                                                    </a>
-                                                </>
-                                            ) : (
-                                                'Nenhum anexo'
-                                            )}
-                                        </p>
-                                    </div>
-                                ))}
-                            </div>
-                            <div style={{ flex: 1 }}>
-                                {anexos.slice().reverse().map((anexo, index) => (
-                                    <div className="card-atividade" key={index} onClick={() => handleAbrirDetalhesAnexo(anexo)}>
-                                        <p><strong>Nome:</strong> {anexo.ds_adicionado_por}</p>
-                                        <p><strong>Data de Abertura:</strong> {anexo.abertura}</p>
-                                        <p><strong>Descrição:</strong> {anexo.ds_texto}</p>
-                                        <p style={{ display: 'flex', alignItems: 'center' }}><strong>Arquivo:</strong>
-                                            <a onClick={() => handleAnexoClick(anexo.ds_anexo)} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                                                {anexo.ds_anexo.split('/').pop()}
-                                                <FaFileAlt
-                                                    className="icone-anexo"
-                                                    style={{ marginLeft: '5px' }}
-                                                />
-                                            </a>
-                                        </p>
-                                    </div>
-                                ))}
-                            </div>
+                                    </p>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>

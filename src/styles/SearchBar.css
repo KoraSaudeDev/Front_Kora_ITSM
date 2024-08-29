@@ -71,3 +71,12 @@ body {
   background-color: white;
   color: #284557;
 }
+
+.conteudo-modal-atividades p {
+  color: #284557;
+}
+
+.conteudo-modal-atividades label {
+  color: #284557;
+  font-weight: bold;
+}
