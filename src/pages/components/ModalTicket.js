@@ -35,7 +35,7 @@ const Modal = ({ data, onClose }) => {
         destinatarios: []
     });
 
-    
+
 
     useEffect(() => {
         axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/hub`)
@@ -47,7 +47,7 @@ const Modal = ({ data, onClose }) => {
             .catch(error => console.error('Erro ao carregar categorias:', error));
     }, []);
 
-    
+
 
     useEffect(() => {
         if (selectedHub) {
@@ -145,7 +145,7 @@ const Modal = ({ data, onClose }) => {
             });
     }, []);
 
-    
+
 
     if (!data) return null;
 
@@ -218,11 +218,10 @@ const Modal = ({ data, onClose }) => {
         const descricao = document.querySelector('#descricao-task').value.trim();
         const executor = document.querySelector('#executor-task').value;
         const status = document.querySelector('#status-task').value;
-        var tipo_atividade = document.querySelector('input[name="visibilidade"]:checked');
-
-        if (!tipo_atividade) {
-            tipo_atividade = 'Privada';
-        } else {
+        var tipo_atividade_checkbox = document.querySelector('input#tipo-atividade');
+        
+        var tipo_atividade = 'Privada';
+        if (tipo_atividade_checkbox && tipo_atividade_checkbox.checked) {
             tipo_atividade = 'Pública';
         }
 
@@ -829,7 +828,7 @@ const Modal = ({ data, onClose }) => {
                                         <p><strong>Nome:</strong> {anexo.ds_adicionado_por}</p>
                                         <p><strong>Data de Abertura:</strong> {anexo.abertura}</p>
                                         <p><strong>Descrição:</strong> {anexo.ds_texto}</p>
-                                        <p style={{ display: 'flex', alignItems: 'center'}}><strong>Arquivo:</strong>
+                                        <p style={{ display: 'flex', alignItems: 'center' }}><strong>Arquivo:</strong>
                                             <a onClick={() => handleAnexoClick(anexo.ds_anexo)} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
                                                 {anexo.ds_anexo.split('/').pop()}
                                                 <FaFileAlt
@@ -925,11 +924,11 @@ const Modal = ({ data, onClose }) => {
                                         </select>
                                     </p>
                                     <div className="switch-container">
-                                        <label className="switch-label">
-                                            <input type="radio" name="visibilidade" value="Pública" className="radio-visibilidade" />
-                                            Pública
+                                        <label htmlFor="tipo-atividade">Pública:</label>
+                                        <label className="switch">
+                                            <input type="checkbox" id="tipo-atividade" />
+                                            <span className="slider round"></span>
                                         </label>
-
                                     </div>
                                     <div className="campo-anexo">
                                         <label htmlFor="anexoAtividade" className="label-anexo">Anexar Arquivo:</label>
