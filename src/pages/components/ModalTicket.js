@@ -30,6 +30,7 @@ const Modal = ({ data, onClose }) => {
     const [isEmailDomainEditable, setIsEmailDomainEditable] = useState(false);
     const [isAllowedCreateUser, setIsAllowedCreateUser] = useState(false);
     const fileInputRef = useRef(null);
+    const [isExpanded, setIsExpanded] = useState(false);
     const [selectedDomain, setSelectedDomain] = useState(data.dominio_email || '');
     const [organizacaoDomains, setOrganizacaoDomains] = useState(data.organizacao_dominio || '');
     const [options, setOptions] = useState({
@@ -733,6 +734,11 @@ const Modal = ({ data, onClose }) => {
         return text.substring(0, maxLength) + "...";
     };
 
+    const toggleExpand = () => {
+        setIsExpanded(prevState => !prevState);
+    };
+    
+
     const convertStatusToTitleCase = (status) => {
         return status
             .toLowerCase()
@@ -815,7 +821,7 @@ const Modal = ({ data, onClose }) => {
                     </div>
                 </div>
 
-                <div className="conteudo-modal">
+                <div className={`conteudo-modal ${isExpanded ? 'expandido' : 'reduzido'}`}>
                     <div className="conteudo-modal-esquerda">
                         <p><strong>Nome:</strong> {data.nome}</p>
                         <p><strong>Matrícula:</strong> {data.matricula}</p>
@@ -967,6 +973,13 @@ const Modal = ({ data, onClose }) => {
                         </div>
                     </div>
                 </div>
+
+                <div className="ver-mais-container">
+                    <button className="botao-ver-mais" onClick={toggleExpand}>
+                        {isExpanded ? 'Ver Menos' : 'Ver Mais'}
+                    </button>
+                </div>
+
 
                 <div className="campo-atividades">
                     <h4>Atividades e Anexos</h4>

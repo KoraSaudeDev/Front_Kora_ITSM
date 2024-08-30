@@ -1028,18 +1028,13 @@ a {
 .conteudo-modal {
     display: flex;
     justify-content: space-between;
-    padding: 20px;
     background-color: #fff;
-    border-top: none;
-    border-radius: 0 5px 5px 5px;
     width: 100%;
     box-sizing: border-box;
-    max-height: auto;
-    overflow: hidden;
-    min-height: 600px;
-    transition: height 0.3s ease-in-out;
-  
+    transition: max-height 0.3s ease-in-out; 
+    
 }
+
 
 .conteudo-modal-esquerda,
 .conteudo-modal-direita {
@@ -1051,7 +1046,7 @@ a {
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
-    overflow-x: auto;
+   
 }
 
 .conteudo-modal-direita{
@@ -1574,3 +1569,32 @@ input:checked + .slider {
 input:checked + .slider:before {
     transform: translateX(20px);
 }
+.conteudo-modal.reduzido {
+    height: 30%;
+    overflow: hidden;
+    transition: height 0.3s ease;
+}
+
+.conteudo-modal.expandido {
+    height: auto; 
+    transition: height 0.3s ease;
+}
+
+.ver-mais-container {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.botao-ver-mais {
+    padding: 8px 16px;
+    background-color: transparent; 
+    color: #007bff; 
+    justify-content: flex-end;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: color 0.3s ease, background-color 0.3s ease; 
+    font-size: 17px;
+}
+
+
