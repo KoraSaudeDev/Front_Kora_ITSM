@@ -39,15 +39,16 @@ const Login = () => {
       const config = {
         method: 'get',
         maxBodyLength: Infinity,
-        url: `${process.env.REACT_APP_API_BASE_URL}/access/meus-grupos?email=${user.email}`,
+        url: `${process.env.REACT_APP_API_BASE_URL}/access/minhas-filas?email=${user.email}`,
         headers: {}
       };
 
       const response = await axios.request(config);
 
-      const roles = response.data.map(item => item.papel);
-      user.cargo = roles;
-
+      if(response.data.filas) user.filas = response.data.filas;
+      if(response.data.filas_id) user.filas_id = response.data.filas_id;
+      if(response.data.id_user) user.id_user = response.data.id_user;
+      
       login(user);
       navigate('/atendimentos/minha-equipe');
     } catch (error) {

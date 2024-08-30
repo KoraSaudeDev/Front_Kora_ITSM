@@ -43,7 +43,6 @@ const Modal = ({ data, onClose }) => {
         destinatarios: []
     });
 
-    // Forms Específicos e Labels
     const formsEspecificos = {
         "novo_usuario": data.novo_usuario,
         "primeiro_nome_user": data.primeiro_nome_user,
@@ -286,11 +285,16 @@ const Modal = ({ data, onClose }) => {
 
         axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/usuarios-executores`)
             .then(response => {
-                setOptions(prevOptions => ({ ...prevOptions, destinatarios: response.data }));
+                const formattedData = response.data.map(destinatario => ({
+                    value: `${destinatario.id} - ${destinatario.fila}`,
+                    label: destinatario.fila
+                }));
+                setOptions(prevOptions => ({ ...prevOptions, destinatarios: formattedData }));
             })
             .catch(error => {
                 console.error('Error fetching destinatarios options:', error);
             });
+
     }, []);
 
     useEffect(() => {
@@ -319,6 +323,25 @@ const Modal = ({ data, onClose }) => {
 
     if (!data) return null;
 
+    function formatDate(dateString, type = 1) {
+        if (!dateString) {
+            return '';
+        }
+
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+
+        if (type === 1) return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+        else if (type === 2) return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        else return '';
+    }
+
+
     const showLoadingOverlay = () => {
         document.getElementById('loading-overlay').style.display = 'flex';
     };
@@ -340,18 +363,26 @@ const Modal = ({ data, onClose }) => {
 
     const handleFileChange = (event) => {
         const files = Array.from(event.target.files);
-        setSelectedFiles((prevFiles) => [...prevFiles, ...files]);
 
-        const newAnexos = files.map((file) => ({
-            cod_fluxo: data.id,
-            ds_adicionado_por: user.name,
-            abertura: new Date().toISOString(),
-            ds_texto: '',
-            ds_anexo: file.name,
-            alterar: 1,
-        }));
+        if (files.length > 0) {
+            const updatedFiles = files.map((file) => ({
+                file,
+                uploadType: 3,
+            }));
 
-        setAnexos((prevAnexos) => [...prevAnexos, ...newAnexos]);
+            setSelectedFiles((prevFiles) => [...prevFiles, ...updatedFiles]);
+
+            const newAnexos = files.map((file) => ({
+                cod_fluxo: data.id,
+                ds_adicionado_por: user.name,
+                abertura: formatDate(new Date().toISOString(), 2),
+                ds_texto: '',
+                ds_anexo: file.name,
+                alterar: 1,
+            }));
+
+            setAnexos((prevAnexos) => [...prevAnexos, ...newAnexos]);
+        }
     };
 
     const handleAbrirAtividadesModal = () => {
@@ -385,7 +416,7 @@ const Modal = ({ data, onClose }) => {
         const aberto_em = document.querySelector('#inicio-task').value;
         const aberto_por = document.querySelector('#aberto-por-task').value;
         const descricao = document.querySelector('#descricao-task').value.trim();
-        const executor = document.querySelector('#executor-task').value;
+        var executor = document.querySelector('#executor-task').value;
         const status = document.querySelector('#status-task').value;
         var tipo_atividade_checkbox = document.querySelector('input#tipo-atividade');
 
@@ -399,6 +430,8 @@ const Modal = ({ data, onClose }) => {
             return;
         }
 
+        executor = executor.split(' - ');
+
         const novaAtividade = {
             cod_fluxo: data.id,
             alterar: 1,
@@ -406,7 +439,8 @@ const Modal = ({ data, onClose }) => {
             aberto_por,
             status,
             descricao,
-            executor,
+            id_executor: executor[0],
+            executor: executor[1],
             tipo_atividade,
             ds_anexo: null
         };
@@ -513,7 +547,7 @@ const Modal = ({ data, onClose }) => {
                 .join(' ');
         }
 
-        showLoadingOverlay();
+        //showLoadingOverlay();
 
         const insert_anexos = anexos.filter(task => task.alterar === 1 && task.id === undefined);
 
@@ -539,6 +573,7 @@ const Modal = ({ data, onClose }) => {
             assunto: selectedAssunto,
             ds_nivel: prioridadeSelecionada,
             status: statusParam === null ? toTitleCase(ultimoItem.status) : statusParam,
+            executor: ultimoItem.id_executor,
             grupo: ultimoItem.executor,
             sla: prioridades.find(line => line.prioridade === prioridadeSelecionada)?.sla,
             //resposta_chamado: resposta_chamado === '' ? null : resposta_chamado
@@ -565,8 +600,8 @@ const Modal = ({ data, onClose }) => {
         try {
             for (let i = 0; i < selectedFiles.length; i++) {
                 const formData = new FormData();
-                formData.append('file', selectedFiles[i]);
-                formData.append('uploadType', 3);
+                formData.append('file', selectedFiles[i].file);
+                formData.append('uploadType', selectedFiles[i].uploadType);
 
                 const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/tickets/file/upload`, formData, {
                     headers: {
@@ -575,9 +610,18 @@ const Modal = ({ data, onClose }) => {
                 });
 
                 if (response.status === 202) {
-                    const matchedFile = insert_anexos.find(task => task.ds_anexo === selectedFiles[i].name);
-                    if (matchedFile) {
-                        matchedFile.ds_anexo = response?.data?.filename;
+                    if (selectedFiles[i].uploadType === 1) {
+                        update_tickets.anexo_resposta = response?.data?.filename;
+                    } else if (selectedFiles[i].uploadType === 2) {
+                        const matchedAtividade = insert_tasks.find(task => task.ds_anexo === selectedFiles[i].file.name);
+                        if (matchedAtividade) {
+                            matchedAtividade.ds_anexo = response?.data?.filename;
+                        }
+                    } else if (selectedFiles[i].uploadType === 3) {
+                        const matchedFile = insert_anexos.find(task => task.ds_anexo === selectedFiles[i].file.name);
+                        if (matchedFile) {
+                            matchedFile.ds_anexo = response?.data?.filename;
+                        }
                     }
                 } else {
                     console.error(`Erro ao enviar o arquivo ${selectedFiles[i].name}:`, response);
@@ -609,6 +653,7 @@ const Modal = ({ data, onClose }) => {
             }
 
             for (const task of insert_tasks) {
+                delete task.id_executor;
                 delete task.alterar;
 
                 const taskConfig = {
@@ -737,7 +782,6 @@ const Modal = ({ data, onClose }) => {
     const toggleExpand = () => {
         setIsExpanded(prevState => !prevState);
     };
-    
 
     const convertStatusToTitleCase = (status) => {
         return status
@@ -925,8 +969,8 @@ const Modal = ({ data, onClose }) => {
                             </div>
                         </div>
 
-                        <p><strong className="data">Abertura:</strong> {data.abertura}</p>
-                        <p><strong className="data">Data Limite:</strong> {data.data_limite}</p>
+                        <p><strong className="data">Abertura:</strong> {formatDate(data.abertura)}</p>
+                        <p><strong className="data">Data Limite:</strong> {formatDate(data.data_limite)}</p>
                         <p><strong className="data">Tipo da SLA:</strong> {prioridades.find(p => p.prioridade === prioridadeSelecionada)?.tipo_tempo.toUpperCase() || ''}</p>
 
                         <div className="campo-editavel">
@@ -1019,7 +1063,7 @@ const Modal = ({ data, onClose }) => {
                                     </div>
 
                                     <p id='status-bolinha'>{atividade.status}</p>
-                                    <p><label>Início:</label> {atividade.aberto_em}</p>
+                                    <p><label>Início:</label> {formatDate(atividade.aberto_em)}</p>
                                     <p><label>Aberto por:</label> {atividade.aberto_por}</p>
                                     <p><label>Destinatário:</label> {atividade.executor}</p>
                                     <p><label>Descrição:</label> {truncateText(atividade.descricao, 50)}</p>
@@ -1042,16 +1086,11 @@ const Modal = ({ data, onClose }) => {
                         </div>
                         <div style={{ flex: 1 }}>
                             {anexos.slice().reverse().map((anexo, index) => (
-                                <div className="card-anexo" key={index}>
+                                <div className="card-anexo" key={index} onClick={() => handleAnexoClick(anexo.ds_anexo)}>
                                     <p><strong>Nome:</strong> {anexo.ds_adicionado_por}</p>
-                                    <p><strong>Data de Abertura:</strong> {anexo.abertura}</p>
+                                    <p><strong>Data de Abertura:</strong> {formatDate(anexo.abertura)}</p>
                                     <p><strong>Arquivo:</strong>
-                                        <a 
-                                            href={anexo.ds_anexo} 
-                                            target="_blank" 
-                                            rel="noopener noreferrer" 
-                                            
-                                        >
+                                        <a>
                                             {anexo.ds_anexo.split('/').pop()}
                                             <FaFileAlt
                                                 className="icone-anexo"
@@ -1062,8 +1101,6 @@ const Modal = ({ data, onClose }) => {
                                 </div>
                             ))}
                         </div>
-
-
                     </div>
                 </div>
             </div>
@@ -1142,7 +1179,7 @@ const Modal = ({ data, onClose }) => {
                                         <select className="select-destinatario" id="executor-task">
                                             <option></option>
                                             {options.destinatarios.map((destinatario, index) => (
-                                                <option key={index} value={destinatario}>{destinatario}</option>
+                                                <option key={index} value={destinatario.value}>{destinatario.label}</option>
                                             ))}
                                         </select>
                                     </p>

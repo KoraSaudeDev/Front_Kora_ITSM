@@ -38,7 +38,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                 let config = {
                     method: 'post',
                     maxBodyLength: Infinity,
-                    url: `${apiUrl}?page=${currentPage}&per_page=${itemsPerPage}`,
+                    url: `${apiUrl}page=${currentPage}&per_page=${itemsPerPage}`,
                     headers: {
                         'Content-Type': 'application/json'
                     },
@@ -64,7 +64,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         }, 10000);
 
         return () => clearTimeout(timer);
-    }, [currentPage, itemsPerPage, filtrosExtras]);
+    }, [currentPage, itemsPerPage]);
 
     useEffect(() => {
         if (selectedTicket) {
@@ -111,7 +111,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         let config = {
             method: 'post',
             maxBodyLength: Infinity,
-            url: `${apiUrl}?page=${currentPage}&per_page=${itemsPerPage}&cod_fluxo=${e.target.value}`,
+            url: `${apiUrl}page=${currentPage}&per_page=${itemsPerPage}&cod_fluxo=${e.target.value}`,
             headers: {
                 'Content-Type': 'application/json'
             },

@@ -7,13 +7,12 @@ const MeusAtendimentos = ({ selectedTicket, onResetTicket }) => {
 
     return (
         <AtendimentosTable
-            titulo="Meus Atendimentos"
-            apiUrl={`${process.env.REACT_APP_API_BASE_URL}/tickets/meus-atendimentos`}
-            filtrosExtras={{ nome: user.nome}}
+            titulo="Minha Equipe"
+            apiUrl={`${process.env.REACT_APP_API_BASE_URL}/tickets/meus-atendimentos?user_id=${user.id_user}&`}
             selectedTicket={selectedTicket}
             onResetTicket={onResetTicket}
         />
     );
-};
+};;
 
 export default MeusAtendimentos;

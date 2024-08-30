@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import '../styles/Sidebar.css';
-import { FaChartPie, FaChartBar, FaPlus, FaHome, FaHeadset, FaChevronDown, FaSignOutAlt } from 'react-icons/fa';
+import { FaChartPie, FaChartBar, FaHeadset, FaChevronDown, FaSignOutAlt } from 'react-icons/fa';
 import logokora from '../assets/images/logokora.png';
 import SemFoto from '../assets/images/Sem_foto.png';
 import { useAuth } from '../context/AuthContext';
@@ -12,16 +12,16 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const [activeDropdown, setActiveDropdown] = useState('dropdownAtendimentos');
   const { user, logout } = useAuth();
-  const [meusAtendimentosCount] = useState(0);
+  const [meusAtendimentosCount, setMeusAtendimentosCount] = useState(0);
   const [minhaEquipeCount, setMinhaEquipeCount] = useState(0);
 
   useEffect(() => {
-    if (user && user.cargo) { 
+    if (user && user.filas && user.id_user) {
       const fetchMinhaEquipeCount = async () => {
         try {
           const response = await axios.post(
             `${process.env.REACT_APP_API_BASE_URL}/tickets/minha-equipe?page=1&per_page=1`,
-            { grupos: user.cargo },
+            { filas: user.filas_id },
             {
               headers: {
                 'Content-Type': 'application/json',
@@ -34,6 +34,16 @@ const Sidebar = () => {
         }
       };
 
+      const fetchMeusAtendimentosCount = async () => {
+        try {
+          const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/tickets/meus-atendimentos?user_id=${user.id_user}&page=1&per_page=1`);
+          setMeusAtendimentosCount(response.data.total_items);
+        } catch (error) {
+          console.error("Erro ao buscar contagem de Meus Atendimentos", error);
+        }
+      };
+
+      fetchMeusAtendimentosCount();
       fetchMinhaEquipeCount();
     }
   }, [user]); 
@@ -109,8 +119,8 @@ const Sidebar = () => {
           </div>
           <div className="informacoes-usuario">
             <p id="usuario">{user?.name || 'Nome do Usuário'}</p>
-            {user?.cargo?.length > 0 ? (
-              user.cargo.map((item, index) => (
+            {user?.filas?.length > 0 ? (
+              user.filas.map((item, index) => (
                 <p key={index} id="cargo">
                   {item}
                 </p>
@@ -138,7 +148,9 @@ const Sidebar = () => {
               <li className={location.pathname === '/atendimentos/meus-atendimentos' ? 'active' : ''}>
                 <Link to="/atendimentos/meus-atendimentos" className={location.pathname === '/atendimentos/meus-atendimentos' ? 'active' : ''}>
                   Meus Atendimentos
-                  <span className="badge">{meusAtendimentosCount}</span>
+                  {meusAtendimentosCount > 0 && (
+                    <span className="badge">{meusAtendimentosCount}</span>
+                  )}
                 </Link>
               </li>
               <li className={location.pathname === '/atendimentos/minha-equipe' ? 'active' : ''}>
