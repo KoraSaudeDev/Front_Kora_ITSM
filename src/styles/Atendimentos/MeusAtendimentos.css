@@ -716,11 +716,11 @@ a {
 .card-anexo {
     background-color: #f8f9fa;
     border: 1px solid #ddd;
-    border-radius: 10px;
+    border-radius: 5px;
     padding: 15px;
     margin-top: 15px;
     margin-bottom: 15px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     display: flex;
     flex-direction: column;
@@ -1035,7 +1035,9 @@ a {
     border-radius: 0 5px 5px 5px;
     width: 100%;
     box-sizing: border-box;
-    max-height: 30%; 
+    height: 400px; /* Altura inicial do modal */
+    overflow: hidden;
+    transition: height 0.3s ease-in-out;
   
 }
 
@@ -1571,4 +1573,30 @@ input:checked + .slider {
 
 input:checked + .slider:before {
     transform: translateX(20px);
+}
+.modal {
+    transition: height 0.3s ease-in-out;
+    overflow: hidden;
+}
+
+.modal.expanded {
+    height: auto;
+}
+
+.conteudo-modal.expanded {
+    height: auto; /* Quando expandido, a altura é ajustada automaticamente */
+}
+
+.ver-mais-btn {
+    margin: 10px 0;
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.ver-mais-btn:hover {
+    background-color: #0056b3;
 }
