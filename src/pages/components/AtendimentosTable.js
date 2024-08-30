@@ -18,12 +18,14 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
 
     const statusOptions = {
         "Em Andamento": "#ffc107",
-        "Em Atendimento": "#83e509",
+        "Em Atendimento": "#A6c620",
         "Aguardando Retorno Fornecedor": "#17a2b8",
         "Aguardando Retorno": "#fd7e90",
         "Em Aberto": "#007bff",
         "Agendada": "#6610f2",
-        "Criação de Usuário": "#fd7e14"
+        "Criação de Usuário": "#fd7e14",
+        "Finalizado": "#229a00",
+        "Cancelado": "#FF0000"
     };
 
     const slaOptions = {
