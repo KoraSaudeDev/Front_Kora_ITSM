@@ -137,7 +137,7 @@ const Modal = ({ data, onClose }) => {
     };
     const statusOptions = {
         "Em Andamento": "#ffc107",
-        "Em Atendimento": "#ffc107",
+        "Em Atendimento": "#83e509",
         "Aguardando Retorno Fornecedor": "#17a2b8",
         "Aguardando Retorno": "#fd7e90",
         "Em Aberto": "#007bff",
