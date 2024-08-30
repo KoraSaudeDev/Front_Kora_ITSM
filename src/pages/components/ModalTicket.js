@@ -1074,7 +1074,7 @@ const Modal = ({ data, onClose }) => {
                                         <label>Anexo:</label>
                                         {atividade.ds_anexo ? (
                                             <>
-                                                <a onClick={() => handleAnexoClick(atividade.ds_anexo)} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                                <a onClick={atividade.id ? () => handleAnexoClick(atividade.ds_anexo) : null} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
                                                     {atividade.ds_anexo.split('/').pop()}
                                                     <FaFileAlt className="icone-anexo" style={{ marginLeft: '5px' }} />
                                                 </a>
@@ -1088,7 +1088,7 @@ const Modal = ({ data, onClose }) => {
                         </div>
                         <div style={{ flex: 1 }}>
                             {anexos.slice().reverse().map((anexo, index) => (
-                                <div className="card-anexo" key={index} onClick={() => handleAnexoClick(anexo.ds_anexo)}>
+                                <div className="card-anexo" key={index} onClick={anexo.id ? () => handleAnexoClick(anexo.ds_anexo) : null}>
                                     <p><strong>Nome:</strong> {anexo.ds_adicionado_por}</p>
                                     <p><strong>Data de Abertura:</strong> {formatDate(anexo.abertura)}</p>
                                     <p><strong>Arquivo:</strong>
@@ -1135,7 +1135,8 @@ const Modal = ({ data, onClose }) => {
                                         <label>Anexo:</label>
                                         {atividadeSelecionada.ds_anexo ? (
                                             <>
-                                                <a onClick={() => handleAnexoClick(atividadeSelecionada.ds_anexo)} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                                <a  onClick={atividadeSelecionada.id ? () => handleAnexoClick(atividadeSelecionada.ds_anexo) : null} 
+                                                    style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
                                                     {atividadeSelecionada.ds_anexo.split('/').pop()}
                                                     <FaFileAlt
                                                         className="icone-anexo"
