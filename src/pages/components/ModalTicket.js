@@ -549,7 +549,7 @@ const Modal = ({ data, onClose }) => {
                 .join(' ');
         }
 
-        //showLoadingOverlay();
+        showLoadingOverlay();
 
         const insert_anexos = anexos.filter(task => task.alterar === 1 && task.id === undefined);
 
@@ -568,25 +568,26 @@ const Modal = ({ data, onClose }) => {
         //const resposta_chamado = document.querySelector("#resp-chamado").value;
 
         const update_tickets = {
-            hub: selectedHub,
-            unidade: selectedUnidade,
-            categoria: selectedCategoria,
-            subcategoria: selectedSubcategoria,
-            assunto: selectedAssunto,
-            ds_nivel: prioridadeSelecionada,
-            status: statusParam === null ? toTitleCase(ultimoItem.status) : statusParam,
-            executor: ultimoItem.id_executor,
-            grupo: ultimoItem.executor,
-            sla: prioridades.find(line => line.prioridade === prioridadeSelecionada)?.sla,
+            hub: selectedHub ?? data.hub,
+            unidade: selectedUnidade ?? data.unidade,
+            categoria: selectedCategoria ?? data.categoria,
+            subcategoria: selectedSubcategoria ?? data.subcategoria,
+            assunto: selectedAssunto ?? data.assunto,
+            ds_nivel: prioridadeSelecionada ?? data.ds_nivel,
+            status: statusParam === null ? toTitleCase(ultimoItem?.status ?? data.status) : statusParam,
+            executor: ultimoItem?.id_executor ?? data.executor,
+            grupo: ultimoItem?.executor ?? data.grupo,
+            sla: prioridades.find(line => line.prioridade === prioridadeSelecionada)?.sla ?? data.sla,
             //resposta_chamado: resposta_chamado === '' ? null : resposta_chamado
-        };
+          };
+          
 
         if (selectedDomain) update_tickets.dominio_email = selectedDomain;
         if (organizacaoDomains) update_tickets.organizacao_dominio = organizacaoDomains
 
         if (update_tickets.status === "Finalizado") {
-            update_tickets.finalizado_por = ultimoItem.aberto_por;
-            update_tickets.data_fim = ultimoItem.aberto_em;
+            update_tickets.finalizado_por = ultimoItem?.aberto_por ?? data.finalizado_por;
+            update_tickets.data_fim = ultimoItem?.aberto_em ?? formatDate(data.data_fim, 2);
             update_tickets.bl_reabertura = 1;
         }
 
@@ -684,6 +685,8 @@ const Modal = ({ data, onClose }) => {
 
                 await sendRequest(fileConfig);
             }
+
+            axios.post(`${process.env.REACT_APP_API_BASE_URL}/tickets/update/sla?cod_fluxo=${data.cod_fluxo}`);
 
             hideLoadingOverlay();
 
