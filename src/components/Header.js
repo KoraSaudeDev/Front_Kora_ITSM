@@ -72,7 +72,9 @@ const Header = ({ onSelectTicket, pendentes = [] }) => {
               data-tooltip="Notificação"
             >
               <FaBell />
-              {pendentes.length > 0 && <div className="notification-dot pulsating"></div>}
+              {pendentes.length > 0 && (
+                <div className="notification-dot pulsating"></div>
+              )}
             </div>
             {showNotifications && (
               <div className={`caixa-notificacoes ${showNotifications ? 'ativa' : ''}`}>
