@@ -45,18 +45,12 @@ const Login = () => {
 
       const response = await axios.request(config);
 
-      if(response.error === "User not found"){
-        login(user);
-        navigate('/atendimentos/minha-equipe');
-      }
-      else{
-        if(response.data.filas) user.filas = response.data.filas;
-        if(response.data.filas_id) user.filas_id = response.data.filas_id;
-        if(response.data.id_user) user.id_user = response.data.id_user;
-
-        login(user);
-        navigate('/atendimentos/minha-equipe');
-      }
+      if(response.data.filas) user.filas = response.data.filas;
+      if(response.data.filas_id) user.filas_id = response.data.filas_id;
+      if(response.data.id_user) user.id_user = response.data.id_user;
+      
+      login(user);
+      navigate('/atendimentos/minha-equipe');
     } catch (error) {
       console.error(error);
     }
