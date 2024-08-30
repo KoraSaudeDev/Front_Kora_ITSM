@@ -714,8 +714,7 @@ a {
     min-height: 40px;
 }
 .card-anexo {
-    background: linear-gradient(135deg, #d6e8fa 0%, #ffffff 100%);
-
+    background-color: #f8f9fa;
     border: 1px solid #ddd;
     border-radius: 10px;
     padding: 15px;
@@ -725,15 +724,16 @@ a {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    align-items: flex-start;
+    justify-content: flex-start; 
     width: 95%; 
     cursor: pointer;
     min-height: auto;
-    text-align: center;
+    text-align: left; 
     overflow: hidden;
     position: relative;
 }
+
 
 .card-anexo:hover {
     transform: translateY(-5px);
@@ -757,7 +757,7 @@ a {
     opacity: 1;
 }
 
-.card-anexo .icone-anexo {
+.card-anexo {
     font-size: 24px;
     color: #6c63ff;
     margin-bottom: 10px;
@@ -768,6 +768,7 @@ a {
     color: #333;
     margin: 0;
     font-weight: 500;
+    margin-bottom: 5px;
 }
 
 .card-anexo p:nth-child(2) {
@@ -1241,7 +1242,7 @@ textarea {
     transform: translateY(-2px);
     box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }
-/* Divisão dos botões "Atividade" e "Anexo" */
+
 .campo-atividades {
     margin-top: -20px;
 }

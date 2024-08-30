@@ -139,7 +139,7 @@ const Modal = ({ data, onClose }) => {
         "Em Andamento": "#ffc107",
         "Em Atendimento": "#ffc107",
         "Aguardando Retorno Fornecedor": "#17a2b8",
-        "Aguardando Retorno": "#6c757d",
+        "Aguardando Retorno": "#fd7e90",
         "Em Aberto": "#007bff",
         "Agendada": "#6610f2",
         "Criação de Usuário": "#fd7e14"
@@ -968,8 +968,6 @@ const Modal = ({ data, onClose }) => {
                     </div>
                 </div>
 
-                
-
                 <div className="campo-atividades">
                     <h4>Atividades e Anexos</h4>
                     <div style={{ display: 'flex', gap: '10px' }}>
@@ -1031,27 +1029,26 @@ const Modal = ({ data, onClose }) => {
                         </div>
                         <div style={{ flex: 1 }}>
                             {anexos.slice().reverse().map((anexo, index) => (
-                                <div
-                                    className="card-anexo"
-                                    key={index}
-                                    onClick={() => window.open(`${process.env.REACT_APP_API_BASE_URL}/${anexo.ds_anexo}`, '_blank')} 
-                                    style={{ cursor: 'pointer' }} 
-                                >
-                                    <h4 style={{ textAlign: 'center', margin: '5px 0' }}>Anexo {anexos.length - index}</h4>
-                                    <p style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <strong>Arquivo:</strong>
-                                        <span style={{ display: 'flex', alignItems: 'center', marginLeft: '5px' }}>
+                                <div className="card-anexo" key={index}>
+                                    <p><strong>Nome:</strong> {anexo.ds_adicionado_por}</p>
+                                    <p><strong>Data de Abertura:</strong> {anexo.abertura}</p>
+                                    <p><strong>Arquivo:</strong>
+                                        <a 
+                                            href={anexo.ds_anexo} 
+                                            target="_blank" 
+                                            rel="noopener noreferrer" 
+                                            
+                                        >
                                             {anexo.ds_anexo.split('/').pop()}
                                             <FaFileAlt
                                                 className="icone-anexo"
                                                 style={{ marginLeft: '5px' }}
                                             />
-                                        </span>
+                                        </a>
                                     </p>
                                 </div>
                             ))}
                         </div>
-
 
 
                     </div>
