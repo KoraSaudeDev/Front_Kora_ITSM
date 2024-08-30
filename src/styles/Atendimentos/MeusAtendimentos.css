@@ -1030,13 +1030,13 @@ a {
     justify-content: space-between;
     padding: 20px;
     background-color: #fff;
-    border: 1px solid #ddd;
     border-top: none;
     border-radius: 0 5px 5px 5px;
     width: 100%;
     box-sizing: border-box;
     max-height: auto;
     overflow: hidden;
+    min-height: 600px;
     transition: height 0.3s ease-in-out;
   
 }
@@ -1573,30 +1573,4 @@ input:checked + .slider {
 
 input:checked + .slider:before {
     transform: translateX(20px);
-}
-.modal {
-    transition: height 0.3s ease-in-out;
-    overflow: hidden;
-}
-
-.modal.expanded {
-    height: auto;
-}
-
-.conteudo-modal.expanded {
-    height: auto; /* Quando expandido, a altura é ajustada automaticamente */
-}
-
-.ver-mais-btn {
-    margin: 10px 0;
-    background-color: #007bff;
-    color: white;
-    padding: 10px;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.ver-mais-btn:hover {
-    background-color: #0056b3;
 }

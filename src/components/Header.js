@@ -3,9 +3,8 @@ import SearchBar from './SearchBar';
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/Header.css';
 import { FaBell } from 'react-icons/fa';
-import dadosTickets from '../pages/Atendimentos/dadosTickets';
 
-const Header = ({ onSelectTicket }) => {
+const Header = ({ onSelectTicket, pendentes = [] }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [isSwinging, setIsSwinging] = useState(false);
   const navigate = useNavigate();
@@ -36,12 +35,6 @@ const Header = ({ onSelectTicket }) => {
     navigate('/atendimentos/meus-atendimentos', { state: { ticket } });
   };
 
-  const pendentes = dadosTickets.filter(
-    (ticket) =>
-      ticket.status === 'Pendente' &&
-      ticket.nomeCompleto === 'Lucas E'
-  );
-
   useEffect(() => {
     if (pendentes.length > 0) {
       const intervalId = setInterval(() => {
@@ -54,8 +47,10 @@ const Header = ({ onSelectTicket }) => {
   }, [pendentes.length]);
 
   useEffect(() => {
-    
-    if (location.pathname !== '/atendimentos/meus-atendimentos' && location.pathname !== '/atendimentos/minha-equipe') {
+    if (
+      location.pathname !== '/atendimentos/meus-atendimentos' &&
+      location.pathname !== '/atendimentos/minha-equipe'
+    ) {
       onSelectTicket(null);
     }
   }, [location.pathname, onSelectTicket]);
