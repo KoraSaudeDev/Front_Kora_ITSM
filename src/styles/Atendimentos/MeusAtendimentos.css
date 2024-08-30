@@ -1035,7 +1035,7 @@ a {
     border-radius: 0 5px 5px 5px;
     width: 100%;
     box-sizing: border-box;
-    height: 400px; /* Altura inicial do modal */
+    max-height: auto;
     overflow: hidden;
     transition: height 0.3s ease-in-out;
   
