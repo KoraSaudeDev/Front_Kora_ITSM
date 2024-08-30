@@ -1570,6 +1570,7 @@ input:checked + .slider:before {
     transform: translateX(20px);
 }
 .conteudo-modal.reduzido {
+    min-height: 200px;
     height: 30%;
     overflow: hidden;
     transition: height 0.3s ease;
@@ -1597,4 +1598,6 @@ input:checked + .slider:before {
     font-size: 17px;
 }
 
-
+h4{
+    color: #3E4676; 
+}
