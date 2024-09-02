@@ -1044,7 +1044,6 @@ a {
 .conteudo-modal-esquerda,
 .conteudo-modal-direita {
     flex: 1; 
-    background-color: #eeeeee;
     border-radius: 4px;
     padding: 20px;
     display: flex;
@@ -1055,7 +1054,6 @@ a {
 }
 
 .conteudo-modal-direita{
-    background-color: white;
     font-size: 14px;
     margin: 0px;
     max-height: 400px;

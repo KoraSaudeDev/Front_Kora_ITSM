@@ -9,7 +9,6 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
     const [modalData, setModalData] = useState(null);
     const [filtroStatus, setFiltroStatus] = useState('');
     const [filtroSLA, setFiltroSLA] = useState('');
-
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(true);
@@ -33,10 +32,26 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         "No Prazo": "#28a745"
     };
 
+
+    const cacheKey = `atendimentos_page_${currentPage}_items_${itemsPerPage}`;
+
     useEffect(() => {
         const fetchAtendimentos = async () => {
             try {
+                setLoading(true);
                 showLoadingOverlay();
+
+                
+                const cachedData = localStorage.getItem(cacheKey);
+                if (cachedData) {
+                    const { tickets, totalItems } = JSON.parse(cachedData);
+                    setAtendimentos(tickets);
+                    setTotalPages(Math.ceil(totalItems / itemsPerPage));
+                    setLoading(false);
+                    hideLoadingOverlay();
+                    return;
+                }
+
                 let config = {
                     method: 'post',
                     maxBodyLength: Infinity,
@@ -48,8 +63,17 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                 };
 
                 const response = await axios.request(config);
-                setAtendimentos(response.data.tickets);
-                setTotalPages(Math.ceil(response.data.total_items / itemsPerPage));
+                const fetchedAtendimentos = response.data.tickets;
+                const totalItems = response.data.total_items;
+
+               
+                localStorage.setItem(
+                    cacheKey,
+                    JSON.stringify({ tickets: fetchedAtendimentos, totalItems })
+                );
+
+                setAtendimentos(fetchedAtendimentos);
+                setTotalPages(Math.ceil(totalItems / itemsPerPage));
                 setLoading(false); 
                 hideLoadingOverlay();
             } catch (error) {
