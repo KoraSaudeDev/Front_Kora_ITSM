@@ -38,7 +38,6 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         const fetchAtendimentos = async () => {
             try {
                 setLoading(true);
-                showLoadingOverlay();
 
                 const cachedData = localStorage.getItem(cacheKey);
                 if (cachedData) {
@@ -69,11 +68,9 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                 );
 
                 setLoading(false);
-                hideLoadingOverlay();
             } catch (error) {
                 console.error('Erro ao buscar atendimentos:', error);
                 setLoading(false);
-                hideLoadingOverlay();
             }
         };
 
@@ -91,14 +88,6 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
             handleClick(selectedTicket);
         }
     }, [selectedTicket]);
-
-    const showLoadingOverlay = () => {
-        document.getElementById('loading-overlay').style.display = 'flex';
-    };
-
-    const hideLoadingOverlay = () => {
-        document.getElementById('loading-overlay').style.display = 'none';
-    };
 
     const handleClick = async (ticket) => {
         try {
@@ -194,9 +183,6 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
 
     return (
         <div className="container-meus-atendimentos" onClick={handleClearFiltro}>
-            <div id="loading-overlay" className="loading-overlay">
-                <div className="loading-spinner"></div>
-            </div>
             <div className="header-meus-atendimentos">
                 <h2>{titulo}</h2>
                 <select value={itemsPerPage} onChange={handleItemsPerPageChange} className="items-per-page-select">

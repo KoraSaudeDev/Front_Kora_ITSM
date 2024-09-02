@@ -22,10 +22,11 @@ const Modal = ({ data, onClose }) => {
     const [editMode, setEditMode] = useState(false);
     const [prioridadeSelecionada, setPrioridadeSelecionada] = useState(data.ds_nivel);
     const [selectedHub, setSelectedHub] = useState(data.hub || '');
+    const [selectedUnidade, setSelectedUnidade] = useState(data.unidade || '');
     const [selectedCategoria, setSelectedCategoria] = useState(data.categoria || '');
     const [selectedSubcategoria, setSelectedSubcategoria] = useState(data.subcategoria || '');
-    const [selectedUnidade, setSelectedUnidade] = useState(data.unidade || '');
     const [selectedAssunto, setSelectedAssunto] = useState(data.assunto || '');
+    const [selectedDestinatario, setSelectedDestinatario] = useState(data.grupo || '');
     const [emailDomains, setEmailDomains] = useState([]);
     const [isEmailDomainEditable, setIsEmailDomainEditable] = useState(false);
     const [isAllowedCreateUser, setIsAllowedCreateUser] = useState(false);
@@ -222,7 +223,7 @@ const Modal = ({ data, onClose }) => {
     useEffect(() => {
         if (selectedSubcategoria) {
             axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/assuntos?categoria=${selectedCategoria}&subcategoria=${selectedSubcategoria}`)
-                .then(response => setOptions(prev => ({ ...prev, assunto: response.data.map(ass => ass.assunto) })))
+                .then(response => setOptions(prev => ({ ...prev, assunto: response.data })))
                 .catch(error => console.error('Erro ao carregar assuntos:', error));
         } else {
             setSelectedAssunto('');
@@ -287,16 +288,20 @@ const Modal = ({ data, onClose }) => {
 
         axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/usuarios-executores`)
             .then(response => {
-                const formattedData = response.data.map(destinatario => ({
-                    value: `${destinatario.id} - ${destinatario.fila}`,
-                    label: destinatario.fila
-                }));
+                const formattedData = response.data.map(destinatario => {
+                    if (destinatario.fila === selectedDestinatario) {
+                        setSelectedDestinatario(`${destinatario.id} - ${destinatario.fila}`)
+                    }
+                    return {
+                        value: `${destinatario.id} - ${destinatario.fila}`,
+                        label: destinatario.fila
+                    };
+                });
                 setOptions(prevOptions => ({ ...prevOptions, destinatarios: formattedData }));
             })
             .catch(error => {
                 console.error('Error fetching destinatarios options:', error);
             });
-
     }, []);
 
     useEffect(() => {
@@ -341,8 +346,7 @@ const Modal = ({ data, onClose }) => {
         if (type === 1) return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
         else if (type === 2) return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
         else return '';
-    }
-
+    };
 
     const showLoadingOverlay = () => {
         document.getElementById('loading-overlay').style.display = 'flex';
@@ -511,11 +515,22 @@ const Modal = ({ data, onClose }) => {
                 setSelectedSubcategoria(value);
                 setSelectedAssunto('');
                 break;
+            case 'assunto':
+                setSelectedAssunto(value);
+
+                const selectedAssuntoObj = options.assunto.find(option => option.assunto === value);
+                if (selectedAssuntoObj) {
+                    const destinatario = options.destinatarios.find(dest => dest.value.startsWith(selectedAssuntoObj.grupo_atendimento));
+                    if (destinatario) {
+                        setSelectedDestinatario(destinatario.value);
+                    }
+                }
+                break;
             case 'unidade':
                 setSelectedUnidade(value);
                 break;
-            case 'assunto':
-                setSelectedAssunto(value);
+            case 'destinatarios':
+                setSelectedDestinatario(value);
                 break;
             default:
                 break;
@@ -565,6 +580,34 @@ const Modal = ({ data, onClose }) => {
 
         const ultimoItem = atividades[atividades.length - 1];
 
+        var id_executor = null;
+        var executor = null;
+
+        if (insert_tasks.length < 1) {
+            const destinatarioParts = selectedDestinatario.split(" - ");
+
+            if (selectedAssunto !== data.assunto ||
+                selectedSubcategoria !== data.subcategoria ||
+                selectedCategoria !== data.categoria ||
+                String(destinatarioParts[0]) !== String(data.executor)) {
+
+                id_executor = destinatarioParts[0];
+                executor = selectedDestinatario.substring(id_executor.length + 3);
+                statusParam = "Em Andamento";
+
+                insert_tasks.push({
+                    "cod_fluxo": data.id,
+                    "aberto_em": formatDate(new Date().toISOString(), 2),
+                    "aberto_por": user.name,
+                    "status": "EM ATENDIMENTO",
+                    "descricao": "Solicitação encaminhada...",
+                    "id_executor": id_executor,
+                    "executor": executor,
+                    "tipo_atividade": "Privada"
+                });
+            }
+        }
+        
         //const resposta_chamado = document.querySelector("#resp-chamado").value;
 
         const update_tickets = {
@@ -575,12 +618,11 @@ const Modal = ({ data, onClose }) => {
             assunto: selectedAssunto ?? data.assunto,
             ds_nivel: prioridadeSelecionada ?? data.ds_nivel,
             status: statusParam === null ? toTitleCase(ultimoItem?.status ?? data.status) : statusParam,
-            executor: ultimoItem?.id_executor ?? data.executor,
-            grupo: ultimoItem?.executor ?? data.grupo,
+            executor: id_executor === null ? (ultimoItem?.id_executor ?? data.executor) : id_executor,
+            grupo: executor === null ? (ultimoItem?.executor ?? data.grupo) : executor,
             sla: prioridades.find(line => line.prioridade === prioridadeSelecionada)?.sla ?? data.sla,
             //resposta_chamado: resposta_chamado === '' ? null : resposta_chamado
         };
-
 
         if (selectedDomain) update_tickets.dominio_email = selectedDomain;
         if (organizacaoDomains) update_tickets.organizacao_dominio = organizacaoDomains
@@ -731,63 +773,68 @@ const Modal = ({ data, onClose }) => {
 
         showLoadingOverlay();
 
-        const param = {
-            "Status": data.status,
-            "Abertura": data.abertura,
-            "Telefone": data.n_tel_usuario,
-            "Email": data.email_solicitante,
-            "gestor_imediato": data.ds_gestor,
-            "gestor_imediato_email": data.ds_email_gestor,
-            "gerente_area": data.ds_gerente,
-            "nome_usuario": data.novo_usuario,
-            "hub_usuario": data.hub_novo_usu,
-            "unidade_usuario": data.unidade_novo_usu,
-            "funcao_usuario": data.cargo,
-            "departamento_usuario": data.departamento_novo_usuario,
-            "senha_usuario": `${data.id}@`,
-            "tipo_licenca": data.ds_licenca,
-            "email_gerente": data.ds_email_gerente,
-            "dominio_email": selectedDomain,
-            "organizacao_dominio": organizacaoDomains,
-            "centro_custo": data.centro_custo,
-            "matricula_usuario": data.matricula_final,
-            "tipo_colaborador": data.ds_tipo_colaborador,
-            "Nome_Empresa": data.Nome_Empresa,
-            "Logon_Script": data.Logon_Script,
-            "Cidade": data.Cidade,
-            "Estado": data.Estado,
-            "CEP": data.CEP,
-            "Pais": data.Pais,
-            "Site": data.Site,
-            "Endereco": data.Endereco,
-            "cod_empresa": data.cod_empresa,
-            "telefone_empresa": data.telefone_empresa,
-            "N° Ticket": data.cod_fluxo,
-            "id": data.id,
-            "tipo_criacao": data.ctrl_criacao_usuario,
-            "app": "tickets"
+        try {
+            const param = {
+                "Status": data.status,
+                "Abertura": data.abertura,
+                "Telefone": data.n_tel_usuario,
+                "Email": data.email_solicitante,
+                "gestor_imediato": data.ds_gestor,
+                "gestor_imediato_email": data.ds_email_gestor,
+                "gerente_area": data.ds_gerente,
+                "nome_usuario": data.novo_usuario,
+                "hub_usuario": data.hub_novo_usu,
+                "unidade_usuario": data.unidade_novo_usu,
+                "funcao_usuario": data.cargo,
+                "departamento_usuario": data.departamento_novo_usuario,
+                "senha_usuario": `${data.id}@`,
+                "tipo_licenca": data.ds_licenca,
+                "email_gerente": data.ds_email_gerente,
+                "dominio_email": selectedDomain,
+                "organizacao_dominio": organizacaoDomains,
+                "centro_custo": data.centro_custo,
+                "matricula_usuario": data.matricula_final,
+                "tipo_colaborador": data.ds_tipo_colaborador,
+                "Nome_Empresa": data.Nome_Empresa,
+                "Logon_Script": data.Logon_Script,
+                "Cidade": data.Cidade,
+                "Estado": data.Estado,
+                "CEP": data.CEP,
+                "Pais": data.Pais,
+                "Site": data.Site,
+                "Endereco": data.Endereco,
+                "cod_empresa": data.cod_empresa,
+                "telefone_empresa": data.telefone_empresa,
+                "N° Ticket": data.cod_fluxo,
+                "id": data.id,
+                "tipo_criacao": data.ctrl_criacao_usuario,
+                "app": "tickets"
+            }
+
+            const config = {
+                method: 'post',
+                url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/create-user-google`,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                data: JSON.stringify(param)
+            };
+            const response = await axios.request(config);
+            console.log(response.data);
+
+            hideLoadingOverlay();
+            setSuccessMessage(response.data);
+            setShowSuccessMessage(true);
+
+            setTimeout(() => {
+                setShowSuccessMessage(false);
+                handleSalvarTicket('Criação de Usuário');
+            }, 1300);
+        } catch (error) {
+            hideLoadingOverlay();
+            console.error("Error creating user:", error);
         }
-
-        const config = {
-            method: 'post',
-            url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/create-user-google`,
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            data: JSON.stringify(param)
-        };
-        const response = await axios.request(config);
-        console.log(response.data);
-
-        hideLoadingOverlay();
-        setSuccessMessage(response.data);
-        setShowSuccessMessage(true);
-
-        setTimeout(() => {
-            setShowSuccessMessage(false);
-            handleSalvarTicket('Criação de Usuário');
-        }, 1300);
-    }
+    };
 
     const handleCloseModal = () => {
         setIsClosingModal(true);
@@ -824,6 +871,9 @@ const Modal = ({ data, onClose }) => {
 
     return (
         <div className="modal-overlay" onClick={handleOverlayClick}>
+            <div id="loading-overlay" className="loading-overlay">
+                <div className="loading-spinner"></div>
+            </div>
             <div className={`modal ${isClosingModal ? 'fechar' : ''}`}>
                 <div className="modal-header">
                     <h3>Ticket #{data.cod_fluxo}</h3>
@@ -880,10 +930,10 @@ const Modal = ({ data, onClose }) => {
                             onChange={(e) => handleFieldChange('assunto', e.target.value)}
                             disabled={!selectedSubcategoria}
                         >
-                            <option></option>
+                            <option value=""></option>
                             {options.assunto.map((option, index) => (
-                                <option key={index} value={option}>
-                                    {option}
+                                <option key={index} value={option.assunto}>
+                                    {option.assunto}
                                 </option>
                             ))}
                         </select>
@@ -967,11 +1017,10 @@ const Modal = ({ data, onClose }) => {
                             }
                         })}
 
-                    
                         <div className="ver-mais-container">
-                                            <button className="botao-ver-mais" onClick={toggleExpand}>
-                                                {isExpanded ? 'Ver Menos' : 'Ver Mais'}
-                                            </button>
+                            <button className="botao-ver-mais" onClick={toggleExpand}>
+                                {isExpanded ? 'Ver Menos' : 'Ver Mais'}
+                            </button>
                         </div>
                     </div>
 
@@ -1005,16 +1054,15 @@ const Modal = ({ data, onClose }) => {
                         <p><strong className="data">Data Limite:</strong> {formatDate(data.data_limite)}</p>
                         <p><strong className="data">Tipo da SLA:</strong> {prioridades.find(p => p.prioridade === prioridadeSelecionada)?.tipo_tempo.toUpperCase() || ''}</p>
 
-
                         <div className="campo-editavel">
                             <strong>Analista Atual:</strong>
-                            <select 
-                                className="select-destinatario" 
-                                id="executor-ticket" 
-                                value={options.destinatarios.find(option => option.label === data.grupo)?.value || ''} 
-                                onChange={(e) => handleFieldChange('grupo', e.target.value)}
+                            <select
+                                className="select-destinatario"
+                                id="executor-ticket"
+                                value={selectedDestinatario}
+                                onChange={(e) => handleFieldChange('destinatarios', e.target.value)}
                             >
-                                <option value="">Selecione um destinatário</option>
+                                <option></option>
                                 {options.destinatarios.map((destinatario, index) => (
                                     <option key={index} value={destinatario.value}>
                                         {destinatario.label}
@@ -1022,7 +1070,6 @@ const Modal = ({ data, onClose }) => {
                                 ))}
                             </select>
                         </div>
-
                         <div className="campo-editavel">
                             <strong>Prioridade:</strong>
                             <select
@@ -1068,11 +1115,7 @@ const Modal = ({ data, onClose }) => {
                     </div>
                 </div>
 
-                
-
-
                 <div className="campo-atividades">
-                    
                     <div style={{ display: 'flex', gap: '10px' }}>
                         <button className="botao-atividades" onClick={handleAbrirAtividadesModal}>
                             <FaPlus style={{ marginRight: '8px' }} /> Atividade
@@ -1179,7 +1222,7 @@ const Modal = ({ data, onClose }) => {
                                         <label>Anexo:</label>
                                         {atividadeSelecionada.ds_anexo ? (
                                             <>
-                                                <a  onClick={atividadeSelecionada.id ? () => handleAnexoClick(atividadeSelecionada.ds_anexo) : null} 
+                                                <a onClick={atividadeSelecionada.id ? () => handleAnexoClick(atividadeSelecionada.ds_anexo) : null}
                                                     style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
                                                     {atividadeSelecionada.ds_anexo.split('/').pop()}
                                                     <FaFileAlt

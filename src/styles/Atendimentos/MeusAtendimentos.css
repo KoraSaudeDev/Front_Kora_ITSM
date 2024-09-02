@@ -1425,6 +1425,34 @@ label[for="nome-anexo"] {
     border-radius: 8px;
 }
 
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.2);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+}
+
+.modal.atividades-modal.fechar {
+    animation: scaleDown 0.5s ease-in-out forwards;
+}
+
+.loading-spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-top: 4px solid #007aff;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
 .modal-loading-overlay img {
     width: 50px;
     height: 50px;
@@ -1576,7 +1604,7 @@ input:checked + .slider:before {
     transform: translateX(20px);
 }
 .conteudo-modal.reduzido {
-    min-height: 450px;
+    min-height: 442px;
     height: 30%;
     overflow: hidden;
     transition: height 0.3s ease;
