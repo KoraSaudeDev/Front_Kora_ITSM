@@ -3,7 +3,7 @@ import { FaSearch, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import Modal from './ModalTicket';
 import axios from 'axios';
 
-const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket, onResetTicket }) => {
+const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket, onResetTicket, tipoTela }) => {
     const [atendimentos, setAtendimentos] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [modalData, setModalData] = useState(null);
@@ -32,8 +32,8 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         "No Prazo": "#28a745"
     };
 
-
-    const cacheKey = `atendimentos_page_${currentPage}_items_${itemsPerPage}`;
+ 
+    const cacheKey = `${tipoTela}_page_${currentPage}_items_${itemsPerPage}`;
 
     useEffect(() => {
         const fetchAtendimentos = async () => {
@@ -41,17 +41,15 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                 setLoading(true);
                 showLoadingOverlay();
 
-                
+               
                 const cachedData = localStorage.getItem(cacheKey);
                 if (cachedData) {
                     const { tickets, totalItems } = JSON.parse(cachedData);
                     setAtendimentos(tickets);
                     setTotalPages(Math.ceil(totalItems / itemsPerPage));
-                    setLoading(false);
-                    hideLoadingOverlay();
-                    return;
                 }
 
+                
                 let config = {
                     method: 'post',
                     maxBodyLength: Infinity,
@@ -66,14 +64,14 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                 const fetchedAtendimentos = response.data.tickets;
                 const totalItems = response.data.total_items;
 
-               
+                
+                setAtendimentos(fetchedAtendimentos);
+                setTotalPages(Math.ceil(totalItems / itemsPerPage));
                 localStorage.setItem(
                     cacheKey,
                     JSON.stringify({ tickets: fetchedAtendimentos, totalItems })
                 );
 
-                setAtendimentos(fetchedAtendimentos);
-                setTotalPages(Math.ceil(totalItems / itemsPerPage));
                 setLoading(false); 
                 hideLoadingOverlay();
             } catch (error) {
@@ -248,7 +246,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                 </div>
             </div>
             
-            {loading ? (
+            {loading && atendimentos.length === 0 ? (
                 <p>Buscando dados...</p>
             ) : atendimentosFiltrados.length === 0 && showNoDataMessage ? (
                 <p>Sem atendimentos no momento.</p>
