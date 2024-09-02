@@ -579,8 +579,8 @@ const Modal = ({ data, onClose }) => {
             grupo: ultimoItem?.executor ?? data.grupo,
             sla: prioridades.find(line => line.prioridade === prioridadeSelecionada)?.sla ?? data.sla,
             //resposta_chamado: resposta_chamado === '' ? null : resposta_chamado
-          };
-          
+        };
+
 
         if (selectedDomain) update_tickets.dominio_email = selectedDomain;
         if (organizacaoDomains) update_tickets.organizacao_dominio = organizacaoDomains
@@ -687,6 +687,26 @@ const Modal = ({ data, onClose }) => {
             }
 
             axios.post(`${process.env.REACT_APP_API_BASE_URL}/tickets/update/sla?cod_fluxo=${data.cod_fluxo}`);
+
+            const logConfig = {
+                method: 'post',
+                url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/log`,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                data: JSON.stringify({
+                    "nome": user.name,
+                    "email": user.email,
+                    "cod_fluxo": data.cod_fluxo,
+                    "log": JSON.stringify({
+                        "updated_ticket": update_tickets,
+                        "inserted_task": insert_tasks,
+                        "updated_task": update_tasks,
+                        "inserted_file": insert_anexos
+                    })
+                })
+            }
+            axios.request(logConfig);
 
             hideLoadingOverlay();
 
@@ -986,8 +1006,8 @@ const Modal = ({ data, onClose }) => {
                         <p><strong className="data">Tipo da SLA:</strong> {prioridades.find(p => p.prioridade === prioridadeSelecionada)?.tipo_tempo.toUpperCase() || ''}</p>
 
 
-                        <div class="campo-editavel">
-                            <strong>Destinatário:</strong>
+                        <div className="campo-editavel">
+                            <strong>Analista Atual:</strong>
                             <select 
                                 className="select-destinatario" 
                                 id="executor-ticket" 
