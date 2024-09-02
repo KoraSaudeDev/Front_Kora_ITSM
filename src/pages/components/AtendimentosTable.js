@@ -255,7 +255,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                     <table className="tabela-atendimentos">
                         <thead>
                             <tr>
-                                <th>N° Ticket</th>
+                                <th>Ticket</th>
                                 <th>Abertura</th>
                                 <th>Status</th>
                                 <th>SLA</th>
@@ -273,9 +273,9 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                         <tbody>
                             {atendimentosFiltrados.map((atendimento, index) => (
                                 <tr key={atendimento.cod_fluxo} onClick={() => handleClick(atendimento)} style={{ '--stagger': index + 1 }}>
-                                    <td>{atendimento.cod_fluxo}</td>
-                                    <td>{new Date(atendimento.abertura).toLocaleString().replace(',', '')}</td>
-                                    <td className={`status ${atendimento.status.replace(/\s/g, '-').toLowerCase()}`}>
+                                    <td id='cont-tabela'>{atendimento.cod_fluxo}</td>
+                                    <td id='cont-tabela' >{new Date(atendimento.abertura).toLocaleString().replace(',', '')}</td>
+                                    <td id='cont-tabela' className={`status ${atendimento.status.replace(/\s/g, '-').toLowerCase()}`}>
                                         <span
                                             className="status-bolinha"
                                             style={{ 
@@ -285,7 +285,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                         ></span>
                                         {atendimento.status}
                                     </td>
-                                    <td className={`sla ${atendimento.sla_util.replace(/\s/g, '-').toLowerCase()}`}>
+                                    <td id='cont-tabela' className={`sla ${atendimento.sla_util.replace(/\s/g, '-').toLowerCase()}`}>
                                         <span
                                             className="sla-bolinha"
                                             style={{ 
@@ -295,15 +295,15 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                         ></span>
                                         {atendimento.sla_util}
                                     </td>
-                                    <td>{new Date(atendimento.data_limite).toLocaleString().replace(',', '')}</td>
-                                    <td>{atendimento.grupo}</td>
-                                    <td>{atendimento.nome}</td>
-                                    <td>{atendimento.area_negocio}</td>
-                                    <td>{atendimento.hub}</td>
-                                    <td>{atendimento.unidade}</td>
-                                    <td>{atendimento.categoria}</td>
-                                    <td>{atendimento.subcategoria}</td>
-                                    <td>{atendimento.assunto}</td>
+                                    <td id='cont-tabela'>{new Date(atendimento.data_limite).toLocaleString().replace(',', '')}</td>
+                                    <td id='cont-tabela'>{atendimento.grupo}</td>
+                                    <td id='cont-tabela'>{atendimento.nome}</td>
+                                    <td id='cont-tabela'>{atendimento.area_negocio}</td>
+                                    <td id='cont-tabela'>{atendimento.hub}</td>
+                                    <td id='cont-tabela'>{atendimento.unidade}</td>
+                                    <td id='cont-tabela'>{atendimento.categoria}</td>
+                                    <td id='cont-tabela'>{atendimento.subcategoria}</td>
+                                    <td id='cont-tabela'>{atendimento.assunto}</td>
                                 </tr>
                             ))}
                         </tbody>

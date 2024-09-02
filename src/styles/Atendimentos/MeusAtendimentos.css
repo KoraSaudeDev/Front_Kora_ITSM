@@ -49,6 +49,12 @@ body {
     font-size: 14px;
 }
 
+#cont-tabela{
+    font-size: 14px;
+
+    
+}
+
 .sla-inline {
     display: flex;
     align-items: center;
@@ -572,7 +578,14 @@ a {
     animation: scaleDown 0.5s ease-in-out forwards;
 }
 
+.container-meus-atendimentos{
+    border-radius: 6px;
+}
 
+.tabela-atendimentos th{
+    font-size: 15px;
+    font-weight: bold;
+}
 
 @keyframes spin {
     0% {

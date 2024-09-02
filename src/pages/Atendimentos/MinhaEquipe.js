@@ -7,7 +7,6 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
 
     return (
         <AtendimentosTable
-            titulo="Minha Equipe"
             apiUrl={`${process.env.REACT_APP_API_BASE_URL}/tickets/minha-equipe?`}
             filtrosExtras={{ filas: user.filas_id }}
             selectedTicket={selectedTicket}
