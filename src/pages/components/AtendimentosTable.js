@@ -238,7 +238,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                 <th>Status</th>
                                 <th>SLA</th>
                                 <th>Data Limite</th>
-                                <th>Grupo | Destinatário</th>
+                                <th>Analista Atual</th>
                                 <th>Nome</th>
                                 <th>Área de Negócio</th>
                                 <th>HUB</th>

@@ -946,6 +946,13 @@ const Modal = ({ data, onClose }) => {
                                 );
                             }
                         })}
+
+                    
+                        <div className="ver-mais-container">
+                                            <button className="botao-ver-mais" onClick={toggleExpand}>
+                                                {isExpanded ? 'Ver Menos' : 'Ver Mais'}
+                                            </button>
+                        </div>
                     </div>
 
                     <div className="conteudo-modal-direita">
@@ -977,6 +984,24 @@ const Modal = ({ data, onClose }) => {
                         <p><strong className="data">Abertura:</strong> {formatDate(data.abertura)}</p>
                         <p><strong className="data">Data Limite:</strong> {formatDate(data.data_limite)}</p>
                         <p><strong className="data">Tipo da SLA:</strong> {prioridades.find(p => p.prioridade === prioridadeSelecionada)?.tipo_tempo.toUpperCase() || ''}</p>
+
+
+                        <div class="campo-editavel">
+                            <strong>Destinatário:</strong>
+                            <select 
+                                className="select-destinatario" 
+                                id="executor-ticket" 
+                                value={options.destinatarios.find(option => option.label === data.grupo)?.value || ''} 
+                                onChange={(e) => handleFieldChange('grupo', e.target.value)}
+                            >
+                                <option value="">Selecione um destinatário</option>
+                                {options.destinatarios.map((destinatario, index) => (
+                                    <option key={index} value={destinatario.value}>
+                                        {destinatario.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
 
                         <div className="campo-editavel">
                             <strong>Prioridade:</strong>
@@ -1023,15 +1048,11 @@ const Modal = ({ data, onClose }) => {
                     </div>
                 </div>
 
-                <div className="ver-mais-container">
-                    <button className="botao-ver-mais" onClick={toggleExpand}>
-                        {isExpanded ? 'Ver Menos' : 'Ver Mais'}
-                    </button>
-                </div>
+                
 
 
                 <div className="campo-atividades">
-                    <h4>Atividades e Anexos</h4>
+                    
                     <div style={{ display: 'flex', gap: '10px' }}>
                         <button className="botao-atividades" onClick={handleAbrirAtividadesModal}>
                             <FaPlus style={{ marginRight: '8px' }} /> Atividade
