@@ -32,7 +32,6 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         "No Prazo": "#28a745"
     };
 
- 
     const cacheKey = `${tipoTela}_page_${currentPage}_items_${itemsPerPage}`;
 
     useEffect(() => {
@@ -41,7 +40,6 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                 setLoading(true);
                 showLoadingOverlay();
 
-               
                 const cachedData = localStorage.getItem(cacheKey);
                 if (cachedData) {
                     const { tickets, totalItems } = JSON.parse(cachedData);
@@ -49,7 +47,6 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                     setTotalPages(Math.ceil(totalItems / itemsPerPage));
                 }
 
-                
                 let config = {
                     method: 'post',
                     maxBodyLength: Infinity,
@@ -64,7 +61,6 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                 const fetchedAtendimentos = response.data.tickets;
                 const totalItems = response.data.total_items;
 
-                
                 setAtendimentos(fetchedAtendimentos);
                 setTotalPages(Math.ceil(totalItems / itemsPerPage));
                 localStorage.setItem(
@@ -72,7 +68,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                     JSON.stringify({ tickets: fetchedAtendimentos, totalItems })
                 );
 
-                setLoading(false); 
+                setLoading(false);
                 hideLoadingOverlay();
             } catch (error) {
                 console.error('Erro ao buscar atendimentos:', error);
@@ -84,7 +80,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         fetchAtendimentos();
 
         const timer = setTimeout(() => {
-            setShowNoDataMessage(true); 
+            setShowNoDataMessage(true);
         }, 10000);
 
         return () => clearTimeout(timer);
@@ -259,22 +255,22 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                 <th>Abertura</th>
                                 <th>Status</th>
                                 <th>SLA</th>
+                                <th>Categoria</th>
+                                <th>Subcategoria</th>
+                                <th>Assunto</th>
                                 <th>Data Limite</th>
                                 <th>Analista Atual</th>
                                 <th>Nome</th>
                                 <th>Área de Negócio</th>
                                 <th>HUB</th>
                                 <th>Unidade de Negócio</th>
-                                <th>Categoria</th>
-                                <th>Subcategoria</th>
-                                <th>Assunto</th>
                             </tr>
                         </thead>
                         <tbody>
                             {atendimentosFiltrados.map((atendimento, index) => (
                                 <tr key={atendimento.cod_fluxo} onClick={() => handleClick(atendimento)} style={{ '--stagger': index + 1 }}>
                                     <td id='cont-tabela'>{atendimento.cod_fluxo}</td>
-                                    <td id='cont-tabela' >{new Date(atendimento.abertura).toLocaleString().replace(',', '')}</td>
+                                    <td id='cont-tabela'>{new Date(atendimento.abertura).toLocaleString().replace(',', '')}</td>
                                     <td id='cont-tabela' className={`status ${atendimento.status.replace(/\s/g, '-').toLowerCase()}`}>
                                         <span
                                             className="status-bolinha"
@@ -295,15 +291,15 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                         ></span>
                                         {atendimento.sla_util}
                                     </td>
+                                    <td id='cont-tabela'>{atendimento.categoria}</td>
+                                    <td id='cont-tabela'>{atendimento.subcategoria}</td>
+                                    <td id='cont-tabela'>{atendimento.assunto}</td>
                                     <td id='cont-tabela'>{new Date(atendimento.data_limite).toLocaleString().replace(',', '')}</td>
                                     <td id='cont-tabela'>{atendimento.grupo}</td>
                                     <td id='cont-tabela'>{atendimento.nome}</td>
                                     <td id='cont-tabela'>{atendimento.area_negocio}</td>
                                     <td id='cont-tabela'>{atendimento.hub}</td>
                                     <td id='cont-tabela'>{atendimento.unidade}</td>
-                                    <td id='cont-tabela'>{atendimento.categoria}</td>
-                                    <td id='cont-tabela'>{atendimento.subcategoria}</td>
-                                    <td id='cont-tabela'>{atendimento.assunto}</td>
                                 </tr>
                             ))}
                         </tbody>
