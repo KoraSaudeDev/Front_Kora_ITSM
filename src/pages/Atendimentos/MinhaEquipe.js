@@ -12,8 +12,10 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
             filtrosExtras={{ filas: user.filas_id }}
             selectedTicket={selectedTicket}
             onResetTicket={onResetTicket}
+            tipoTela='minha_equipe'
         />
     );
 };
+
 
 export default MinhaEquipe;
