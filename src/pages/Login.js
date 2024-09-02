@@ -91,7 +91,7 @@ const Login = () => {
         <img src="https://i.postimg.cc/8k9pdsZV/unnamed.png" alt="Kora Logo" className="login-logo" />
 
 
-        <h2>Kora System</h2>
+        <h2>ITSM</h2>
         {/* <input type="text" id="nome" placeholder="Digite seu Nome"/>
         <input type="text" id="email" placeholder="Digite seu Email"/>
         <input type="button" id="btn" value="Enviar" onClick={onSuccess}/> */}
