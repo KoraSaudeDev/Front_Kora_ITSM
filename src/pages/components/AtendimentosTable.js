@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FaSearch, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import Modal from './ModalTicket';
 import axios from 'axios';
@@ -15,19 +15,23 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
     const [showNoDataMessage, setShowNoDataMessage] = useState(false);
     const [itemsPerPage, setItemsPerPage] = useState(10);
 
+    const prevPageRef = useRef(currentPage);
+    const prevItemsPerPageRef = useRef(itemsPerPage);
+    const prevStatusFilterRef = useRef(filtroStatus);
+    const prevSLAFilterPageRef = useRef(filtroSLA);
+
     const [sortColumn, setSortColumn] = useState('');
     const [sortDirection, setSortDirection] = useState(null);
 
     const statusOptions = {
-        "Em Andamento": "#FFC107",        
-        "Em Atendimento": "#43A825",     
-        "Aguardando Retorno Fornecedor": "#00ACC1", 
-        "Aguardando Retorno": "#F50057",  
-        "Em Aberto": "#2962FF",          
-        "Agendada": "#D500F9",          
-        "Criação de Usuário": "#FF3D00", 
-        "Finalizado": "#00C853",         
-        "Cancelado": "#D50000"            
+        "Em Andamento": "#FFC107",
+        "Aguardando Retorno Fornecedor": "#00ACC1",
+        "Aguardando Retorno": "#F50057",
+        "Em Aberto": "#2962FF",
+        "Agendada": "#D500F9",
+        "Criação de Usuário": "#FF3D00",
+        "Finalizado": "#00C853",
+        "Cancelado": "#D50000"
     };
 
     const slaOptions = {
@@ -40,57 +44,93 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
     useEffect(() => {
         const fetchAtendimentos = async () => {
             try {
+                if (prevPageRef.current !== currentPage || prevItemsPerPageRef.current !== itemsPerPage ||
+                    prevStatusFilterRef.current !== filtroStatus || prevSLAFilterPageRef.current !== filtroSLA) 
+                {
+                    showLoadingOverlay();
+                }
                 setLoading(true);
-
+    
                 const cachedData = localStorage.getItem(cacheKey);
                 if (cachedData) {
                     const { tickets, totalItems } = JSON.parse(cachedData);
                     setAtendimentos(tickets);
                     setTotalPages(Math.ceil(totalItems / itemsPerPage));
                 }
-
+    
+                let url = `${apiUrl}page=${currentPage}&per_page=${itemsPerPage}`;
+                
+                if (sortColumn && sortDirection) {
+                    url += `&sort_by=${sortColumn}&sort_order=${sortDirection}`;
+                }
+    
+                if (filtroStatus) {
+                    url += `&status=${filtroStatus}`;
+                }
+    
+                if (filtroSLA) {
+                    url += `&st_sla=${filtroSLA}`;
+                }
+    
+                console.log(url)
+    
                 let config = {
                     method: 'post',
                     maxBodyLength: Infinity,
-                    url: `${apiUrl}page=${currentPage}&per_page=${itemsPerPage}`,
+                    url: url,
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     data: filtrosExtras
                 };
-
+    
                 const response = await axios.request(config);
                 const fetchedAtendimentos = response.data.tickets;
                 const totalItems = response.data.total_items;
-
+                
+                hideLoadingOverlay();
+    
                 setAtendimentos(fetchedAtendimentos);
                 setTotalPages(Math.ceil(totalItems / itemsPerPage));
                 localStorage.setItem(
                     cacheKey,
                     JSON.stringify({ tickets: fetchedAtendimentos, totalItems })
                 );
-
+    
                 setLoading(false);
             } catch (error) {
                 console.error('Erro ao buscar atendimentos:', error);
                 setLoading(false);
             }
         };
-
+    
         fetchAtendimentos();
-
+    
         const timer = setTimeout(() => {
             setShowNoDataMessage(true);
         }, 10000);
-
+    
+        prevPageRef.current = currentPage;
+        prevItemsPerPageRef.current = itemsPerPage;
+        prevStatusFilterRef.current = filtroStatus;
+        prevSLAFilterPageRef.current = filtroSLA;
+    
         return () => clearTimeout(timer);
-    }, [currentPage, itemsPerPage]);
+    }, [currentPage, itemsPerPage, sortColumn, sortDirection, filtroStatus, filtroSLA]);
 
     useEffect(() => {
         if (selectedTicket) {
             handleClick(selectedTicket);
         }
     }, [selectedTicket]);
+
+    const showLoadingOverlay = () => {
+        document.getElementById('loading-overlay').style.display = 'flex';
+    };
+
+    const hideLoadingOverlay = () => {
+        document.getElementById('loading-overlay').style.display = 'none';
+    };
 
     const handleClick = async (ticket) => {
         try {
@@ -104,10 +144,12 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
 
     const handleFiltroClick = (status) => {
         setFiltroStatus(filtroStatus === status ? '' : status);
+        setCurrentPage(1);
     };
 
     const handleSLAClick = (sla) => {
         setFiltroSLA(filtroSLA === sla ? '' : sla);
+        setCurrentPage(1);
     };
 
     const handleClearFiltro = (e) => {
@@ -160,40 +202,21 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
 
     const handleSort = (column) => {
         if (sortColumn === column) {
-            // Alternar a direção de ordenação
             if (sortDirection === 'asc') {
                 setSortDirection('desc');
             } else if (sortDirection === 'desc') {
-                setSortDirection(null); // Remove a ordenação
+                setSortDirection(null);
                 setSortColumn('');
             } else {
                 setSortDirection('asc');
             }
         } else {
-            // Ordenar por uma nova coluna
             setSortColumn(column);
             setSortDirection('asc');
         }
     };
 
-    const sortData = (data) => {
-        if (!sortColumn || !sortDirection) return data;
-
-        return [...data].sort((a, b) => {
-            const aValue = a[sortColumn];
-            const bValue = b[sortColumn];
-
-            if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-            if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
-            return 0;
-        });
-    };
-
-    const atendimentosFiltrados = sortData(
-        atendimentos
-            .filter(atendimento => !filtroStatus || atendimento.status === filtroStatus)
-            .filter(atendimento => !filtroSLA || atendimento.sla_util === filtroSLA)
-    );
+    const atendimentosFiltrados = atendimentos
 
     const renderPaginationButtons = () => {
         const pageButtons = [];
@@ -219,6 +242,9 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
 
     return (
         <div className="container-meus-atendimentos" onClick={handleClearFiltro}>
+            <div id="loading-overlay" className="loading-overlay">
+                <div className="loading-spinner"></div>
+            </div>
             <div className="header-meus-atendimentos">
                 <h2>{titulo}</h2>
                 <select value={itemsPerPage} onChange={handleItemsPerPageChange} className="items-per-page-select">
@@ -263,7 +289,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                     </select>
                 </div>
             </div>
-            
+
             {loading && atendimentos.length === 0 ? (
                 <p>Buscando dados...</p>
             ) : atendimentosFiltrados.length === 0 && showNoDataMessage ? (
@@ -273,9 +299,9 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                     <table className="tabela-atendimentos">
                         <thead>
                             <tr>
-                                <th 
+                                <th
                                     id='ticket'
-                                    onClick={() => handleSort('cod_fluxo')} 
+                                    onClick={() => handleSort('cod_fluxo')}
                                     className={
                                         sortColumn === 'cod_fluxo'
                                             ? sortDirection === 'asc'
@@ -284,10 +310,10 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                             : ''
                                     }
                                 >
-                                   Ticket          
+                                    Ticket
                                 </th>
-                                <th 
-                                    onClick={() => handleSort('abertura')} 
+                                <th
+                                    onClick={() => handleSort('abertura')}
                                     className={
                                         sortColumn === 'abertura'
                                             ? sortDirection === 'asc'
@@ -298,8 +324,8 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                 >
                                     Abertura
                                 </th>
-                                <th 
-                                    onClick={() => handleSort('status')} 
+                                <th
+                                    onClick={() => handleSort('status')}
                                     className={
                                         sortColumn === 'status'
                                             ? sortDirection === 'asc'
@@ -310,10 +336,10 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                 >
                                     Status
                                 </th>
-                                <th 
-                                    onClick={() => handleSort('sla_util')} 
+                                <th
+                                    onClick={() => handleSort('st_sla')}
                                     className={
-                                        sortColumn === 'sla_util'
+                                        sortColumn === 'st_sla'
                                             ? sortDirection === 'asc'
                                                 ? 'sorted-asc'
                                                 : 'sorted-desc'
@@ -322,8 +348,8 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                 >
                                     SLA
                                 </th>
-                                <th 
-                                    onClick={() => handleSort('categoria')} 
+                                <th
+                                    onClick={() => handleSort('categoria')}
                                     className={
                                         sortColumn === 'categoria'
                                             ? sortDirection === 'asc'
@@ -334,8 +360,8 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                 >
                                     Categoria
                                 </th>
-                                <th 
-                                    onClick={() => handleSort('subcategoria')} 
+                                <th
+                                    onClick={() => handleSort('subcategoria')}
                                     className={
                                         sortColumn === 'subcategoria'
                                             ? sortDirection === 'asc'
@@ -346,8 +372,8 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                 >
                                     Subcategoria
                                 </th>
-                                <th 
-                                    onClick={() => handleSort('assunto')} 
+                                <th
+                                    onClick={() => handleSort('assunto')}
                                     className={
                                         sortColumn === 'assunto'
                                             ? sortDirection === 'asc'
@@ -358,8 +384,8 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                 >
                                     Assunto
                                 </th>
-                                <th 
-                                    onClick={() => handleSort('data_limite')} 
+                                <th
+                                    onClick={() => handleSort('data_limite')}
                                     className={
                                         sortColumn === 'data_limite'
                                             ? sortDirection === 'asc'
@@ -370,8 +396,8 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                 >
                                     Data Limite
                                 </th>
-                                <th 
-                                    onClick={() => handleSort('grupo')} 
+                                <th
+                                    onClick={() => handleSort('grupo')}
                                     className={
                                         sortColumn === 'grupo'
                                             ? sortDirection === 'asc'
@@ -382,8 +408,8 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                 >
                                     Analista Atual
                                 </th>
-                                <th 
-                                    onClick={() => handleSort('nome')} 
+                                <th
+                                    onClick={() => handleSort('nome')}
                                     className={
                                         sortColumn === 'nome'
                                             ? sortDirection === 'asc'
@@ -394,8 +420,8 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                 >
                                     Nome
                                 </th>
-                                <th 
-                                    onClick={() => handleSort('area_negocio')} 
+                                <th
+                                    onClick={() => handleSort('area_negocio')}
                                     className={
                                         sortColumn === 'area_negocio'
                                             ? sortDirection === 'asc'
@@ -406,8 +432,8 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                 >
                                     Área de Negócio
                                 </th>
-                                <th 
-                                    onClick={() => handleSort('hub')} 
+                                <th
+                                    onClick={() => handleSort('hub')}
                                     className={
                                         sortColumn === 'hub'
                                             ? sortDirection === 'asc'
@@ -418,8 +444,8 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                 >
                                     HUB
                                 </th>
-                                <th 
-                                    onClick={() => handleSort('unidade')} 
+                                <th
+                                    onClick={() => handleSort('unidade')}
                                     className={
                                         sortColumn === 'unidade'
                                             ? sortDirection === 'asc'
@@ -440,9 +466,9 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                     <td id='cont-tabela' className={`status ${atendimento.status.replace(/\s/g, '-').toLowerCase()}`}>
                                         <span
                                             className="status-bolinha"
-                                            style={{ 
+                                            style={{
                                                 backgroundColor: statusOptions[atendimento.status] || '#000',
-                                                marginRight: '8px'  
+                                                marginRight: '8px'
                                             }}
                                         ></span>
                                         {atendimento.status}
@@ -450,7 +476,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                     <td id='cont-tabela' className={`sla ${atendimento.sla_util.replace(/\s/g, '-').toLowerCase()}`}>
                                         <span
                                             className="sla-bolinha"
-                                            style={{ 
+                                            style={{
                                                 backgroundColor: slaOptions[atendimento.sla_util] || '#000',
                                                 marginRight: '8px'
                                             }}
