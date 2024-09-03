@@ -137,15 +137,15 @@ const Modal = ({ data, onClose }) => {
         "ds_obs": "Observações",
     };
     const statusOptions = {
-        "Em Andamento": "#FFC107",        // Amarelo Escuro Neon
-        "Em Atendimento": "#64DD17",      // Verde Escuro Neon
-        "Aguardando Retorno Fornecedor": "#00ACC1", // Ciano Escuro Neon
-        "Aguardando Retorno": "#F50057",  // Rosa Escuro Neon
-        "Em Aberto": "#2962FF",           // Azul Escuro Neon
-        "Agendada": "#D500F9",            // Roxo Escuro Neon
-        "Criação de Usuário": "#FF3D00",  // Laranja Escuro Neon
-        "Finalizado": "#00C853",          // Verde Lima Escuro Neon
-        "Cancelado": "#D50000"            // Vermelho Escuro Neon
+        "Em Andamento": "#FFC107",        
+        "Em Atendimento": "#43A825",     
+        "Aguardando Retorno Fornecedor": "#00ACC1", 
+        "Aguardando Retorno": "#F50057",  
+        "Em Aberto": "#2962FF",          
+        "Agendada": "#D500F9",          
+        "Criação de Usuário": "#FF3D00", 
+        "Finalizado": "#00C853",         
+        "Cancelado": "#D50000"            
     };
     
     
@@ -539,6 +539,7 @@ const Modal = ({ data, onClose }) => {
                 break;
         }
     };
+    
 
     const handleDomainChange = (event) => {
         const selectedDomain = event.target.value;
@@ -1155,7 +1156,7 @@ const Modal = ({ data, onClose }) => {
                                         fontWeight: 'bold'
                                     }}
                                 >
-                                    {atividade.status}
+                                    {convertStatusToTitleCase(atividade.status)}
                                 </p>
                                 <p><label>Início:</label> {formatDate(atividade.aberto_em)}</p>
                                 <p><label>Aberto por:</label> {atividade.aberto_por}</p>
