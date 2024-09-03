@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import Select from 'react-select';
 import { FaTimes, FaFileAlt, FaPlus, FaUserPlus } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
@@ -26,7 +27,7 @@ const Modal = ({ data, onClose }) => {
     const [selectedCategoria, setSelectedCategoria] = useState(data.categoria || '');
     const [selectedSubcategoria, setSelectedSubcategoria] = useState(data.subcategoria || '');
     const [selectedAssunto, setSelectedAssunto] = useState(data.assunto || '');
-    const [selectedDestinatario, setSelectedDestinatario] = useState(data.grupo || '');
+    const [selectedDestinatario, setSelectedDestinatario] = useState(data.executor || '');
     const [emailDomains, setEmailDomains] = useState([]);
     const [isEmailDomainEditable, setIsEmailDomainEditable] = useState(false);
     const [isAllowedCreateUser, setIsAllowedCreateUser] = useState(false);
@@ -34,6 +35,7 @@ const Modal = ({ data, onClose }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [selectedDomain, setSelectedDomain] = useState(data.dominio_email || '');
     const [organizacaoDomains, setOrganizacaoDomains] = useState(data.organizacao_dominio || '');
+    const [executor, setExecutor] = useState(null);
     const [options, setOptions] = useState({
         hub: [],
         unidade: [],
@@ -137,19 +139,17 @@ const Modal = ({ data, onClose }) => {
         "ds_obs": "Observações",
     };
     const statusOptions = {
-        "Em Andamento": "#FFC107",        
-        "Em Atendimento": "#43A825",     
-        "Aguardando Retorno Fornecedor": "#00ACC1", 
-        "Aguardando Retorno": "#F50057",  
-        "Em Aberto": "#2962FF",          
-        "Agendada": "#D500F9",          
-        "Criação de Usuário": "#FF3D00", 
-        "Finalizado": "#00C853",         
-        "Cancelado": "#D50000"            
+        "Em Andamento": "#FFC107",
+        "Em Atendimento": "#43A825",
+        "Aguardando Retorno Fornecedor": "#00ACC1",
+        "Aguardando Retorno": "#F50057",
+        "Em Aberto": "#2962FF",
+        "Agendada": "#D500F9",
+        "Criação de Usuário": "#FF3D00",
+        "Finalizado": "#00C853",
+        "Cancelado": "#D50000"
     };
-    
-    
-    
+
     const slaOptions = {
         "Em Atraso": "#dc3545",
         "No Prazo": "#28a745"
@@ -292,7 +292,7 @@ const Modal = ({ data, onClose }) => {
         axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/usuarios-executores`)
             .then(response => {
                 const formattedData = response.data.map(destinatario => {
-                    if (destinatario.fila === selectedDestinatario) {
+                    if (String(destinatario.id) === String(selectedDestinatario)) {
                         setSelectedDestinatario(`${destinatario.id} - ${destinatario.fila}`)
                     }
                     return {
@@ -425,7 +425,6 @@ const Modal = ({ data, onClose }) => {
         const aberto_em = document.querySelector('#inicio-task').value;
         const aberto_por = document.querySelector('#aberto-por-task').value;
         const descricao = document.querySelector('#descricao-task').value.trim();
-        var executor = document.querySelector('#executor-task').value;
         const status = document.querySelector('#status-task').value;
         var tipo_atividade_checkbox = document.querySelector('input#tipo-atividade');
 
@@ -439,7 +438,7 @@ const Modal = ({ data, onClose }) => {
             return;
         }
 
-        executor = executor.split(' - ');
+        var executorSplit = executor.value.split(' - ');
 
         const novaAtividade = {
             cod_fluxo: data.id,
@@ -448,8 +447,8 @@ const Modal = ({ data, onClose }) => {
             aberto_por,
             status,
             descricao,
-            id_executor: executor[0],
-            executor: executor[1],
+            id_executor: executorSplit[0],
+            executor: executorSplit[1],
             tipo_atividade,
             ds_anexo: null
         };
@@ -520,7 +519,6 @@ const Modal = ({ data, onClose }) => {
                 break;
             case 'assunto':
                 setSelectedAssunto(value);
-
                 const selectedAssuntoObj = options.assunto.find(option => option.assunto === value);
                 if (selectedAssuntoObj) {
                     const destinatario = options.destinatarios.find(dest => dest.value.startsWith(selectedAssuntoObj.grupo_atendimento));
@@ -539,7 +537,6 @@ const Modal = ({ data, onClose }) => {
                 break;
         }
     };
-    
 
     const handleDomainChange = (event) => {
         const selectedDomain = event.target.value;
@@ -611,7 +608,7 @@ const Modal = ({ data, onClose }) => {
                 });
             }
         }
-        
+
         //const resposta_chamado = document.querySelector("#resp-chamado").value;
 
         const update_tickets = {
@@ -873,6 +870,18 @@ const Modal = ({ data, onClose }) => {
         }
     };
 
+    const categoriaOptions = options.categoria.map(option => ({ value: option, label: option }));
+    const subcategoriaOptions = selectedCategoria
+        ? options.subcategoria.map(option => ({ value: option, label: option }))
+        : [];
+    const assuntoOptions = selectedSubcategoria
+        ? options.assunto.map(option => ({ value: option.assunto, label: option.assunto }))
+        : [];
+    const destinatarioOptions = options.destinatarios.map((destinatario) => ({
+        value: destinatario.value,
+        label: destinatario.label,
+    }));
+
     return (
         <div className="modal-overlay" onClick={handleOverlayClick}>
             <div id="loading-overlay" className="loading-overlay">
@@ -900,47 +909,38 @@ const Modal = ({ data, onClose }) => {
                 <div className="modal-filters">
                     <div className="campo-selecao">
                         <strong className="link-label">Categoria</strong>
-                        <select
-                            value={selectedCategoria}
-                            onChange={(e) => handleFieldChange('categoria', e.target.value)}
-                        >
-                            <option></option>
-                            {options.categoria.map((option, index) => (
-                                <option key={index} value={option}>
-                                    {option}
-                                </option>
-                            ))}
-                        </select>
+                        <Select
+                            className="select-destinatario"
+                            value={categoriaOptions.find(option => option.value === selectedCategoria) || null}
+                            onChange={(selectedOption) => handleFieldChange('categoria', selectedOption ? selectedOption.value : '')}
+                            options={categoriaOptions}
+                            isClearable
+                            placeholder=""
+                        />
                     </div>
                     <div className="campo-selecao">
                         <strong className="link-label">Subcategoria</strong>
-                        <select
-                            value={selectedSubcategoria}
-                            onChange={(e) => handleFieldChange('subcategoria', e.target.value)}
-                            disabled={!selectedCategoria}
-                        >
-                            <option></option>
-                            {options.subcategoria.map((option, index) => (
-                                <option key={index} value={option}>
-                                    {option}
-                                </option>
-                            ))}
-                        </select>
+                        <Select
+                            className="select-destinatario"
+                            value={subcategoriaOptions.find(option => option.value === selectedSubcategoria) || null}
+                            onChange={(selectedOption) => handleFieldChange('subcategoria', selectedOption ? selectedOption.value : '')}
+                            options={subcategoriaOptions}
+                            isClearable
+                            placeholder=""
+                            isDisabled={!selectedCategoria}
+                        />
                     </div>
                     <div className="campo-selecao">
                         <strong className="link-label">Assunto</strong>
-                        <select
-                            value={selectedAssunto}
-                            onChange={(e) => handleFieldChange('assunto', e.target.value)}
-                            disabled={!selectedSubcategoria}
-                        >
-                            <option value=""></option>
-                            {options.assunto.map((option, index) => (
-                                <option key={index} value={option.assunto}>
-                                    {option.assunto}
-                                </option>
-                            ))}
-                        </select>
+                        <Select
+                            className="select-destinatario"
+                            value={assuntoOptions.find(option => option.value === selectedAssunto) || null}
+                            onChange={(selectedOption) => handleFieldChange('assunto', selectedOption ? selectedOption.value : '')}
+                            options={assuntoOptions}
+                            isClearable
+                            placeholder=""
+                            isDisabled={!selectedSubcategoria}
+                        />
                     </div>
                 </div>
 
@@ -1060,19 +1060,15 @@ const Modal = ({ data, onClose }) => {
 
                         <div className="campo-editavel">
                             <strong>Analista Atual:</strong>
-                            <select
+                            <Select
                                 className="select-destinatario"
                                 id="executor-ticket"
-                                value={selectedDestinatario}
-                                onChange={(e) => handleFieldChange('destinatarios', e.target.value)}
-                            >
-                                <option></option>
-                                {options.destinatarios.map((destinatario, index) => (
-                                    <option key={index} value={destinatario.value}>
-                                        {destinatario.label}
-                                    </option>
-                                ))}
-                            </select>
+                                value={destinatarioOptions.find(option => option.value === selectedDestinatario)}
+                                onChange={(selectedOption) => handleFieldChange('destinatarios', selectedOption ? selectedOption.value : '')}
+                                options={destinatarioOptions}
+                                isClearable
+                                placeholder=""
+                            />
                         </div>
                         <div className="campo-editavel">
                             <strong>Prioridade:</strong>
@@ -1143,44 +1139,44 @@ const Modal = ({ data, onClose }) => {
                     </div>
                     <div style={{ display: 'flex', gap: '20px' }}>
                         <div style={{ flex: 3 }}>
-                        {atividades.slice().reverse().map((atividade, index) => (
-                            <div className="card-atividade" key={index} onClick={() => handleAbrirDetalhesAtividade(atividade)}>
-                                <p
-                                    id='status-bolinha'
-                                    style={{
-                                        backgroundColor: statusOptions[convertStatusToTitleCase(atividade.status)] || '#000',
-                                        color: 'white',
-                                        padding:'4px 8px 4px 8px',
-                                        borderRadius: '12px',
-                                        display: 'inline-block',
-                                        fontWeight: 'bold'
-                                    }}
-                                >
-                                    {convertStatusToTitleCase(atividade.status)}
-                                </p>
-                                <p><label>Início:</label> {formatDate(atividade.aberto_em)}</p>
-                                <p><label>Aberto por:</label> {atividade.aberto_por}</p>
-                                <p><label>Destinatário:</label> {atividade.executor}</p>
-                                <p><label>Descrição:</label> {truncateText(atividade.descricao, 50)}</p>
+                            {atividades.slice().reverse().map((atividade, index) => (
+                                <div className="card-atividade" key={index} onClick={() => handleAbrirDetalhesAtividade(atividade)}>
+                                    <p
+                                        id='status-bolinha'
+                                        style={{
+                                            backgroundColor: statusOptions[convertStatusToTitleCase(atividade.status)] || '#000',
+                                            color: 'white',
+                                            padding: '4px 8px 4px 8px',
+                                            borderRadius: '12px',
+                                            display: 'inline-block',
+                                            fontWeight: 'bold'
+                                        }}
+                                    >
+                                        {convertStatusToTitleCase(atividade.status)}
+                                    </p>
+                                    <p><label>Início:</label> {formatDate(atividade.aberto_em)}</p>
+                                    <p><label>Aberto por:</label> {atividade.aberto_por}</p>
+                                    <p><label>Destinatário:</label> {atividade.executor}</p>
+                                    <p><label>Descrição:</label> {truncateText(atividade.descricao, 50)}</p>
 
-                                <p style={{ display: 'flex', alignItems: 'center' }}>
-                                    <label>Anexo:</label>
-                                    {atividade.ds_anexo ? (
-                                        <>
-                                            <a
-                                                onClick={atividade.id ? () => handleAnexoClick(atividade.ds_anexo) : null}
-                                                style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
-                                            >
-                                                {atividade.ds_anexo.split('/').pop()}
-                                                <FaFileAlt className="icone-anexo" style={{ marginLeft: '5px' }} />
-                                            </a>
-                                        </>
-                                    ) : (
-                                        'Nenhum anexo'
-                                    )}
-                                </p>
-                            </div>
-                        ))}
+                                    <p style={{ display: 'flex', alignItems: 'center' }}>
+                                        <label>Anexo:</label>
+                                        {atividade.ds_anexo ? (
+                                            <>
+                                                <a
+                                                    onClick={atividade.id ? () => handleAnexoClick(atividade.ds_anexo) : null}
+                                                    style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+                                                >
+                                                    {atividade.ds_anexo.split('/').pop()}
+                                                    <FaFileAlt className="icone-anexo" style={{ marginLeft: '5px' }} />
+                                                </a>
+                                            </>
+                                        ) : (
+                                            'Nenhum anexo'
+                                        )}
+                                    </p>
+                                </div>
+                            ))}
 
                         </div>
                         <div style={{ flex: 1 }}>
@@ -1276,12 +1272,14 @@ const Modal = ({ data, onClose }) => {
                                     </p>
                                     <p>
                                         <label>Destinatário:</label>
-                                        <select className="select-destinatario" id="executor-task">
-                                            <option></option>
-                                            {options.destinatarios.map((destinatario, index) => (
-                                                <option key={index} value={destinatario.value}>{destinatario.label}</option>
-                                            ))}
-                                        </select>
+                                        <Select
+                                            className="select-destinatario"
+                                            id="executor-task"
+                                            options={destinatarioOptions}
+                                            isClearable
+                                            placeholder=""
+                                            onChange={selectedOption => setExecutor(selectedOption)}
+                                        />
                                     </p>
                                     <div className="switch-container">
                                         <label htmlFor="tipo-atividade">Pública:</label>
