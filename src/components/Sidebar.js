@@ -84,16 +84,6 @@ const Sidebar = () => {
     setActiveDropdown((prevState) => (prevState === id ? '' : id));
   };
 
-  const resetDropdowns = () => {
-    setActiveDropdown('');
-  };
-
-  const handleTicketRedirect = () => {
-    if (window.confirm("Certifique-se de estar conectado em uma Rede Kora")) {
-      window.location.href = "http://10.27.254.161:8088/superset/dashboard/p/nZk8vLL2gQ1/";
-    }
-  };
-
   const handleLogout = () => {
     logout();
   };
@@ -154,19 +144,9 @@ const Sidebar = () => {
                   )}
                 </Link>
               </li>
-            </ul>
-          </li>
-          <li className={`item-navegacao ${activeDropdown === 'dropdownDashboard' ? 'active' : ''}`}>
-            <a href="#" className={`link-navegacao ${location.pathname.includes('/dashboard') ? 'active' : ''}`} onClick={() => alternarDropdown('dropdownDashboard')}>
-              <FaChartPie className="icon" />
-              <span>Dashboard</span>
-              <FaChevronDown className={`seta ${activeDropdown === 'dropdownDashboard' ? 'rotacionar' : ''}`} />
-            </a>
-            <ul id="dropdownDashboard" className={`conteudo-dropdown ${activeDropdown === 'dropdownDashboard' ? 'mostrar' : ''}`}>
-              <li className={location.pathname === '/dashboard/tickets' ? 'active' : ''}>
-                <a href="#" onClick={handleTicketRedirect}>
-                  <FaChartBar className="icon" />
-                  <span>Tickets</span>
+              <li className={location.pathname === '/atendimentos/dashboard' ? 'active' : ''}>
+                <a href="http://10.27.254.161:8088/superset/dashboard/p/pV5rmOZ7zgW/" target="_blank" rel="noopener noreferrer" className={location.pathname === '/atendimentos/dashboard' ? 'active' : ''}>
+                  Dashboard
                 </a>
               </li>
             </ul>
