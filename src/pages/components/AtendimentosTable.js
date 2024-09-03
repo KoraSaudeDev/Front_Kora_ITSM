@@ -15,17 +15,21 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
     const [showNoDataMessage, setShowNoDataMessage] = useState(false);
     const [itemsPerPage, setItemsPerPage] = useState(10);
 
+    const [sortColumn, setSortColumn] = useState('');
+    const [sortDirection, setSortDirection] = useState(null);
+
     const statusOptions = {
-        "Em Andamento": "#ffc107",
-        "Em Atendimento": "#A6c620",
-        "Aguardando Retorno Fornecedor": "#17a2b8",
-        "Aguardando Retorno": "#fd7e90",
-        "Em Aberto": "#007bff",
-        "Agendada": "#6610f2",
-        "Criação de Usuário": "#fd7e14",
-        "Finalizado": "#229a00",
-        "Cancelado": "#FF0000"
+        "Em Andamento": "#FFC107",        
+        "Em Atendimento": "#64DD17",     
+        "Aguardando Retorno Fornecedor": "#00ACC1", 
+        "Aguardando Retorno": "#F50057",  
+        "Em Aberto": "#2962FF",          
+        "Agendada": "#D500F9",          
+        "Criação de Usuário": "#FF3D00", 
+        "Finalizado": "#00C853",         
+        "Cancelado": "#D50000"            
     };
+    
 
     const slaOptions = {
         "Em Atraso": "#dc3545",
@@ -155,9 +159,42 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         setCurrentPage(1);
     };
 
-    const atendimentosFiltrados = atendimentos
-        .filter(atendimento => !filtroStatus || atendimento.status === filtroStatus)
-        .filter(atendimento => !filtroSLA || atendimento.sla_util === filtroSLA);
+    const handleSort = (column) => {
+        if (sortColumn === column) {
+            // Alternar a direção de ordenação
+            if (sortDirection === 'asc') {
+                setSortDirection('desc');
+            } else if (sortDirection === 'desc') {
+                setSortDirection(null); // Remove a ordenação
+                setSortColumn('');
+            } else {
+                setSortDirection('asc');
+            }
+        } else {
+            // Ordenar por uma nova coluna
+            setSortColumn(column);
+            setSortDirection('asc');
+        }
+    };
+
+    const sortData = (data) => {
+        if (!sortColumn || !sortDirection) return data;
+
+        return [...data].sort((a, b) => {
+            const aValue = a[sortColumn];
+            const bValue = b[sortColumn];
+
+            if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+            if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+            return 0;
+        });
+    };
+
+    const atendimentosFiltrados = sortData(
+        atendimentos
+            .filter(atendimento => !filtroStatus || atendimento.status === filtroStatus)
+            .filter(atendimento => !filtroSLA || atendimento.sla_util === filtroSLA)
+    );
 
     const renderPaginationButtons = () => {
         const pageButtons = [];
@@ -237,19 +274,163 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                     <table className="tabela-atendimentos">
                         <thead>
                             <tr>
-                                <th>Ticket</th>
-                                <th>Abertura</th>
-                                <th>Status</th>
-                                <th>SLA</th>
-                                <th>Categoria</th>
-                                <th>Subcategoria</th>
-                                <th>Assunto</th>
-                                <th>Data Limite</th>
-                                <th>Analista Atual</th>
-                                <th>Nome</th>
-                                <th>Área de Negócio</th>
-                                <th>HUB</th>
-                                <th>Unidade de Negócio</th>
+                                <th 
+                                    id='ticket'
+                                    onClick={() => handleSort('cod_fluxo')} 
+                                    className={
+                                        sortColumn === 'cod_fluxo'
+                                            ? sortDirection === 'asc'
+                                                ? 'sorted-asc'
+                                                : 'sorted-desc'
+                                            : ''
+                                    }
+                                >
+                                   Ticket          
+                                </th>
+                                <th 
+                                    onClick={() => handleSort('abertura')} 
+                                    className={
+                                        sortColumn === 'abertura'
+                                            ? sortDirection === 'asc'
+                                                ? 'sorted-asc'
+                                                : 'sorted-desc'
+                                            : ''
+                                    }
+                                >
+                                    Abertura
+                                </th>
+                                <th 
+                                    onClick={() => handleSort('status')} 
+                                    className={
+                                        sortColumn === 'status'
+                                            ? sortDirection === 'asc'
+                                                ? 'sorted-asc'
+                                                : 'sorted-desc'
+                                            : ''
+                                    }
+                                >
+                                    Status
+                                </th>
+                                <th 
+                                    onClick={() => handleSort('sla_util')} 
+                                    className={
+                                        sortColumn === 'sla_util'
+                                            ? sortDirection === 'asc'
+                                                ? 'sorted-asc'
+                                                : 'sorted-desc'
+                                            : ''
+                                    }
+                                >
+                                    SLA
+                                </th>
+                                <th 
+                                    onClick={() => handleSort('categoria')} 
+                                    className={
+                                        sortColumn === 'categoria'
+                                            ? sortDirection === 'asc'
+                                                ? 'sorted-asc'
+                                                : 'sorted-desc'
+                                            : ''
+                                    }
+                                >
+                                    Categoria
+                                </th>
+                                <th 
+                                    onClick={() => handleSort('subcategoria')} 
+                                    className={
+                                        sortColumn === 'subcategoria'
+                                            ? sortDirection === 'asc'
+                                                ? 'sorted-asc'
+                                                : 'sorted-desc'
+                                            : ''
+                                    }
+                                >
+                                    Subcategoria
+                                </th>
+                                <th 
+                                    onClick={() => handleSort('assunto')} 
+                                    className={
+                                        sortColumn === 'assunto'
+                                            ? sortDirection === 'asc'
+                                                ? 'sorted-asc'
+                                                : 'sorted-desc'
+                                            : ''
+                                    }
+                                >
+                                    Assunto
+                                </th>
+                                <th 
+                                    onClick={() => handleSort('data_limite')} 
+                                    className={
+                                        sortColumn === 'data_limite'
+                                            ? sortDirection === 'asc'
+                                                ? 'sorted-asc'
+                                                : 'sorted-desc'
+                                            : ''
+                                    }
+                                >
+                                    Data Limite
+                                </th>
+                                <th 
+                                    onClick={() => handleSort('grupo')} 
+                                    className={
+                                        sortColumn === 'grupo'
+                                            ? sortDirection === 'asc'
+                                                ? 'sorted-asc'
+                                                : 'sorted-desc'
+                                            : ''
+                                    }
+                                >
+                                    Analista Atual
+                                </th>
+                                <th 
+                                    onClick={() => handleSort('nome')} 
+                                    className={
+                                        sortColumn === 'nome'
+                                            ? sortDirection === 'asc'
+                                                ? 'sorted-asc'
+                                                : 'sorted-desc'
+                                            : ''
+                                    }
+                                >
+                                    Nome
+                                </th>
+                                <th 
+                                    onClick={() => handleSort('area_negocio')} 
+                                    className={
+                                        sortColumn === 'area_negocio'
+                                            ? sortDirection === 'asc'
+                                                ? 'sorted-asc'
+                                                : 'sorted-desc'
+                                            : ''
+                                    }
+                                >
+                                    Área de Negócio
+                                </th>
+                                <th 
+                                    onClick={() => handleSort('hub')} 
+                                    className={
+                                        sortColumn === 'hub'
+                                            ? sortDirection === 'asc'
+                                                ? 'sorted-asc'
+                                                : 'sorted-desc'
+                                            : ''
+                                    }
+                                >
+                                    HUB
+                                </th>
+                                <th 
+                                    onClick={() => handleSort('unidade')} 
+                                    className={
+                                        sortColumn === 'unidade'
+                                            ? sortDirection === 'asc'
+                                                ? 'sorted-asc'
+                                                : 'sorted-desc'
+                                            : ''
+                                    }
+                                >
+                                    Unidade de Negócio
+                                </th>
                             </tr>
                         </thead>
                         <tbody>

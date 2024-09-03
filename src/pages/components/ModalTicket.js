@@ -137,16 +137,19 @@ const Modal = ({ data, onClose }) => {
         "ds_obs": "Observações",
     };
     const statusOptions = {
-        "Em Andamento": "#ffc107",
-        "Em Atendimento": "#A6c620",
-        "Aguardando Retorno Fornecedor": "#17a2b8",
-        "Aguardando Retorno": "#fd7e90",
-        "Em Aberto": "#007bff",
-        "Agendada": "#6610f2",
-        "Criação de Usuário": "#fd7e14",
-        "Finalizado": "#229a00",
-        "Cancelado": "#FF0000"
+        "Em Andamento": "#FFC107",        // Amarelo Escuro Neon
+        "Em Atendimento": "#64DD17",      // Verde Escuro Neon
+        "Aguardando Retorno Fornecedor": "#00ACC1", // Ciano Escuro Neon
+        "Aguardando Retorno": "#F50057",  // Rosa Escuro Neon
+        "Em Aberto": "#2962FF",           // Azul Escuro Neon
+        "Agendada": "#D500F9",            // Roxo Escuro Neon
+        "Criação de Usuário": "#FF3D00",  // Laranja Escuro Neon
+        "Finalizado": "#00C853",          // Verde Lima Escuro Neon
+        "Cancelado": "#D50000"            // Vermelho Escuro Neon
     };
+    
+    
+    
     const slaOptions = {
         "Em Atraso": "#dc3545",
         "No Prazo": "#28a745"
@@ -1139,39 +1142,45 @@ const Modal = ({ data, onClose }) => {
                     </div>
                     <div style={{ display: 'flex', gap: '20px' }}>
                         <div style={{ flex: 3 }}>
-                            {atividades.slice().reverse().map((atividade, index) => (
-                                <div className="card-atividade" key={index} onClick={() => handleAbrirDetalhesAtividade(atividade)}>
-                                    <div className="status-container" style={{ textAlign: 'right' }}>
-                                        <span
-                                            className="status-bolinha"
-                                            style={{
-                                                backgroundColor: statusOptions[convertStatusToTitleCase(atividade.status)] || '#000',
-                                                marginRight: '8px'
-                                            }}
-                                        ></span>
-                                    </div>
+                        {atividades.slice().reverse().map((atividade, index) => (
+                            <div className="card-atividade" key={index} onClick={() => handleAbrirDetalhesAtividade(atividade)}>
+                                <p
+                                    id='status-bolinha'
+                                    style={{
+                                        backgroundColor: statusOptions[convertStatusToTitleCase(atividade.status)] || '#000',
+                                        color: 'white',
+                                        padding:'4px 8px 4px 8px',
+                                        borderRadius: '12px',
+                                        display: 'inline-block',
+                                        fontWeight: 'bold'
+                                    }}
+                                >
+                                    {atividade.status}
+                                </p>
+                                <p><label>Início:</label> {formatDate(atividade.aberto_em)}</p>
+                                <p><label>Aberto por:</label> {atividade.aberto_por}</p>
+                                <p><label>Destinatário:</label> {atividade.executor}</p>
+                                <p><label>Descrição:</label> {truncateText(atividade.descricao, 50)}</p>
 
-                                    <p id='status-bolinha'>{atividade.status}</p>
-                                    <p><label>Início:</label> {formatDate(atividade.aberto_em)}</p>
-                                    <p><label>Aberto por:</label> {atividade.aberto_por}</p>
-                                    <p><label>Destinatário:</label> {atividade.executor}</p>
-                                    <p><label>Descrição:</label> {truncateText(atividade.descricao, 50)}</p>
+                                <p style={{ display: 'flex', alignItems: 'center' }}>
+                                    <label>Anexo:</label>
+                                    {atividade.ds_anexo ? (
+                                        <>
+                                            <a
+                                                onClick={atividade.id ? () => handleAnexoClick(atividade.ds_anexo) : null}
+                                                style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+                                            >
+                                                {atividade.ds_anexo.split('/').pop()}
+                                                <FaFileAlt className="icone-anexo" style={{ marginLeft: '5px' }} />
+                                            </a>
+                                        </>
+                                    ) : (
+                                        'Nenhum anexo'
+                                    )}
+                                </p>
+                            </div>
+                        ))}
 
-                                    <p style={{ display: 'flex', alignItems: 'center' }}>
-                                        <label>Anexo:</label>
-                                        {atividade.ds_anexo ? (
-                                            <>
-                                                <a onClick={atividade.id ? () => handleAnexoClick(atividade.ds_anexo) : null} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-                                                    {atividade.ds_anexo.split('/').pop()}
-                                                    <FaFileAlt className="icone-anexo" style={{ marginLeft: '5px' }} />
-                                                </a>
-                                            </>
-                                        ) : (
-                                            'Nenhum anexo'
-                                        )}
-                                    </p>
-                                </div>
-                            ))}
                         </div>
                         <div style={{ flex: 1 }}>
                             {anexos.slice().reverse().map((anexo, index) => (

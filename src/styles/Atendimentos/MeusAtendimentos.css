@@ -247,12 +247,6 @@ textarea {
     gap: 10px;
 }
 
-.status-bolinha {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    cursor: pointer;
-}
 
 .tabela-container {
     width: 100%;
@@ -1532,8 +1526,8 @@ label[for="nome-anexo"] {
 }
 #status-bolinha {
     position: absolute;
-    top:7%;
-    right: 7%; 
+    top:9%;
+    right: 2%; 
     display: flex;
     align-items: center;
     gap: 5px; 
@@ -1649,3 +1643,67 @@ input:checked + .slider:before {
 h4{
     color: #3E4676; 
 }
+th#ticket {
+    margin-right: 10px; 
+    padding-right: 24px; 
+}
+
+th:not(#ticket) {
+    padding-right: 32px; 
+}
+
+th::before,
+th::after {
+    right: 8px;
+}
+
+
+th {
+    position: relative;
+    padding: 8px 16px;
+    text-align: left;
+    font-weight: 500;
+    color: #3E4676;
+    font-size: 15px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+th::before,
+th::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+th::before {
+    top: calc(50% - 6px);
+    border-bottom: 5px solid #3E4676;
+}
+
+th::after {
+    top: calc(50%);
+    border-top: 5px solid #3E4676;
+}
+
+th.sorted-asc::before {
+    opacity: 1;
+    border-bottom-color: #000;
+}
+
+th.sorted-desc::after {
+    opacity: 1;
+    border-top-color: #000;
+}
+
+th.sorted-asc::after,
+th.sorted-desc::before {
+    opacity: 0.2;
+}
+
