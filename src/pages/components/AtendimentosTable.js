@@ -24,14 +24,15 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
     const [sortDirection, setSortDirection] = useState(null);
 
     const statusOptions = {
-        "Em Andamento": "#FFC107",
-        "Aguardando Retorno Fornecedor": "#00ACC1",
-        "Aguardando Retorno": "#F50057",
-        "Em Aberto": "#2962FF",
-        "Agendada": "#D500F9",
-        "Criação de Usuário": "#FF3D00",
-        "Finalizado": "#00C853",
-        "Cancelado": "#D50000"
+        "Em Andamento": "#20C997",        
+        "Em Atendimento": "#43A825",     
+        "Aguardando Retorno Fornecedor": "#E87C86", 
+        "Aguardando Retorno": "#F50057",  
+        "Em Aberto": "#3B7DDD",          
+        "Agendada": "#D500F9",          
+        "Criação de Usuário": "#FF3D00", 
+        "Finalizado": "#434343",         
+        "Cancelado": "#D50000"            
     };
 
     const slaOptions = {
@@ -50,28 +51,28 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                     showLoadingOverlay();
                 }
                 setLoading(true);
-    
+
                 const cachedData = localStorage.getItem(cacheKey);
                 if (cachedData) {
                     const { tickets, totalItems } = JSON.parse(cachedData);
                     setAtendimentos(tickets);
                     setTotalPages(Math.ceil(totalItems / itemsPerPage));
                 }
-    
+
                 let url = `${apiUrl}page=${currentPage}&per_page=${itemsPerPage}`;
                 
                 if (sortColumn && sortDirection) {
                     url += `&sort_by=${sortColumn}&sort_order=${sortDirection}`;
                 }
-    
+
                 if (filtroStatus) {
                     url += `&status=${filtroStatus}`;
                 }
-    
+
                 if (filtroSLA) {
                     url += `&st_sla=${filtroSLA}`;
                 }
-    
+
                 let config = {
                     method: 'post',
                     maxBodyLength: Infinity,
@@ -81,38 +82,38 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                     },
                     data: filtrosExtras
                 };
-    
+
                 const response = await axios.request(config);
                 const fetchedAtendimentos = response.data.tickets;
                 const totalItems = response.data.total_items;
                 
                 hideLoadingOverlay();
-    
+
                 setAtendimentos(fetchedAtendimentos);
                 setTotalPages(Math.ceil(totalItems / itemsPerPage));
                 localStorage.setItem(
                     cacheKey,
                     JSON.stringify({ tickets: fetchedAtendimentos, totalItems })
                 );
-    
+
                 setLoading(false);
             } catch (error) {
                 console.error('Erro ao buscar atendimentos:', error);
                 setLoading(false);
             }
         };
-    
+
         fetchAtendimentos();
-    
+
         const timer = setTimeout(() => {
             setShowNoDataMessage(true);
         }, 10000);
-    
+
         prevPageRef.current = currentPage;
         prevItemsPerPageRef.current = itemsPerPage;
         prevStatusFilterRef.current = filtroStatus;
         prevSLAFilterPageRef.current = filtroSLA;
-    
+
         return () => clearTimeout(timer);
     }, [currentPage, itemsPerPage, sortColumn, sortDirection, filtroStatus, filtroSLA]);
 
@@ -214,7 +215,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         }
     };
 
-    const atendimentosFiltrados = atendimentos
+    const atendimentosFiltrados = atendimentos;
 
     const renderPaginationButtons = () => {
         const pageButtons = [];
@@ -461,25 +462,41 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                 <tr key={atendimento.cod_fluxo} onClick={() => handleClick(atendimento)} style={{ '--stagger': index + 1 }}>
                                     <td id='cont-tabela'>{atendimento.cod_fluxo}</td>
                                     <td id='cont-tabela'>{new Date(atendimento.abertura).toLocaleString().replace(',', '')}</td>
-                                    <td id='cont-tabela' className={`status ${atendimento.status.replace(/\s/g, '-').toLowerCase()}`}>
+                                    <td id='cont-tabela'>
                                         <span
-                                            className="status-bolinha"
+                                            className="status"
                                             style={{
                                                 backgroundColor: statusOptions[atendimento.status] || '#000',
-                                                marginRight: '8px'
+                                                color: 'white',
+                                                width: '150px',
+                                                height: '30px',
+                                                lineHeight: '30px',
+                                                textAlign: 'center',
+                                                borderRadius: '6px',
+                                                display: 'inline-block',
+                                                fontWeight: 'bold'
                                             }}
-                                        ></span>
-                                        {atendimento.status}
+                                        >
+                                            {atendimento.status}
+                                        </span>
                                     </td>
-                                    <td id='cont-tabela' className={`sla ${atendimento.sla_util.replace(/\s/g, '-').toLowerCase()}`}>
+                                    <td id='cont-tabela'>
                                         <span
-                                            className="sla-bolinha"
+                                            className="sla"
                                             style={{
                                                 backgroundColor: slaOptions[atendimento.sla_util] || '#000',
-                                                marginRight: '8px'
+                                                color: 'white',
+                                                width: '100px',
+                                                height: '30px',
+                                                lineHeight: '30px',
+                                                textAlign: 'center',
+                                                borderRadius: '6px',
+                                                display: 'inline-block',
+                                                fontWeight: 'bold'
                                             }}
-                                        ></span>
-                                        {atendimento.sla_util}
+                                        >
+                                            {atendimento.sla_util}
+                                        </span>
                                     </td>
                                     <td id='cont-tabela'>{atendimento.categoria}</td>
                                     <td id='cont-tabela'>{atendimento.subcategoria}</td>

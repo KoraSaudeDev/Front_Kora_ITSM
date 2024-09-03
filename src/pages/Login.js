@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 import { useAuth } from '../context/AuthContext';
@@ -6,29 +6,22 @@ import { useNavigate } from 'react-router-dom';
 import '../styles/Login.css';
 import axios from 'axios';
 
+const logoKoraUrl = "https://i.postimg.cc/8k9pdsZV/unnamed.png";
+
 const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [userData, setUserData] = useState(null);
+  const [stayLoggedIn, setStayLoggedIn] = useState(false);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       const user = JSON.parse(storedUser);
+      setUserData(user);
       login(user);
       navigate('/atendimentos/meus-atendimentos');
     }
-
-    const button = document.querySelector('.nsm7Bb-HzV7m-LgbsSe');
-    if (button) {
-      button.style.backgroundColor = '#4285f4';
-      button.style.color = '#fff';
-      button.style.borderRadius = '12px';
-      button.style.padding = '12px 20px';
-      button.style.fontWeight = 'bold';
-      button.style.fontSize = '16px';
-      button.style.transition = 'background-color 0.3s ease, transform 0.3s ease';
-    }
-
   }, [login, navigate]);
 
   const onSuccess = async (res) => {
@@ -45,10 +38,11 @@ const Login = () => {
 
       const response = await axios.request(config);
 
-      if(response.data.filas) user.filas = response.data.filas;
-      if(response.data.filas_id) user.filas_id = response.data.filas_id;
-      if(response.data.id_user) user.id_user = response.data.id_user;
-      
+      if (response.data.filas) user.filas = response.data.filas;
+      if (response.data.filas_id) user.filas_id = response.data.filas_id;
+      if (response.data.id_user) user.id_user = response.data.id_user;
+
+      setUserData(user);
       login(user);
       navigate('/atendimentos/minha-equipe');
     } catch (error) {
@@ -56,52 +50,48 @@ const Login = () => {
     }
   };
 
-  // const onSuccess = async () => {
-  //   try {
-  //     const user = {}
-  //     user.name = document.querySelector('#nome').value;
-  //     user.email = document.querySelector('#email').value
-
-  //     const config = {
-  //       method: 'get',
-  //       maxBodyLength: Infinity,
-  //       url: `${process.env.REACT_APP_API_BASE_URL}/access/meus-grupos?email=${user.email}`,
-  //       headers: {}
-  //     };
-
-  //     const response = await axios.request(config);
-
-  //     const roles = response.data.map(item => item.papel);
-  //     user.cargo = roles;
-
-  //     login(user);
-  //     navigate('/atendimentos/meus-atendimentos');
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
-
   const onFailure = (res) => {
     console.log("LOGIN FAILED: ", res);
   };
 
+  const toggleStayLoggedIn = () => {
+    setStayLoggedIn(!stayLoggedIn);
+  };
+
   return (
-    <div className="login-container">
-      <div className="login-box">
-        <img src="https://i.postimg.cc/8k9pdsZV/unnamed.png" alt="Kora Logo" className="login-logo" />
-
-
-        <h2>ITSM</h2>
-        {/* <input type="text" id="nome" placeholder="Digite seu Nome"/>
-        <input type="text" id="email" placeholder="Digite seu Email"/>
-        <input type="button" id="btn" value="Enviar" onClick={onSuccess}/> */}
-        <GoogleLogin
-          onSuccess={onSuccess}
-          onError={onFailure}
-          useOneTap
-          className="google-login-button"
-          theme="outline"
-        />
+    <div className="custom-login-background">
+      <div className="custom-login-container">
+        <div className="custom-login-box">
+          <img
+            src={userData?.picture || logoKoraUrl}
+            alt="Profile"
+            className="custom-login-logo"
+            style={{
+              borderRadius: userData?.picture ? '50%' : '0',
+              width: userData?.picture ? '100px' : '120px',
+              height: userData?.picture ? '100px' : 'auto',
+            }}
+          />
+          <h2 className="custom-login-title">{userData ? `Welcome back, ${userData.name}` : "Bem-vindo ao ITSM"}</h2>
+          <p className="custom-login-subtitle">Entre na sua conta para continuar</p>
+          <GoogleLogin
+            onSuccess={onSuccess}
+            onError={onFailure}
+            useOneTap
+            className="custom-google-login-button"
+            theme="outline"
+          />
+          <div className="custom-remember-me-container">
+            <div className={`custom-toggle-container ${stayLoggedIn ? 'on' : 'off'}`} onClick={toggleStayLoggedIn}>
+              <div className={`custom-toggle-switch ${stayLoggedIn ? 'on' : 'off'}`}>
+                {stayLoggedIn ? '😊' : '😐'}
+              </div>
+            </div>
+            <label htmlFor="custom-remember-me" className="custom-remember-me-label">
+              Mantenha-me conectado
+            </label>
+          </div>
+        </div>
       </div>
     </div>
   );

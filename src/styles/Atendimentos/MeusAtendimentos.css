@@ -24,6 +24,8 @@ body {
     transition: background-color 0.3s ease;
 }
 
+
+
 .search-bar-container {
     display: flex;
     align-items: center;
@@ -928,7 +930,6 @@ svg {
     padding: 8px;
     margin-bottom: 16px;
     border-radius: 4px;
-    border: 1px solid #ccc;
     font-size: 14px;
 }
 
@@ -1046,6 +1047,8 @@ a {
     margin: 0px;
     max-height: 400px;
     background-color: #fff;
+    border: none;
+    
 }
 
 .conteudo-modal-esquerda{
@@ -1272,7 +1275,7 @@ textarea {
 .botao-atividades,
 .botao-anexo {
     width: 15%;
-    min-width: 150px; /* Define a largura mínima para ambos os botões */
+    min-width: 150px; 
     font-weight: 300;
     margin-top: 20px;
     margin-bottom: 20px;
@@ -1310,12 +1313,12 @@ textarea {
     transform: translateY(1px);
 }
 
-/* Remover especificidade de margem e largura mínima para botões específicos */
+
 .botao-atividades,
 .botao-anexo {
     margin-top: 20px;
     margin-bottom: 20px;
-    min-width: 150px; /* Ambos os botões terão a mesma largura mínima */
+    min-width: 150px; 
 }
 
 label[for="nome-anexo"] {
@@ -1477,7 +1480,6 @@ label[for="nome-anexo"] {
 
 .conteudo-modal-direita {
     margin-left: 5px;
-    border: 1px solid #ddd;
     
 }
 
@@ -1629,10 +1631,10 @@ input:checked + .slider:before {
 
 .botao-ver-mais {
     padding: 4px 8px;
-    background-color: #6a91bb; 
+    background-color: #808198; 
     color: #fff;
     border: none;
-    border-radius: 100px;
+    border-radius: 4px;
     cursor: pointer;
     transition: color 0.3s ease, background-color 0.3s ease;
     font-size: 15px;
@@ -1717,3 +1719,12 @@ th.sorted-desc::before {
     opacity: 0.2;
 }
 
+.status-rect, .sla-rect {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px; 
+    font-weight: bold;
+    color: white;
+    margin-left: 8px;
+    font-size: 14px;
+}

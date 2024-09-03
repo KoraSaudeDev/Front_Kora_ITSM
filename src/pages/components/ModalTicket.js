@@ -139,15 +139,15 @@ const Modal = ({ data, onClose }) => {
         "ds_obs": "Observações",
     };
     const statusOptions = {
-        "Em Andamento": "#FFC107",
-        "Em Atendimento": "#43A825",
-        "Aguardando Retorno Fornecedor": "#00ACC1",
-        "Aguardando Retorno": "#F50057",
-        "Em Aberto": "#2962FF",
-        "Agendada": "#D500F9",
-        "Criação de Usuário": "#FF3D00",
-        "Finalizado": "#00C853",
-        "Cancelado": "#D50000"
+        "Em Andamento": "#20C997",        
+        "Em Atendimento": "#43A825",     
+        "Aguardando Retorno Fornecedor": "#E87C86", 
+        "Aguardando Retorno": "#F50057",  
+        "Em Aberto": "#3B7DDD",          
+        "Agendada": "#D500F9",          
+        "Criação de Usuário": "#FF3D00", 
+        "Finalizado": "#434343",         
+        "Cancelado": "#D50000"            
     };
 
     const slaOptions = {
@@ -1029,30 +1029,32 @@ const Modal = ({ data, onClose }) => {
                     </div>
 
                     <div className="conteudo-modal-direita">
-                        <div className="header-status-sla">
-                            <div className="status-container">
-                                <strong>Status:</strong>
-                                <span
-                                    className="status-bolinha"
-                                    style={{
-                                        backgroundColor: statusOptions[data.status] || '#000',
-                                        marginLeft: '8px'
-                                    }}
-                                ></span>
-                                {data.status}
-                            </div>
-                            <div className="sla-container">
-                                <strong>SLA:</strong>
-                                <span
-                                    className="sla-bolinha"
-                                    style={{
-                                        backgroundColor: slaOptions[data.st_sla] || '#000',
-                                        marginLeft: '8px'
-                                    }}
-                                ></span>
-                                {data.st_sla}
-                            </div>
-                        </div>
+                    <div className="header-status-sla">
+                <div className="status-container">
+                    <strong>Status:</strong>
+                    <span
+                        className="status-rect"
+                        style={{
+                            backgroundColor: statusOptions[data.status] || '#000',
+                        }}
+                    >
+                        {data.status}
+                    </span>
+                </div>
+                <div className="sla-container">
+                    <strong>SLA:</strong>
+                    <span
+                        className="sla-rect"
+                        style={{
+                            backgroundColor: slaOptions[data.st_sla] || '#000',
+                        }}
+                    >
+                        {data.st_sla}
+                    </span>
+                </div>
+            </div>
+
+
 
                         <p><strong className="data">Abertura:</strong> {formatDate(data.abertura)}</p>
                         <p><strong className="data">Data Limite:</strong> {formatDate(data.data_limite)}</p>
@@ -1147,7 +1149,7 @@ const Modal = ({ data, onClose }) => {
                                             backgroundColor: statusOptions[convertStatusToTitleCase(atividade.status)] || '#000',
                                             color: 'white',
                                             padding: '4px 8px 4px 8px',
-                                            borderRadius: '12px',
+                                            borderRadius: '4px',
                                             display: 'inline-block',
                                             fontWeight: 'bold'
                                         }}

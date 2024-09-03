@@ -159,6 +159,9 @@ const Sidebar = () => {
           </li>
         </ul>
       </div>
+      <div className="sidebar-footer">
+        <p>Version 1.0</p>
+      </div>
     </nav>
   );
 };
