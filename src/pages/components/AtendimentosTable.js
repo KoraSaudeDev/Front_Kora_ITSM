@@ -72,8 +72,6 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                     url += `&st_sla=${filtroSLA}`;
                 }
     
-                console.log(url)
-    
                 let config = {
                     method: 'post',
                     maxBodyLength: Infinity,
