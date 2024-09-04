@@ -3,10 +3,12 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #f0f4f8;
+  background-color: #f3f7fc;
+  flex-direction: column; 
 }
 
 .custom-login-container {
+  margin-top: 10%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -141,3 +143,4 @@
   margin-top: 20px;
   font-size: 15px;
 }
+

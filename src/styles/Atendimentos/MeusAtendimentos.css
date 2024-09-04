@@ -1612,7 +1612,7 @@ input:checked + .slider:before {
 }
 .conteudo-modal.reduzido {
     min-height: 442px;
-    height: 30%;
+    height: 40%;
     overflow: hidden;
     transition: height 0.3s ease;
     position: relative; 

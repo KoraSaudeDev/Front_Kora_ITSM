@@ -15,8 +15,14 @@ body {
   box-sizing: border-box;
   background: url('../src/assets/images/bg_home.png');
   user-select: none;
+  zoom: 0.9;
   
 }
+
+html {
+  zoom: 0.8;
+}
+
 
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Varela Round', sans-serif;
