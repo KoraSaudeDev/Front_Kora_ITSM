@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Autosuggest from 'react-autosuggest';
 import axios from 'axios';
 import Modal from '../pages/components/ModalTicket'; 
+import { FaSearch } from 'react-icons/fa'; // Ícone de busca
 import '../styles/SearchBar.css';
 
 const statusOptions = {
@@ -47,7 +48,7 @@ const SearchBar = () => {
       const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/tickets-preview?id=${inputValue}`);
       return response.data.tickets.slice(0, 3).map((ticket) => ({
         name: `${ticket.cod_fluxo} - ${ticket.nome}`,
-        status: ticket.status,  // Adiciona o status do ticket
+        status: ticket.status, 
         ticketData: ticket 
       }));
     } catch (error) {
@@ -97,13 +98,14 @@ const SearchBar = () => {
   };
 
   const inputProps = {
-    placeholder: 'Pesquisar...',
+    placeholder: 'Consulta de Tickets...',
     value,
     onChange,
   };
 
   return (
-    <div>
+    <div className="react-autosuggest__container">
+      
       <Autosuggest
         suggestions={suggestions}
         onSuggestionsFetchRequested={onSuggestionsFetchRequested}

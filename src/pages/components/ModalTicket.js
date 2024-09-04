@@ -20,7 +20,6 @@ const Modal = ({ data, onClose }) => {
     const [atividadeSelecionada, setAtividadeSelecionada] = useState(null);
     const [anexoSelecionado, setAnexoSelecionado] = useState(null);
     const [isEditMode, setIsEditMode] = useState(false);
-    const [editMode, setEditMode] = useState(false);
     const [prioridadeSelecionada, setPrioridadeSelecionada] = useState(data.ds_nivel);
     const [selectedHub, setSelectedHub] = useState(data.hub || '');
     const [selectedUnidade, setSelectedUnidade] = useState(data.unidade || '');
@@ -45,6 +44,27 @@ const Modal = ({ data, onClose }) => {
         status: [],
         destinatarios: []
     });
+
+    const customStyles = {
+        option: (provided, state) => ({
+            ...provided,
+            backgroundColor: state.isSelected ? '#007aff' : state.isFocused ? '#e0f7fa' : 'white', // Cor de fundo
+            color: state.isSelected ? 'white' : '#3E4676', // Cor do texto
+            padding: 10,
+        }),
+        control: (provided) => ({
+            ...provided,
+            borderColor: '#007aff', // Cor da borda do select
+            boxShadow: 'none', // Remover sombra
+            '&:hover': {
+                borderColor: '#007aff', // Cor da borda ao passar o mouse
+            },
+        }),
+        singleValue: (provided) => ({
+            ...provided,
+            color: '#3E4676', // Cor do valor selecionado
+        }),
+    };
 
     const formsEspecificos = {
         "novo_usuario": data.novo_usuario,
@@ -916,6 +936,7 @@ const Modal = ({ data, onClose }) => {
                             options={categoriaOptions}
                             isClearable
                             placeholder=""
+                            styles={customStyles} // Adiciona o estilo customizado aqui
                         />
                     </div>
                     <div className="campo-selecao">
@@ -928,6 +949,7 @@ const Modal = ({ data, onClose }) => {
                             isClearable
                             placeholder=""
                             isDisabled={!selectedCategoria}
+                            styles={customStyles} // Adiciona o estilo customizado aqui
                         />
                     </div>
                     <div className="campo-selecao">
@@ -940,6 +962,7 @@ const Modal = ({ data, onClose }) => {
                             isClearable
                             placeholder=""
                             isDisabled={!selectedSubcategoria}
+                            styles={customStyles} // Adiciona o estilo customizado aqui
                         />
                     </div>
                 </div>
