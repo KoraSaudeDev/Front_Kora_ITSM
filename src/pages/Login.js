@@ -91,6 +91,9 @@ const Login = () => {
               Mantenha-me conectado
             </label>
           </div>
+          <div className="sidebar-footer">
+            <p>Version 1.02</p>
+          </div>
         </div>
       </div>
     </div>
