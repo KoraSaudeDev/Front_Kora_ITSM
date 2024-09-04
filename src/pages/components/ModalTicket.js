@@ -570,7 +570,7 @@ const Modal = ({ data, onClose }) => {
         setPrioridadeSelecionada(prioridade);
     };
 
-    const handleSalvarTicket = async (statusParam = null) => {
+    const handleSalvarTicket = async (statusParam = null, senha = null) => {
         if (!selectedHub || !selectedUnidade || !selectedCategoria || !selectedSubcategoria || !selectedAssunto || !prioridadeSelecionada) {
             alert('Por favor, preencha todos os campos obrigatórios.');
             return;
@@ -646,7 +646,8 @@ const Modal = ({ data, onClose }) => {
         };
 
         if (selectedDomain) update_tickets.dominio_email = selectedDomain;
-        if (organizacaoDomains) update_tickets.organizacao_dominio = organizacaoDomains
+        if (organizacaoDomains) update_tickets.organizacao_dominio = organizacaoDomains;
+        if (senha) update_tickets.senha_usuario = senha;
 
         if (update_tickets.status === "Finalizado") {
             update_tickets.finalizado_por = ultimoItem?.aberto_por ?? data.finalizado_por;
@@ -849,7 +850,7 @@ const Modal = ({ data, onClose }) => {
 
             setTimeout(() => {
                 setShowSuccessMessage(false);
-                handleSalvarTicket('Criação de Usuário');
+                handleSalvarTicket('Criação de Usuário', `${data.id}@`);
             }, 1300);
         } catch (error) {
             hideLoadingOverlay();
