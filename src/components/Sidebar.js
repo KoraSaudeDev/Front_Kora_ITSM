@@ -160,7 +160,7 @@ const Sidebar = () => {
         </ul>
       </div>
       <div className="sidebar-footer">
-        <p>Version 1.03</p>
+        <p>Version 1.004</p>
       </div>
     </nav>
   );

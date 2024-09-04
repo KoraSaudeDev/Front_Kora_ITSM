@@ -331,7 +331,7 @@ const Modal = ({ data, onClose }) => {
         if (
             data.categoria === "Acesso/Rede" &&
             data.subcategoria === "Contas de E-mail/Rede" &&
-            data.ctrl_criacao_usuario === 3 &&
+            [1, 2, 3].includes(data.ctrl_criacao_usuario) &&
             (data.assunto.includes("E-mail") || data.assunto.includes("Rede")) &&
             (data.status === "Em Andamento" || data.status === "Em Aberto")
         ) {
