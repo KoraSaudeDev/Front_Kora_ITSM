@@ -22,7 +22,8 @@
 .breadcrumb {
   font-size: 16px;
   color: #dee2e6;
-  margin-top: 5px;
+  margin-top: 15px;
+  margin-bottom: 10px;
   display: flex;
   align-items: center;
   text-shadow: none; 
@@ -43,6 +44,7 @@ main.main-content {
   padding-top: 70px;
   transform: translateX(0);
   opacity: 1;
+  
  
 }
 
@@ -67,3 +69,6 @@ main.main-content.reduced-margin {
   font-size: 12px;
   margin-top: -13px;
 }
+
+
+

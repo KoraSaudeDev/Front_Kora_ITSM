@@ -4,6 +4,18 @@ import axios from 'axios';
 import Modal from '../pages/components/ModalTicket'; 
 import '../styles/SearchBar.css';
 
+const statusOptions = {
+  "Em Andamento": "#20C997",        
+  "Em Atendimento": "#43A825",     
+  "Aguardando Retorno Fornecedor": "#E87C86", 
+  "Aguardando Retorno": "#F50057",  
+  "Em Aberto": "#3B7DDD",          
+  "Agendada": "#D500F9",          
+  "Criação de Usuário": "#FF3D00", 
+  "Finalizado": "#434343",         
+  "Cancelado": "#D50000"            
+};
+
 const SearchBar = () => {
   const [value, setValue] = useState('');
   const [suggestions, setSuggestions] = useState([]);
@@ -33,8 +45,9 @@ const SearchBar = () => {
 
     try {
       const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/tickets-preview?id=${inputValue}`);
-      return response.data.tickets.map((ticket) => ({
-        name: `Ticket #${ticket.cod_fluxo} - ${ticket.nome}`,
+      return response.data.tickets.slice(0, 3).map((ticket) => ({
+        name: `${ticket.cod_fluxo} - ${ticket.nome}`,
+        status: ticket.status,  // Adiciona o status do ticket
         ticketData: ticket 
       }));
     } catch (error) {
@@ -46,8 +59,26 @@ const SearchBar = () => {
   const getSuggestionValue = (suggestion) => suggestion.name;
 
   const renderSuggestion = (suggestion) => (
-    <div>
-      {suggestion.name}
+    <div className="suggestion-item">
+      <span>{suggestion.name}</span>
+      <span
+        className="status-seach"
+        style={{
+          backgroundColor: statusOptions[suggestion.status] || '#000',
+          color: 'white',
+          width: '120px',
+          height: '20px',
+          lineHeight: '20px',
+          textAlign: 'center',
+          borderRadius: '6px',
+          display: 'inline-block',
+          fontSize: '12px',
+          marginLeft: '10px',
+          fontWeight: '500'
+        }}
+      >
+        {suggestion.status}
+      </span>
     </div>
   );
 

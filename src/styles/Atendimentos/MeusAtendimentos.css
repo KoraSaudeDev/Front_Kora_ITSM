@@ -927,7 +927,8 @@ svg {
 .select-destinatario {
     display: block;
     width: 100%;
-    padding: 8px;
+    padding: 0px;
+    margin-top: 5px;
     margin-bottom: 16px;
     border-radius: 4px;
     font-size: 14px;
@@ -990,7 +991,7 @@ a {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 0px;
+    margin-top: 10px;
     margin-left: -10px;
     border-bottom: 1px solid #ddd;
     margin-bottom: 10px;

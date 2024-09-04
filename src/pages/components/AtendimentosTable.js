@@ -474,7 +474,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                                 textAlign: 'center',
                                                 borderRadius: '6px',
                                                 display: 'inline-block',
-                                                fontWeight: 'bold'
+                                                fontWeight: '500'
                                             }}
                                         >
                                             {atendimento.status}
@@ -492,7 +492,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                                 textAlign: 'center',
                                                 borderRadius: '6px',
                                                 display: 'inline-block',
-                                                fontWeight: 'bold'
+                                                fontWeight: '500'
                                             }}
                                         >
                                             {atendimento.sla_util}

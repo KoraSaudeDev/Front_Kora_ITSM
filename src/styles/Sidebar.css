@@ -285,11 +285,14 @@ main.mover.zoom {
 }
 
 .sidebar-footer {
-  padding: 1px;
-  text-align: center;
-  font-size: 14px;
+  position: absolute; /* Alinha o rodapé dentro da sidebar */
+  bottom: 0; /* Fixa no fundo da sidebar */
+  right: 0; /* Alinha à direita da sidebar */
+  width: 100%; /* Garante que o rodapé ocupe toda a largura da sidebar */
+  font-size: 10px;
   color: #888;
-  position: absolute;
-  bottom: 0;
-  width: 100%;
+  text-align: center;
+
 }
+
+

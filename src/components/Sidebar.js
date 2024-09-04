@@ -116,7 +116,7 @@ const Sidebar = () => {
                 </p>
               ))
             ) : (
-              <p id="cargo">Sem grupo</p>
+              <p id="cargo">Sem fila de atendimento</p>
             )}
           </div>
         </div>

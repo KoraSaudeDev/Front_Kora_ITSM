@@ -2,7 +2,7 @@ import React from 'react';
 import '../styles/Main.css';
 
 const Main = ({ title, description, children }) => {
-  const formattedDescription = `Home / ${description}`;
+  const formattedDescription = `ITSM / ${description}`;
 
   return (
     <main>
@@ -23,6 +23,7 @@ const Main = ({ title, description, children }) => {
       <div className="conteudo">
         {children}
       </div>
+      
     </main>
   );
 };

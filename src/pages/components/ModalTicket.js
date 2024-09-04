@@ -889,7 +889,7 @@ const Modal = ({ data, onClose }) => {
             </div>
             <div className={`modal ${isClosingModal ? 'fechar' : ''}`}>
                 <div className="modal-header">
-                    <h3>Ticket #{data.cod_fluxo}</h3>
+                    <h3>#{data.cod_fluxo}</h3>
                     <div className="botao-salvar-container">
                         {isAllowedCreateUser && (
                             <button className="botao-salvar-ticket" style={{ display: 'flex', alignItems: 'center', gap: '8px' }} onClick={handleCreateUser}>
