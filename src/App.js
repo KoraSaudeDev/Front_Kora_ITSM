@@ -48,7 +48,7 @@ const App = () => {
                 <Sidebar isOpen={isSidebarOpen} />
                 <Routes>
                   <Route
-                    path="/"
+                    path="/suporte"
                     element={
                       <ProtectedRoute
                         element={
