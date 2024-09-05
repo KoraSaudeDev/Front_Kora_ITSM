@@ -794,7 +794,7 @@ const Modal = ({ data, onClose }) => {
         }
 
         try {
-            if ([2, 3].includes(data.ctrl_criacao_usuario)) {
+            if ([1, 3].includes(data.ctrl_criacao_usuario)) {
                 showLoadingOverlay();
 
                 const param = {
