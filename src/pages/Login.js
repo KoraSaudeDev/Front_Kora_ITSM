@@ -93,7 +93,7 @@ const Login = () => {
             </label>
           </div>
           <div className="sidebar-footer">
-            <p>Version 1.008</p>
+            <p>Version 1.009</p>
           </div>
         </div>
       </div>

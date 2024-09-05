@@ -571,7 +571,7 @@ const Modal = ({ data, onClose }) => {
     };
 
     const handleSalvarTicket = async (statusParam = null, senha = null) => {
-        if (!selectedHub || !selectedUnidade || !selectedCategoria || !selectedSubcategoria || !selectedAssunto || !prioridadeSelecionada) {
+        if (!selectedHub || !selectedUnidade || !selectedCategoria || !selectedSubcategoria || !selectedAssunto || !prioridadeSelecionada || !selectedDestinatario) {
             alert('Por favor, preencha todos os campos obrigatórios.');
             return;
         }
@@ -944,7 +944,7 @@ const Modal = ({ data, onClose }) => {
 
                 <div className="modal-filters">
                     <div className="campo-selecao">
-                        <strong className="link-label">Categoria</strong>
+                        <strong className="link-label">Categoria <span className="campo-obrigatorio">*</span></strong>
                         <Select
                             className="select-destinatario"
                             value={categoriaOptions.find(option => option.value === selectedCategoria) || null}
@@ -956,7 +956,7 @@ const Modal = ({ data, onClose }) => {
                         />
                     </div>
                     <div className="campo-selecao">
-                        <strong className="link-label">Subcategoria</strong>
+                        <strong className="link-label">Subcategoria <span className="campo-obrigatorio">*</span></strong>
                         <Select
                             className="select-destinatario"
                             value={subcategoriaOptions.find(option => option.value === selectedSubcategoria) || null}
@@ -969,7 +969,7 @@ const Modal = ({ data, onClose }) => {
                         />
                     </div>
                     <div className="campo-selecao">
-                        <strong className="link-label">Assunto</strong>
+                        <strong className="link-label">Assunto <span className="campo-obrigatorio">*</span></strong>
                         <Select
                             className="select-destinatario"
                             value={assuntoOptions.find(option => option.value === selectedAssunto) || null}
@@ -1100,7 +1100,7 @@ const Modal = ({ data, onClose }) => {
                         <p><strong className="data">Tipo da SLA:</strong> {prioridades.find(p => p.prioridade === prioridadeSelecionada)?.tipo_tempo.toUpperCase() || ''}</p>
 
                         <div className="campo-editavel">
-                            <strong>Analista Atual:</strong>
+                            <strong>Analista Atual: <span className="campo-obrigatorio">*</span></strong>
                             <Select
                                 className="select-destinatario"
                                 id="executor-ticket"
@@ -1112,7 +1112,7 @@ const Modal = ({ data, onClose }) => {
                             />
                         </div>
                         <div className="campo-editavel">
-                            <strong>Prioridade:</strong>
+                            <strong>Prioridade: <span className="campo-obrigatorio">*</span></strong>
                             <select
                                 value={prioridadeSelecionada}
                                 onChange={(e) => handlePrioridadeClick(e.target.value)}
@@ -1125,7 +1125,7 @@ const Modal = ({ data, onClose }) => {
                             </select>
                         </div>
                         <div className="campo-editavel">
-                            <strong>Hub:</strong>
+                            <strong>Hub: <span className="campo-obrigatorio">*</span></strong>
                             <select
                                 value={selectedHub}
                                 onChange={(e) => handleFieldChange('hub', e.target.value)}
@@ -1139,7 +1139,7 @@ const Modal = ({ data, onClose }) => {
                             </select>
                         </div>
                         <div className="campo-editavel">
-                            <strong>Unidade de Negócio:</strong>
+                            <strong>Unidade de Negócio: <span className="campo-obrigatorio">*</span></strong>
                             <select
                                 value={selectedUnidade}
                                 onChange={(e) => handleFieldChange('unidade', e.target.value)}
