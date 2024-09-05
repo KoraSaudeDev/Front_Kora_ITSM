@@ -35,7 +35,7 @@ const App = () => {
     <AuthProvider>
       <Router>
         <Routes>
-          <Route path="/login" element={<Login />} />
+          <Route path="/suporte/login" element={<Login />} />
           <Route
             path="/*"
             element={
@@ -60,7 +60,7 @@ const App = () => {
                     }
                   />
                   <Route
-                    path="/atendimentos/meus-atendimentos"
+                    path="/suporte/meus-atendimentos"
                     element={
                       <ProtectedRoute
                         element={
@@ -72,7 +72,7 @@ const App = () => {
                     }
                   />
                   <Route
-                    path="/atendimentos/minha-equipe"
+                    path="/suporte/minha-equipe"
                     element={
                       <ProtectedRoute
                         element={
@@ -84,7 +84,7 @@ const App = () => {
                     }
                   />
                   <Route
-                    path="/atendimentos/all-tickets"
+                    path="/suporte/all-tickets"
                     element={
                       <ProtectedRoute
                         element={
@@ -96,7 +96,7 @@ const App = () => {
                     }
                   />
                   <Route
-                    path="/atendimentos/novo-ticket-futuro"
+                    path="/suporte/novo-ticket-futuro"
                     element={
                       <ProtectedRoute
                         element={

@@ -20,7 +20,7 @@ const Login = () => {
       const user = JSON.parse(storedUser);
       setUserData(user);
       login(user);
-      navigate('/atendimentos/meus-atendimentos');
+      navigate('/suporte/meus-atendimentos');
     }
   }, [login, navigate]);
 
@@ -44,7 +44,7 @@ const Login = () => {
 
       setUserData(user);
       login(user);
-      navigate('/atendimentos/minha-equipe');
+      navigate('/suporte/minha-equipe');
     } catch (error) {
       console.error(error);
     }
