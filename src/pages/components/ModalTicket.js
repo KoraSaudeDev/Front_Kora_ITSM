@@ -854,7 +854,7 @@ const Modal = ({ data, onClose }) => {
                     handleSalvarTicket('Criação de Usuário', `${data.id}@`);
                 }, 1300);
             }
-            else{
+            else {
                 handleSalvarTicket('Criação de Usuário', `${data.id}@`);
             }
         } catch (error) {
@@ -898,10 +898,20 @@ const Modal = ({ data, onClose }) => {
 
     const categoriaOptions = options.categoria.map(option => ({ value: option, label: option }));
     const subcategoriaOptions = selectedCategoria
-        ? options.subcategoria.map(option => ({ value: option, label: option }))
+        ? [
+            ...options.subcategoria.map(option => ({ value: option, label: option })),
+            ...(options.subcategoria.includes(selectedSubcategoria)
+                ? []
+                : [{ value: selectedSubcategoria, label: selectedSubcategoria }])
+        ]
         : [];
     const assuntoOptions = selectedSubcategoria
-        ? options.assunto.map(option => ({ value: option.assunto, label: option.assunto }))
+        ? [
+            ...options.assunto.map(option => ({ value: option.assunto, label: option.assunto })),
+            ...(options.assunto.find(option => option.assunto === selectedAssunto)
+                ? []
+                : [{ value: selectedAssunto, label: selectedAssunto }])
+        ]
         : [];
     const destinatarioOptions = options.destinatarios.map((destinatario) => ({
         value: destinatario.value,
