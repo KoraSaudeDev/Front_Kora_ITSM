@@ -159,15 +159,15 @@ const Modal = ({ data, onClose }) => {
         "ds_obs": "Observações",
     };
     const statusOptions = {
-        "Em Andamento": "#20C997",        
-        "Em Atendimento": "#43A825",     
-        "Aguardando Retorno Fornecedor": "#E87C86", 
-        "Aguardando Retorno": "#F50057",  
-        "Em Aberto": "#3B7DDD",          
-        "Agendada": "#D500F9",          
-        "Criação de Usuário": "#FF3D00", 
-        "Finalizado": "#434343",         
-        "Cancelado": "#D50000"            
+        "Em Andamento": "#20C997",
+        "Em Atendimento": "#43A825",
+        "Aguardando Retorno Fornecedor": "#E87C86",
+        "Aguardando Retorno": "#F50057",
+        "Em Aberto": "#3B7DDD",
+        "Agendada": "#D500F9",
+        "Criação de Usuário": "#FF3D00",
+        "Finalizado": "#434343",
+        "Cancelado": "#D50000"
     };
 
     const slaOptions = {
@@ -793,65 +793,70 @@ const Modal = ({ data, onClose }) => {
             return;
         }
 
-        showLoadingOverlay();
-
         try {
-            const param = {
-                "Status": data.status,
-                "Abertura": data.abertura,
-                "Telefone": data.n_tel_usuario,
-                "Email": data.email_solicitante,
-                "gestor_imediato": data.ds_gestor,
-                "gestor_imediato_email": data.ds_email_gestor,
-                "gerente_area": data.ds_gerente,
-                "nome_usuario": data.novo_usuario,
-                "hub_usuario": data.hub_novo_usu,
-                "unidade_usuario": data.unidade_novo_usu,
-                "funcao_usuario": data.cargo,
-                "departamento_usuario": data.departamento_novo_usuario,
-                "senha_usuario": `${data.id}@`,
-                "tipo_licenca": data.ds_licenca,
-                "email_gerente": data.ds_email_gerente,
-                "dominio_email": selectedDomain,
-                "organizacao_dominio": organizacaoDomains,
-                "centro_custo": data.centro_custo,
-                "matricula_usuario": data.matricula_final,
-                "tipo_colaborador": data.ds_tipo_colaborador,
-                "Nome_Empresa": data.Nome_Empresa,
-                "Logon_Script": data.Logon_Script,
-                "Cidade": data.Cidade,
-                "Estado": data.Estado,
-                "CEP": data.CEP,
-                "Pais": data.Pais,
-                "Site": data.Site,
-                "Endereco": data.Endereco,
-                "cod_empresa": data.cod_empresa,
-                "telefone_empresa": data.telefone_empresa,
-                "N° Ticket": data.cod_fluxo,
-                "id": data.id,
-                "tipo_criacao": data.ctrl_criacao_usuario,
-                "app": "tickets"
+            if ([2, 3].includes(data.ctrl_criacao_usuario)) {
+                showLoadingOverlay();
+
+                const param = {
+                    "Status": data.status,
+                    "Abertura": data.abertura,
+                    "Telefone": data.n_tel_usuario,
+                    "Email": data.email_solicitante,
+                    "gestor_imediato": data.ds_gestor,
+                    "gestor_imediato_email": data.ds_email_gestor,
+                    "gerente_area": data.ds_gerente,
+                    "nome_usuario": data.novo_usuario,
+                    "hub_usuario": data.hub_novo_usu,
+                    "unidade_usuario": data.unidade_novo_usu,
+                    "funcao_usuario": data.cargo,
+                    "departamento_usuario": data.departamento_novo_usuario,
+                    "senha_usuario": `${data.id}@`,
+                    "tipo_licenca": data.ds_licenca,
+                    "email_gerente": data.ds_email_gerente,
+                    "dominio_email": selectedDomain,
+                    "organizacao_dominio": organizacaoDomains,
+                    "centro_custo": data.centro_custo,
+                    "matricula_usuario": data.matricula_final,
+                    "tipo_colaborador": data.ds_tipo_colaborador,
+                    "Nome_Empresa": data.Nome_Empresa,
+                    "Logon_Script": data.Logon_Script,
+                    "Cidade": data.Cidade,
+                    "Estado": data.Estado,
+                    "CEP": data.CEP,
+                    "Pais": data.Pais,
+                    "Site": data.Site,
+                    "Endereco": data.Endereco,
+                    "cod_empresa": data.cod_empresa,
+                    "telefone_empresa": data.telefone_empresa,
+                    "N° Ticket": data.cod_fluxo,
+                    "id": data.id,
+                    "tipo_criacao": data.ctrl_criacao_usuario,
+                    "app": "tickets"
+                }
+
+                const config = {
+                    method: 'post',
+                    url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/create-user-google`,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    data: JSON.stringify(param)
+                };
+                const response = await axios.request(config);
+                console.log(response.data);
+
+                hideLoadingOverlay();
+                setSuccessMessage(response.data);
+                setShowSuccessMessage(true);
+
+                setTimeout(() => {
+                    setShowSuccessMessage(false);
+                    handleSalvarTicket('Criação de Usuário', `${data.id}@`);
+                }, 1300);
             }
-
-            const config = {
-                method: 'post',
-                url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/create-user-google`,
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                data: JSON.stringify(param)
-            };
-            const response = await axios.request(config);
-            console.log(response.data);
-
-            hideLoadingOverlay();
-            setSuccessMessage(response.data);
-            setShowSuccessMessage(true);
-
-            setTimeout(() => {
-                setShowSuccessMessage(false);
+            else{
                 handleSalvarTicket('Criação de Usuário', `${data.id}@`);
-            }, 1300);
+            }
         } catch (error) {
             hideLoadingOverlay();
             console.error("Error creating user:", error);
@@ -1053,30 +1058,30 @@ const Modal = ({ data, onClose }) => {
                     </div>
 
                     <div className="conteudo-modal-direita">
-                    <div className="header-status-sla">
-                <div className="status-container">
-                    <strong>Status:</strong>
-                    <span
-                        className="status-rect"
-                        style={{
-                            backgroundColor: statusOptions[data.status] || '#000',
-                        }}
-                    >
-                        {data.status}
-                    </span>
-                </div>
-                <div className="sla-container">
-                    <strong>SLA:</strong>
-                    <span
-                        className="sla-rect"
-                        style={{
-                            backgroundColor: slaOptions[data.st_sla] || '#000',
-                        }}
-                    >
-                        {data.st_sla}
-                    </span>
-                </div>
-            </div>
+                        <div className="header-status-sla">
+                            <div className="status-container">
+                                <strong>Status:</strong>
+                                <span
+                                    className="status-rect"
+                                    style={{
+                                        backgroundColor: statusOptions[data.status] || '#000',
+                                    }}
+                                >
+                                    {data.status}
+                                </span>
+                            </div>
+                            <div className="sla-container">
+                                <strong>SLA:</strong>
+                                <span
+                                    className="sla-rect"
+                                    style={{
+                                        backgroundColor: slaOptions[data.st_sla] || '#000',
+                                    }}
+                                >
+                                    {data.st_sla}
+                                </span>
+                            </div>
+                        </div>
 
 
 
