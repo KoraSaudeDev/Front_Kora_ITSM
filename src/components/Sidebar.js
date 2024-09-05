@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import '../styles/Sidebar.css';
-import { FaChartPie, FaChartBar, FaHeadset, FaChevronDown, FaSignOutAlt } from 'react-icons/fa';
+import { FaHeadset, FaChevronDown, FaSignOutAlt } from 'react-icons/fa';
 import logokora from '../assets/images/logokora.png';
 import SemFoto from '../assets/images/Sem_foto.png';
 import { useAuth } from '../context/AuthContext';
@@ -121,13 +121,31 @@ const Sidebar = () => {
           </div>
         </div>
         <ul className="botoes-navegacao">
+          
           <li className={`item-navegacao ${activeDropdown === 'dropdownAtendimentos' ? 'active' : ''}`}>
+            
             <a href="#" className={`link-navegacao ${location.pathname.includes('/atendimentos') ? 'active' : ''}`} onClick={() => alternarDropdown('dropdownAtendimentos')}>
               <FaHeadset className="icon" />
               <span>ITSM</span>
               <FaChevronDown className={`seta ${activeDropdown === 'dropdownAtendimentos' ? 'rotacionar' : ''}`} />
             </a>
             <ul id="dropdownAtendimentos" className={`conteudo-dropdown ${activeDropdown === 'dropdownAtendimentos' ? 'mostrar' : ''}`}>
+              <li className={location.pathname === '/atendimentos/novo-ticket' ? 'active' : ''}>
+                <a
+                  href="https://www.appsheet.com/start/3dbf5f58-b6b1-4ee8-bd4d-a14699c5dc31#view=Novo%20Ticket
+"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={location.pathname === '/atendimentos/novo-ticket' ? 'active' : ''}
+                >
+                  Novo Ticket
+                </a>
+              </li>
+              {/* <li className={location.pathname === '/atendimentos/novo-ticket-futuro' ? 'active' : ''}>
+                <Link to="/atendimentos/novo-ticket-futuro" className={location.pathname === '/atendimentos/novo-ticket-futuro' ? 'active' : ''}>
+                  Novo Ticket Futuro
+                </Link>
+              </li> */}
               <li className={location.pathname === '/atendimentos/meus-atendimentos' ? 'active' : ''}>
                 <Link to="/atendimentos/meus-atendimentos" className={location.pathname === '/atendimentos/meus-atendimentos' ? 'active' : ''}>
                   Meus Atendimentos
@@ -160,7 +178,7 @@ const Sidebar = () => {
         </ul>
       </div>
       <div className="sidebar-footer">
-        <p>Version 1.007</p>
+        <p>Version 1.008</p>
       </div>
     </nav>
   );

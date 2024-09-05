@@ -96,7 +96,7 @@ const App = () => {
                     }
                   />
                   <Route
-                    path="/atendimentos/novo-ticket"
+                    path="/atendimentos/novo-ticket-futuro"
                     element={
                       <ProtectedRoute
                         element={

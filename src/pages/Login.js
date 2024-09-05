@@ -80,6 +80,7 @@ const Login = () => {
             useOneTap
             className="custom-google-login-button"
             theme="outline"
+            scope="profile email"
           />
           <div className="custom-remember-me-container">
             <div className={`custom-toggle-container ${stayLoggedIn ? 'on' : 'off'}`} onClick={toggleStayLoggedIn}>
@@ -92,7 +93,7 @@ const Login = () => {
             </label>
           </div>
           <div className="sidebar-footer">
-            <p>Version 1.007</p>
+            <p>Version 1.008</p>
           </div>
         </div>
       </div>
