@@ -145,7 +145,7 @@ const Sidebar = () => {
                 <Link to="/atendimentos/novo-ticket-futuro" className={location.pathname === '/atendimentos/novo-ticket-futuro' ? 'active' : ''}>
                   Novo Ticket Futuro
                 </Link>
-              </li> */}
+              </li>  */}
               <li className={location.pathname === '/atendimentos/meus-atendimentos' ? 'active' : ''}>
                 <Link to="/atendimentos/meus-atendimentos" className={location.pathname === '/atendimentos/meus-atendimentos' ? 'active' : ''}>
                   Meus Atendimentos

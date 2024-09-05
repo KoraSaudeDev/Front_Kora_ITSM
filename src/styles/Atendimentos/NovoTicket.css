@@ -12,22 +12,85 @@ body {
     flex-direction: row;
     align-items: flex-start;
     justify-content: space-between;
-    margin: 20px;
 }
 
-.info-basicas, .detalhes-ticket {
+.info-basicas-duas-colunas {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.coluna-esquerda, .coluna-direita {
+    width: 48%;
     background-color: #fff;
+    margin-right: 5px;
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-right: 10px;
     padding: 20px;
-    width: 48%; 
+}
+
+/* Estilos aplicados diretamente às classes do Select */
+.css-1014xh8-control,  .css-3iigni-container {
+    border-color: #ddd;
+}
+
+.css-1014xh8-control {
+    border-color: #ddd !important; 
+    transition: border-color 0.3s ease-in-out;
+}
+
+.css-1014xh8-control:focus-within {
+    border-color: #007aff !important; 
+}
+
+
+#abertura{
+    border: 1px solid #ddd; 
+    padding: 8px;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    font-size: 14px;
+}
+
+
+#nome-completo,
+#email,
+#matricula,
+#cargo-form,
+#area-negocio,
+#descricao,
+#observacao {
+    border: 1px solid #ddd; 
+    padding: 8px;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+#nome-completo:focus,
+#email:focus,
+#matricula:focus,
+#cargo-form:focus,
+#area-negocio:focus,
+#descricao:focus,
+#observacao:focus {
+    border-color: #007aff; 
+    box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2); 
+    outline: none; 
 }
 
 .info-basicas h2, .detalhes-ticket h2 {
     margin-top: 0;
     font-weight: 300;
     text-align: left;
+}
+
+#cargo{
+    margin-bottom: 20px;
 }
 
 .formulario {
@@ -45,18 +108,8 @@ body {
     margin-bottom: 5px;
 }
 
-.formulario input,
-.formulario select,
-.formulario textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
 .formulario .campo-upload input {
-    border: none;
+     border: none;
     padding: 0;
 }
 
@@ -89,15 +142,15 @@ body {
     border: 1px solid #ddd;
 }
 
-#cargo{
-    margin:0px ;
+#cargo {
+    margin: 5px;
 }
 
-#descricao{
+#descricao {
     height: 100px;
 }
 
-#observacao{
+#observacao {
     height: 70px;
 }
 
@@ -107,14 +160,14 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     font-weight: 400;
-    background-color: #f9f9f9; 
-    color: #333; 
+    background-color: #f9f9f9;
+    color: #333;
     padding: 20px 40px;
     border-radius: 10px;
     box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     font-size: 18px;
-    z-index: 1000; 
+    z-index: 1000;
     opacity: 0;
     animation: fadeInOut 3s ease-in-out;
 }
