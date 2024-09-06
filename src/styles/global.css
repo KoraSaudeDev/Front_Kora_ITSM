@@ -6,6 +6,17 @@
     user-select: none;
   }
   
+  body {
+    font-family: 'Hind Vadodara', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background: url('bg_home.png');!important
+    user-select: none;
+    zoom: 0.9;
+    
+  }
+  
   #titulo-principal {
     font-size: 23px;
     font-weight: 500;

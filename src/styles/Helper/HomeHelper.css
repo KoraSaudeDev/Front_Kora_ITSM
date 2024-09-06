@@ -1,0 +1,181 @@
+body, html {
+    background-image: none;
+}
+
+.background-branco {
+    background: white url('../../assets/images/fundo_site.png') no-repeat center top;
+    background-size: 100% auto;
+    min-height: 137.1vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    zoom: 0.9;
+}
+
+.container-helper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 150px;
+}
+
+.cartoes-container-helper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    max-width: 85%;
+    margin-top: -8%;
+    padding: 20px;
+    overflow-x: auto; 
+}
+
+/* Animação de entrada da esquerda para a direita com escala */
+@keyframes slideInFromLeft {
+    0% {
+        transform: translateX(-100px) scale(0.8);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.cartao-helper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.8); 
+    border-radius: 4px; 
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease; 
+    font-size: 1rem;
+    border: none; 
+    padding: 20px;
+    width: 220px;
+    height: 320px; 
+    cursor: pointer;
+    text-align: center;
+    color: #333; 
+    font-weight: 500;
+    backdrop-filter: blur(10px);
+
+    /* Animação inicial */
+    opacity: 0;
+    animation: slideInFromLeft 0.5s ease forwards;
+    animation-delay: var(--delay);
+}
+
+/* Atrasos personalizados para cada cartão */
+.cartao-helper:nth-child(1) {
+    --delay: 0.1s;
+}
+
+.cartao-helper:nth-child(2) {
+    --delay: 0.2s;
+}
+
+.cartao-helper:nth-child(3) {
+    --delay: 0.3s;
+}
+
+.cartao-helper:nth-child(4) {
+    --delay: 0.4s;
+}
+
+.cartao-helper:nth-child(5) {
+    --delay: 0.5s;
+}
+.cartao-helper:nth-child(6) {
+    --delay: 0.6s;
+}
+.cartao-helper:nth-child(7) {
+    --delay: 0.7s;
+}
+
+.cartao-helper:hover {
+    transform: scale(1.04);
+    box-shadow: 0 6px 12px rgba(117, 165, 255, 0.2); 
+    background-color: rgba(255, 255, 255, 1); 
+}
+
+.icone-helper {
+    font-size: 60px; 
+    margin-bottom: 15px;
+    color: #08548a;
+}
+
+.nome-helper {
+    font-size: 20px;
+    font-weight: 600; 
+    color: #1c1c1e; 
+    margin-top: 15px;
+}
+
+/* Botão Acessar */
+.btn-acessar {
+    background-color: #007aff; 
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 60px;
+    cursor: pointer;
+    margin-top: 40px;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.btn-acessar:hover {
+    background-color: #005bb5;
+    transform: translateY(-3px);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .cartoes-container-helper {
+        flex-direction: row;
+        overflow-x: auto;
+    }
+
+    .cartao-helper {
+        width: 150px;
+        height: 250px;
+    }
+
+    .icone-helper {
+        font-size: 80px; 
+    }
+}
+
+.balloon-inside-card {
+    position: absolute;
+    top: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ff4d4d;
+    color: white;
+    padding: 12px 30px;
+    width: 80%;
+    border-radius: 5px;
+    font-size: 15px;
+    z-index: 100;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
+    transition: ease-in 0.5s;
+}
+
+.balloon-inside-card::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: #ff4d4d transparent transparent transparent;
+}

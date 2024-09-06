@@ -1,0 +1,47 @@
+.cartoes-rh-acesso-rh {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    margin-top: 50px;
+    width: 100%;
+}
+
+.cartao-rh-acesso-rh {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    padding: 40px; /* Aumentando o padding */
+    width: 250px;  /* Aumentando a largura */
+    height: 250px; /* Aumentando a altura */
+    cursor: pointer;
+    border: none;
+    text-align: center;
+    color: #2b3a5f;
+
+    /* Animação de zoom */
+    animation: fadeInZoom 0.8s ease forwards;
+    opacity: 0;
+}
+
+.cartao-rh-acesso-rh:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 24px rgba(102, 160, 247, 0.1);
+}
+
+.icone-acesso-rh {
+    font-size: 60px;
+    margin-bottom: 20px;
+    color: #08548a;
+}
+
+.nome-acesso-rh {
+    font-size: 20px;
+    font-weight: 600;
+    color: #3e4676;
+}

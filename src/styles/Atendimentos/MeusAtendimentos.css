@@ -1,11 +1,18 @@
-body {
-    font-family: 'Jost', -apple-system, sans-serif;
-    font-size: 15px;
-    color: #3E4676;
-    background-repeat: no-repeat;
+body, html {
+    font-family: 'Hind Vadodara', sans-serif;
     margin: 0;
     padding: 0;
-}
+    box-sizing: border-box;
+    background: url('bg_home.png');
+    user-select: none;
+    zoom: 0.9;
+    width: 100%;
+    height: 100%;
+    
+  }
+  
+
+
 
 .container-meus-atendimentos {
     padding: 20px;

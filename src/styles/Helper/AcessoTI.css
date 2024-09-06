@@ -1,0 +1,229 @@
+body, html {
+    background: none;
+    background-color: #fff; /* ou a cor desejada */
+    margin: 0;
+    padding: 0;
+}
+
+.background-branco-TI.image-loading {
+    background-color: white; /* Cor de fundo enquanto a imagem carrega */
+}
+
+.background-branco-TI {
+    background-image: url('../../assets/images/bghelper.png');
+    background-size: 100% auto;
+    background-position: center top;
+    background-repeat: no-repeat;
+    margin-top: 0;
+    min-height: 137.1vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    zoom: 0.9;
+}
+
+.cabecalho-acessoti {
+    background-color: #0b3554;
+    width: 100%;
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+.logo-acessoti {
+    width: 150px;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+    cursor: pointer;
+}
+
+.logo-acessoti:hover {
+    transform: scale(1.1);
+    opacity: 0.8;
+}
+
+.container-acessoti {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 120px;
+    width: 100%;
+}
+
+/* Animação para cartões maiores */
+@keyframes fadeInZoom {
+    0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(50px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Animação para cartões menores - efeito de escala por coluna */
+@keyframes fadeInScale {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.cartoes-maiores-acessoti {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+    flex-wrap: nowrap;
+}
+
+.cartao-maior-acessoti {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    padding: 20px;
+    width: 150px;
+    height: 150px;
+    cursor: pointer;
+    border: none;
+    text-align: center;
+    color: #2b3a5f;
+    
+    /* Aplica a animação */
+    animation: fadeInZoom 0.8s ease forwards;
+    opacity: 0;
+}
+
+.cartao-maior-acessoti:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 24px rgba(102, 160, 247, 0.1);
+}
+
+.cartoes-menores-acessoti {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); 
+    grid-gap: 10px;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+/* Animação de escala por coluna para os cartões menores */
+.cartao-menor-acessoti {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    padding: 10px;
+    width: 140px;
+    height: 120px;
+    cursor: pointer;
+    border: none;
+    text-align: center;
+    color: #2b3a5f;
+
+    /* Aplica a animação */
+    animation: fadeInScale 0.5s ease forwards;
+    opacity: 0;
+}
+
+/* Aplica um atraso incremental para que cada coluna apareça em momentos diferentes */
+.cartao-menor-acessoti:nth-child(5n+1) {
+    animation-delay: 0.1s;
+}
+.cartao-menor-acessoti:nth-child(5n+2) {
+    animation-delay: 0.2s;
+}
+.cartao-menor-acessoti:nth-child(5n+3) {
+    animation-delay: 0.3s;
+}
+.cartao-menor-acessoti:nth-child(5n+4) {
+    animation-delay: 0.4s;
+}
+.cartao-menor-acessoti:nth-child(5n+5) {
+    animation-delay: 0.5s;
+}
+
+.cartao-menor-acessoti:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 24px rgba(102, 160, 247, 0.1);
+}
+
+.icone-acessoti {
+    font-size: 40px;
+    margin-bottom: 10px;
+    color: #08548a;
+}
+
+.nome-acessoti {
+    font-size: 16px;
+    font-weight: 600;
+    color: #3e4676;
+}
+
+/* Ajustes responsivos */
+@media (max-width: 1024px) {
+    .cartao-maior-acessoti {
+        width: 160px;
+        height: 180px;
+    }
+
+    .cartao-menor-acessoti {
+        width: 120px;
+        height: 140px;
+    }
+
+    .icone-acessoti {
+        font-size: 35px;
+    }
+
+    .nome-acessoti {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 768px) {
+    .cartoes-menores-acessoti {
+        grid-template-columns: repeat(3, 1fr); 
+    }
+
+    .cartao-maior-acessoti {
+        width: 150px;
+        height: 170px;
+    }
+
+    .cartao-menor-acessoti {
+        width: 110px;
+        height: 130px;
+    }
+
+    .icone-acessoti {
+        font-size: 30px;
+    }
+
+    .nome-acessoti {
+        font-size: 12px;
+    }
+}

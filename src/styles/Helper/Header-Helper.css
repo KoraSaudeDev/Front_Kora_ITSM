@@ -1,0 +1,24 @@
+.cabecalho-helper {
+    background-color: #0b3554; 
+    width: 100%;
+    color: white;
+    padding: 26px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+.logo-helper {
+    width: 220px;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+    cursor: pointer;
+}
+
+.logo-helper:hover {
+    transform: scale(1.1);
+    opacity: 0.8;
+}

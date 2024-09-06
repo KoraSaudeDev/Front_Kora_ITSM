@@ -10,8 +10,9 @@ import Main from './components/Main';
 import Home from './pages/Home';
 import Login from './pages/Login';
 
-import HomeHelper from './components/HomeHelper';
-import AcessoTI from './components/AcessoTI';
+import HomeHelper from './components/Helper/HomeHelper';
+import AcessoTI from './components/Helper/AcessoTI';
+import AcessoRH from './components/Helper/AcessoRH';
 
 import MeusAtendimentos from './pages/Atendimentos/MeusAtendimentos';
 import MinhaEquipe from './pages/Atendimentos/MinhaEquipe';
@@ -40,6 +41,7 @@ const App = () => {
         <Routes>
           <Route path="/helper" element={<HomeHelper />} />
           <Route path="/helper/AcessoTI" element={<AcessoTI />} />
+          <Route path="/helper/AcessoRH" element={<AcessoRH />} />
           <Route path="/suporte/login" element={<Login />} />
           <Route path="/" element={<Navigate to="/helper" />} /> {/* Redireciona para /helper */}
           <Route
