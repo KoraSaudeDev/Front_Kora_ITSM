@@ -5,6 +5,6 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "33964:3000"
+      - "33963:3000"
     environment:
       - REACT_APP_API_BASE_URL=${REACT_APP_API_BASE_URL}
