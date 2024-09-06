@@ -7,17 +7,17 @@ import { faLaptopCode, faUsers, faShoppingCart, faDollarSign, faBullseye, faStet
 
 function HomeHelper() {
     const [imageLoaded, setImageLoaded] = useState(false);
-    const [showBalloon, setShowBalloon] = useState({});
+    const [alertas, setAlertas] = useState({}); 
     const navigate = useNavigate();
 
     const secoes = [
-        { nome: 'TI', icone: faLaptopCode },
-        { nome: 'RH', icone: faUsers },
-        { nome: 'Suprimentos', icone: faShoppingCart },
-        { nome: 'Financeiro', icone: faDollarSign },
-        { nome: 'Marketing', icone: faBullseye },
-        { nome: 'Assistencial', icone: faStethoscope },
-        { nome: 'Controladoria & Contabilidade', icone: faChartLine }
+        { nome: 'TI', icone: faLaptopCode, bgColor: '#F4E1C9', textColor: '#1c1c1e', habilitado: true },
+        { nome: 'RH', icone: faUsers, bgColor: '#A2C9E1', textColor: '#1c1c1e', habilitado: true },
+        { nome: 'Suprimentos', icone: faShoppingCart, bgColor: '#1C293E', textColor: '#ffffff', habilitado: true },
+        { nome: 'Financeiro', icone: faDollarSign, bgColor: '#A2C9E1', textColor: '#1c1c1e', habilitado: false },
+        { nome: 'Marketing', icone: faBullseye, bgColor: '#A2C9E1', textColor: '#1c1c1e', habilitado: true },
+        { nome: 'Assistencial', icone: faStethoscope, bgColor: '#F4E1C9', textColor: '#1c1c1e', habilitado: false },
+        { nome: 'Controladoria & Contabilidade', icone: faChartLine, bgColor: '#A2C9E1', textColor: '#1c1c1e', habilitado: false }
     ];
 
     useEffect(() => {
@@ -27,47 +27,41 @@ function HomeHelper() {
     }, []);
 
     const aoClicarHelper = (indice) => {
-        const secao = secoes[indice].nome;
-        if (secao === 'TI') {
-            navigate('/helper/acessoTI');
-        } else if (secao === 'RH') {
-            navigate('/helper/AcessoRH');
-        } else if (secao === 'Suprimentos') {
-            navigate('/helper/AcessoSuprimentos');
-        } else if (secao === 'Marketing') {
-            navigate('/helper/AcessoMarketing');
-        } else if (secao === 'Financeiro' || secao === 'Assistencial' || secao === 'Controladoria & Contabilidade') {
-            setShowBalloon((prevState) => ({
-                ...prevState,
-                [indice]: true
-            }));
+        const secao = secoes[indice];
+        if (!secao.habilitado) {
+            setAlertas((prevAlertas) => ({ ...prevAlertas, [indice]: 'Esta seção não está habilitada no QAS' }));
+
             setTimeout(() => {
-                setShowBalloon((prevState) => ({
-                    ...prevState,
-                    [indice]: false
-                }));
-            }, 3000);
+                setAlertas((prevAlertas) => ({ ...prevAlertas, [indice]: null }));
+            }, 3000); 
+        } else {
+            setAlertas((prevAlertas) => ({ ...prevAlertas, [indice]: null }));
+            switch (secao.nome) {
+                case 'TI': navigate('/helper/acessoTI'); break;
+                case 'RH': navigate('/helper/AcessoRH'); break;
+                case 'Suprimentos': navigate('/helper/AcessoSuprimentos'); break;
+                case 'Marketing': navigate('/helper/AcessoMarketing'); break;
+                default: break;
+            }
         }
     };
 
     return (
-        <div className={`background-branco ${imageLoaded ? 'image-loaded' : 'image-loading'}`}>
+        <div className={`background-branco-home ${imageLoaded ? 'image-loaded' : 'image-loading'}`}>
             <HeaderHelper />
-            <div className="container-helper">
-                <div className="cartoes-container-helper">
+            <div className="container-helper-home">
+                <div className="cartoes-container-helper-home">
                     {secoes.map((secao, indice) => (
-                        <div 
-                            key={indice} 
-                            className="cartao-helper" 
+                        <div
+                            key={indice}
+                            className={`cartao-helper-home pos-${indice}`} 
                             onClick={() => aoClicarHelper(indice)}
+                            style={{ backgroundColor: secao.bgColor }}
                         >
-                            <FontAwesomeIcon icon={secao.icone} className="icone-helper" />
-                            <div className="nome-helper">{secao.nome}</div>
-                            <button className="btn-acessar">Acessar</button>
-                            {showBalloon[indice] && (
-                                <div className="balloon-inside-card">
-                                    Não disponível no QAS
-                                </div>
+                            <FontAwesomeIcon icon={secao.icone} className="icone-constante-helper-home" style={{ color: secao.textColor }} />
+                            <div className="nome-helper-home" style={{ color: secao.textColor }}>{secao.nome}</div>
+                            {alertas[indice] && (
+                                <div className="alerta-helper-home">{alertas[indice]}</div>
                             )}
                         </div>
                     ))}

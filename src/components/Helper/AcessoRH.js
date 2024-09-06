@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../styles/Helper/AcessoRH.css';
-import HeaderHelper from './Header-Helper'; // Importando o HeaderHelper
+import HeaderHelper from './Header-Helper'; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLaptop, faUsers } from '@fortawesome/free-solid-svg-icons';
 
@@ -26,17 +26,17 @@ function AcessoRH() {
 
     return (
         <div className={`background-branco-TI ${imageLoaded ? 'image-loaded' : 'image-loading'}`}>
-            <HeaderHelper /> {/* Chamando o cabeçalho reutilizável */}
+            <HeaderHelper />
             <div className="container-acesso-rh">
                 <div className="cartoes-rh-acesso-rh">
                     {secoesRh.map((secao, indice) => (
                         <div
                             key={indice}
-                            className="cartao-rh-acesso-rh"
+                            className="cartao-maior-acessoti"
                             onClick={() => aoClicarHelper(secao)}
                         >
-                            <FontAwesomeIcon icon={secao.icone} className="icone-acesso-rh" />
-                            <div className="nome-acesso-rh">{secao.nome}</div>
+                            <FontAwesomeIcon icon={secao.icone} className="icone-acessoti" />
+                            <div className="nome-acessoti">{secao.nome}</div>
                         </div>
                     ))}
                 </div>

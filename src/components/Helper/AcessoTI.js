@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../styles/Helper/AcessoTI.css';
 import HeaderHelper from './Header-Helper';
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faEnvelope,
@@ -34,6 +33,8 @@ import {
 function AcessoTI() {
     const navigate = useNavigate();
     const [imageLoaded, setImageLoaded] = useState(false);
+    const [showAlert, setShowAlert] = useState(false); // Estado para mostrar ou esconder a tarja vermelha
+    const [alertMessage, setAlertMessage] = useState(''); // Mensagem da tarja
 
     const secoesMaiores = [
         { nome: 'MV', icone: faServer, link: 'https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#appName=TicketsGeral-448944302&view=Novo%20Ticket&defaults={"categoria":"MV"}' },
@@ -73,13 +74,24 @@ function AcessoTI() {
     }, []);
 
     const aoClicarHelper = (secao) => {
-        window.open(secao.link, '_blank');
+        if (['Arsenal', 'Controladoria', 'Financeiro'].includes(secao.nome)) {
+            setAlertMessage('Não contém no QAS'); // Define a mensagem de alerta
+            setShowAlert(true); // Mostra a tarja vermelha
+            setTimeout(() => setShowAlert(false), 3000); // Oculta a tarja após 3 segundos
+        } else {
+            window.open(secao.link, '_blank');
+        }
     };
 
     return (
         <div className={`background-branco-TI ${imageLoaded ? 'image-loaded' : 'image-loading'}`}>
             <HeaderHelper />
             <div className="container-acessoti">
+                {showAlert && (
+                    <div className="alert-bar">
+                        {alertMessage}
+                    </div>
+                )}
                 <div className="cartoes-maiores-acessoti">
                     {secoesMaiores.map((secao, indice) => (
                         <div
@@ -100,8 +112,8 @@ function AcessoTI() {
                             className="cartao-menor-acessoti"
                             onClick={() => aoClicarHelper(secao)}
                         >
-                            <FontAwesomeIcon icon={secao.icone} className="icone-acessoti" />
-                            <div className="nome-acessoti">{secao.nome}</div>
+                            <FontAwesomeIcon icon={secao.icone} className="icone-acessoti-menor" />
+                            <div className="nome-acessoti-menor">{secao.nome}</div>
                         </div>
                     ))}
                 </div>
@@ -111,4 +123,3 @@ function AcessoTI() {
 }
 
 export default AcessoTI;
-

@@ -31,11 +31,11 @@ function AcessoMarketing() {
                     {secoesMarketing.map((secao, indice) => (
                         <div
                             key={indice}
-                            className="cartao-marketing"
+                            className="cartao-maior-acessoti"
                             onClick={() => aoClicarHelper(secao)}
                         >
-                            <FontAwesomeIcon icon={secao.icone} className="icone-marketing" />
-                            <div className="nome-marketing">{secao.nome}</div>
+                            <FontAwesomeIcon icon={secao.icone} className="icone-acessoti" />
+                            <div className="nome-acessoti">{secao.nome}</div>
                         </div>
                     ))}
                 </div>

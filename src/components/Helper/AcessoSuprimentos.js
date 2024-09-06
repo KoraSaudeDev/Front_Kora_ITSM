@@ -36,11 +36,11 @@ function AcessoSuprimentos() {
                     {secoesSuprimentos.map((secao, indice) => (
                         <div
                             key={indice}
-                            className="cartao-suprimentos"
+                            className="cartao-maior-acessoti"
                             onClick={() => aoClicarHelper(secao)}
                         >
-                            <FontAwesomeIcon icon={secao.icone} className="icone-suprimentos" />
-                            <div className="nome-suprimentos">{secao.nome}</div>
+                            <FontAwesomeIcon icon={secao.icone} className="icone-acessoti" />
+                            <div className="nome-acessoti">{secao.nome}</div>
                         </div>
                     ))}
                 </div>
