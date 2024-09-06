@@ -286,10 +286,10 @@ main.mover.zoom {
 }
 
 .sidebar-footer {
-  position: absolute; /* Alinha o rodapé dentro da sidebar */
-  bottom: 0; /* Fixa no fundo da sidebar */
-  right: 0; /* Alinha à direita da sidebar */
-  width: 100%; /* Garante que o rodapé ocupe toda a largura da sidebar */
+  position: absolute; 
+  bottom: 0; 
+  right: 0; 
+  width: 100%; 
   font-size: 10px;
   color: #888;
   text-align: center;

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; // Importando Navigate
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; 
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import './App.css';
@@ -13,6 +13,8 @@ import Login from './pages/Login';
 import HomeHelper from './components/Helper/HomeHelper';
 import AcessoTI from './components/Helper/AcessoTI';
 import AcessoRH from './components/Helper/AcessoRH';
+import AcessoSuprimentos from './components/Helper/AcessoSuprimentos';
+import AcessoMarketing from './components/Helper/AcessoMarketing';
 
 import MeusAtendimentos from './pages/Atendimentos/MeusAtendimentos';
 import MinhaEquipe from './pages/Atendimentos/MinhaEquipe';
@@ -42,8 +44,10 @@ const App = () => {
           <Route path="/helper" element={<HomeHelper />} />
           <Route path="/helper/AcessoTI" element={<AcessoTI />} />
           <Route path="/helper/AcessoRH" element={<AcessoRH />} />
+          <Route path="/helper/AcessoSuprimentos" element={<AcessoSuprimentos />} />
+          <Route path="/helper/AcessoMarketing" element={<AcessoMarketing />} />
           <Route path="/suporte/login" element={<Login />} />
-          <Route path="/" element={<Navigate to="/helper" />} /> {/* Redireciona para /helper */}
+          <Route path="/" element={<Navigate to="/helper" />} /> 
           <Route
             path="/*"
             element={

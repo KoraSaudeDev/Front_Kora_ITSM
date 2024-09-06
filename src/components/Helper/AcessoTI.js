@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../styles/Helper/AcessoTI.css';
-import HeaderHelper from './Header-Helper'; // Ajuste o caminho conforme necessário
+import HeaderHelper from './Header-Helper';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {

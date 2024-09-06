@@ -1,12 +1,12 @@
 body, html {
     background: none;
-    background-color: #fff; /* ou a cor desejada */
+    background-color: #fff; 
     margin: 0;
     padding: 0;
 }
 
 .background-branco-TI.image-loading {
-    background-color: white; /* Cor de fundo enquanto a imagem carrega */
+    background-color: white; 
 }
 
 .background-branco-TI {
@@ -53,11 +53,11 @@ body, html {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin-top: 120px;
+    margin-top: 200px;
     width: 100%;
 }
 
-/* Animação para cartões maiores */
+
 @keyframes fadeInZoom {
     0% {
         opacity: 0;
@@ -69,7 +69,7 @@ body, html {
     }
 }
 
-/* Animação para cartões menores - efeito de escala por coluna */
+
 @keyframes fadeInScale {
     0% {
         opacity: 0;
@@ -85,7 +85,7 @@ body, html {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 20px;
+    gap: 10px;
     margin-bottom: 30px;
     flex-wrap: nowrap;
 }
@@ -107,7 +107,7 @@ body, html {
     text-align: center;
     color: #2b3a5f;
     
-    /* Aplica a animação */
+    
     animation: fadeInZoom 0.8s ease forwards;
     opacity: 0;
 }
@@ -119,14 +119,14 @@ body, html {
 
 .cartoes-menores-acessoti {
     display: grid;
-    grid-template-columns: repeat(5, 1fr); 
+    grid-template-columns: repeat(7, 1fr); 
     grid-gap: 10px;
     justify-content: center;
     align-items: center;
     margin-bottom: 30px;
 }
 
-/* Animação de escala por coluna para os cartões menores */
+
 .cartao-menor-acessoti {
     display: flex;
     flex-direction: column;
@@ -144,12 +144,12 @@ body, html {
     text-align: center;
     color: #2b3a5f;
 
-    /* Aplica a animação */
+    
     animation: fadeInScale 0.5s ease forwards;
     opacity: 0;
 }
 
-/* Aplica um atraso incremental para que cada coluna apareça em momentos diferentes */
+
 .cartao-menor-acessoti:nth-child(5n+1) {
     animation-delay: 0.1s;
 }
@@ -183,7 +183,7 @@ body, html {
     color: #3e4676;
 }
 
-/* Ajustes responsivos */
+
 @media (max-width: 1024px) {
     .cartao-maior-acessoti {
         width: 160px;

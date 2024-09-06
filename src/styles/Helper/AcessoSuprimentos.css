@@ -1,13 +1,24 @@
-.cartoes-rh-acesso-rh {
+
+
+.container-acesso-suprimentos {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    gap: 40px;
-    margin-top: 50px;
-    width: 100%;
+    justify-content: center;
+    margin-top: 150px;
 }
 
-.cartao-rh-acesso-rh {
+.cartoes-suprimentos {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    width: 80%;
+}
+
+
+.cartao-suprimentos {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -20,27 +31,35 @@
     width: 200px;
     height: 250px;
     cursor: pointer;
-    border: none;
     text-align: center;
     color: #2b3a5f;
-
-
-    animation: fadeInZoom 0.8s ease forwards;
     opacity: 0;
+    animation: fadeIn 0.8s ease forwards;
 }
 
-.cartao-rh-acesso-rh:hover {
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.cartao-suprimentos:hover {
     transform: scale(1.05);
     box-shadow: 0 12px 24px rgba(102, 160, 247, 0.1);
 }
 
-.icone-acesso-rh {
+.icone-suprimentos {
     font-size: 60px;
     margin-bottom: 20px;
     color: #08548a;
 }
 
-.nome-acesso-rh {
+.nome-suprimentos {
     font-size: 20px;
     font-weight: 600;
     color: #3e4676;

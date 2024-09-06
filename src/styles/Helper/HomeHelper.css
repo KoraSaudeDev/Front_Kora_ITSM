@@ -32,7 +32,7 @@ body, html {
     overflow-x: auto; 
 }
 
-/* Animação de entrada da esquerda para a direita com escala */
+
 @keyframes slideInFromLeft {
     0% {
         transform: translateX(-100px) scale(0.8);
@@ -65,13 +65,13 @@ body, html {
     font-weight: 500;
     backdrop-filter: blur(10px);
 
-    /* Animação inicial */
+    
     opacity: 0;
     animation: slideInFromLeft 0.5s ease forwards;
     animation-delay: var(--delay);
 }
 
-/* Atrasos personalizados para cada cartão */
+
 .cartao-helper:nth-child(1) {
     --delay: 0.1s;
 }
@@ -117,7 +117,7 @@ body, html {
     margin-top: 15px;
 }
 
-/* Botão Acessar */
+
 .btn-acessar {
     background-color: #007aff; 
     color: white;
@@ -135,7 +135,7 @@ body, html {
     transform: translateY(-3px);
 }
 
-/* Responsividade */
+
 @media (max-width: 768px) {
     .cartoes-container-helper {
         flex-direction: row;
