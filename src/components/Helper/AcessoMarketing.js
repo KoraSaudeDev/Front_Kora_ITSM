@@ -10,7 +10,7 @@ function AcessoMarketing() {
     const [imageLoaded, setImageLoaded] = useState(false);
 
     const secoesMarketing = [
-        { nome: 'Marketing e Comunicação', icone: faBullhorn, link: '#' }
+        { nome: 'Marketing e Comunicação', icone: faBullhorn, link: 'https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#appName=TicketsGeral-448944302&view=Novo%20Ticket&defaults={"categoria":"Marketing e Comunicacao"}' }
     ];
 
     useEffect(() => {
