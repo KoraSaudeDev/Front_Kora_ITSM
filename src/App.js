@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; // Importando Navigate
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import './App.css';
@@ -9,6 +9,9 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Main from './components/Main';
 import Home from './pages/Home';
 import Login from './pages/Login';
+
+import HomeHelper from './components/HomeHelper';
+import AcessoTI from './components/AcessoTI';
 
 import MeusAtendimentos from './pages/Atendimentos/MeusAtendimentos';
 import MinhaEquipe from './pages/Atendimentos/MinhaEquipe';
@@ -35,7 +38,10 @@ const App = () => {
     <AuthProvider>
       <Router>
         <Routes>
+          <Route path="/helper" element={<HomeHelper />} />
+          <Route path="/helper/AcessoTI" element={<AcessoTI />} />
           <Route path="/suporte/login" element={<Login />} />
+          <Route path="/" element={<Navigate to="/helper" />} /> {/* Redireciona para /helper */}
           <Route
             path="/*"
             element={
