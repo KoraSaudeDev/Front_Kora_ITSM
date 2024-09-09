@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FaSearch, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaSearch, FaChevronLeft, FaChevronRight, FaFilter } from 'react-icons/fa';
 import Modal from './ModalTicket';
+import caixaVazia from '../../assets/images/caixa-vazia.png';
+
+
 import axios from 'axios';
 
 const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket, onResetTicket, tipoTela }) => {
@@ -14,6 +17,8 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
     const [loading, setLoading] = useState(true);
     const [showNoDataMessage, setShowNoDataMessage] = useState(false);
     const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+    const [selectedColumnFilter, setSelectedColumnFilter] = useState('');
 
     const prevPageRef = useRef(currentPage);
     const prevItemsPerPageRef = useRef(itemsPerPage);
@@ -239,6 +244,11 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         return pageButtons;
     };
 
+    const columnOptions = [
+        'abertura', 'status', 'st_sla', 'categoria', 'subcategoria',
+        'assunto', 'data_limite', 'grupo', 'nome', 'area_negocio', 'hub', 'unidade'
+    ];
+
     return (
         <div className="container-meus-atendimentos" onClick={handleClearFiltro}>
             <div id="loading-overlay" className="loading-overlay">
@@ -252,6 +262,34 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                     <option value={50}>50</option>
                     <option value={100}>100</option>
                 </select>
+
+                <div className="filter-icon-container">
+                    <FaFilter 
+                        className="filter-icon" 
+                        onClick={() => setShowFilterDropdown(!showFilterDropdown)} 
+                    />
+                    {showFilterDropdown && (
+                        <div className="filter-dropdown">
+                            <h4>Selecione a Coluna para Filtrar</h4>
+                            <select
+                                value={selectedColumnFilter}
+                                onChange={(e) => setSelectedColumnFilter(e.target.value)}
+                                className="filter-column-select"
+                            >
+                                <option value="">Selecione uma Coluna</option>
+                                {columnOptions.map((col) => (
+                                    <option key={col} value={col}>
+                                        {col.charAt(0).toUpperCase() + col.slice(1)}
+                                    </option>
+                                ))}
+                            </select>
+                            <button className="save-filter-button" onClick={() => setShowFilterDropdown(false)}>
+                                Salvar
+                            </button>
+                        </div>
+                    )}
+                </div>
+
                 <div className="search-bar-container">
                     <FaSearch className="search-icon" />
                     <input
@@ -292,7 +330,10 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
             {loading && atendimentos.length === 0 ? (
                 <p>Buscando dados...</p>
             ) : atendimentosFiltrados.length === 0 && showNoDataMessage ? (
-                <p>Sem atendimentos no momento.</p>
+                <div className="no-data-container">
+                    <img src={caixaVazia} alt="Sem atendimentos" className="no-data-image" />
+                    <p id="sematendimento">Sem atendimentos no momento.</p>
+                </div>
             ) : (
                 <div className="tabela-container">
                     <table className="tabela-atendimentos">
