@@ -33,8 +33,8 @@ import {
 function AcessoTI() {
     const navigate = useNavigate();
     const [imageLoaded, setImageLoaded] = useState(false);
-    const [showAlert, setShowAlert] = useState(false); // Estado para mostrar ou esconder a tarja vermelha
-    const [alertMessage, setAlertMessage] = useState(''); // Mensagem da tarja
+    const [showAlert, setShowAlert] = useState(false); 
+    const [alertMessage, setAlertMessage] = useState(''); 
 
     const secoesMaiores = [
         { nome: 'MV', icone: faServer, link: 'https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#appName=TicketsGeral-448944302&view=Novo%20Ticket&defaults={"categoria":"MV"}' },
@@ -75,9 +75,9 @@ function AcessoTI() {
 
     const aoClicarHelper = (secao) => {
         if (['Arsenal', 'Controladoria', 'Financeiro'].includes(secao.nome)) {
-            setAlertMessage('Não contém no QAS'); // Define a mensagem de alerta
-            setShowAlert(true); // Mostra a tarja vermelha
-            setTimeout(() => setShowAlert(false), 3000); // Oculta a tarja após 3 segundos
+            setAlertMessage('Não contém no QAS'); 
+            setShowAlert(true); 
+            setTimeout(() => setShowAlert(false), 3000); 
         } else {
             window.open(secao.link, '_blank');
         }
@@ -108,12 +108,23 @@ function AcessoTI() {
                 <div className="cartoes-menores-acessoti">
                     {secoesMenores.map((secao, indice) => (
                         <div
-                            key={indice}
-                            className="cartao-menor-acessoti"
-                            onClick={() => aoClicarHelper(secao)}
+                        key={indice}
+                        className={`cartao-menor-acessoti ${secao.nome === 'Suporte' ? 'suporte-special' : ''}`}
+                        onClick={() => aoClicarHelper(secao)}
+                        style={secao.nome === 'Suporte' ? { backgroundColor: '#1C293E', color: 'white' } : {}}
+           
                         >
-                            <FontAwesomeIcon icon={secao.icone} className="icone-acessoti-menor" />
-                            <div className="nome-acessoti-menor">{secao.nome}</div>
+                           <FontAwesomeIcon 
+                            icon={secao.icone} 
+                            className="icone-acessoti-menor" 
+                            style={secao.nome === 'Suporte' ? { color: 'white' } : {}}
+                        />
+                           <div 
+                                className="nome-acessoti-menor" 
+                                style={secao.nome === 'Suporte' ? { color: 'white' } : {}}
+                            >
+                                {secao.nome}
+                            </div>
                         </div>
                     ))}
                 </div>

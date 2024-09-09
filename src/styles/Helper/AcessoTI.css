@@ -9,6 +9,15 @@ body, html {
     background-color: #F4fafd; 
 }
 
+@font-face {
+    font-family: 'kora-light';
+    src: url('../../assets/fonts/TTFirsNeue-Light.ttf') format('truetype');
+
+    font-style: normal;
+  }
+
+
+
 .background-branco-TI {
     background-size: 100% auto;
     background-position: center top;
@@ -146,9 +155,10 @@ body, html {
 }
 
 .cartao-maior-acessoti .nome-acessoti {
-    font-size: 18px;
+    font-size: 25px;
     font-weight: bold;
     color: #003b64;
+    font-family: 'TT Firs Neue Bold', sans-serif;
     margin-top: 100px;
     width: 100%;
     text-align: center;
@@ -167,6 +177,7 @@ body, html {
     justify-items: center;
     margin-bottom: 30px;
     max-width: 770px;
+    
 }
 
 .cartao-menor-acessoti {
@@ -186,6 +197,7 @@ body, html {
     text-align: center;
     color: #003b64;
     
+    
     animation: fadeInScale 0.5s ease forwards;
     opacity: 0;
 }
@@ -202,8 +214,10 @@ body, html {
 }
 
 .nome-acessoti-menor {
-    font-size: 14px;
+    font-size: 17.0px;
     font-weight: 600;
+    text-align: left;
+    font-family: 'kora-light', sans-serif;
     color: #003b64;
 }
 
@@ -234,6 +248,8 @@ body, html {
         font-size: 12px; 
     }
 }
+
+
 
 @media (max-width: 768px) {
     .cartoes-menores-acessoti {
@@ -270,4 +286,9 @@ body, html {
 .cartao-menor-acessoti svg {
     font-size: 40px;
     margin-top: 10px;
+}
+
+.container-acessoti .cartao-menor-acessoti.suporte-special {
+    background-color: #153C53 !important;
+    color: #ffff !important;
 }

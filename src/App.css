@@ -79,3 +79,10 @@ h1, h2, h3, h4, h5, h6 {
     transform: rotate(360deg);
   }
 }
+
+@font-face {
+  font-family: 'TT Firs Neue Bold';
+  src: url('./assets/fonts/TTFirsNeue-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
