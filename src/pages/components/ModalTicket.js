@@ -899,7 +899,7 @@ const Modal = ({ data, onClose }) => {
         } else if (prioridadeSelecionada === 'P7') {
             return prioridade.prioridade !== 'P6';
         }
-        return true;
+        return prioridade.prioridade !== 'P6' && prioridade.prioridade !== 'P7';
     });
 
     return (
