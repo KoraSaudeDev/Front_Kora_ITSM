@@ -42,7 +42,8 @@ const Modal = ({ data, onClose }) => {
         subcategoria: [],
         assunto: [],
         status: [],
-        destinatarios: []
+        destinatarios: [],
+        prioridades: []
     });
 
     const customStyles = {
@@ -169,48 +170,10 @@ const Modal = ({ data, onClose }) => {
         "Finalizado": "#434343",
         "Cancelado": "#D50000"
     };
-
     const slaOptions = {
         "Em Atraso": "#dc3545",
         "No Prazo": "#28a745"
     };
-    const prioridades = [
-        {
-            "prioridade": "P1",
-            "sla": "240",
-            "tipo_tempo": "Corrido"
-        },
-        {
-            "prioridade": "P2",
-            "sla": "480",
-            "tipo_tempo": "Corrido"
-        },
-        {
-            "prioridade": "P3",
-            "sla": "1200",
-            "tipo_tempo": "Útil"
-        },
-        {
-            "prioridade": "P4",
-            "sla": "1800",
-            "tipo_tempo": "Útil"
-        },
-        {
-            "prioridade": "P5",
-            "sla": "3000",
-            "tipo_tempo": "Útil"
-        },
-        {
-            "prioridade": "P6",
-            "sla": "4200",
-            "tipo_tempo": "Útil"
-        },
-        {
-            "prioridade": "P7",
-            "sla": "9000",
-            "tipo_tempo": "Útil"
-        }
-    ];
 
     useEffect(() => {
         axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/hub`)
@@ -324,6 +287,19 @@ const Modal = ({ data, onClose }) => {
             })
             .catch(error => {
                 console.error('Error fetching destinatarios options:', error);
+            });
+    }, []);
+
+    useEffect(() => {
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/sla`)
+            .then(response => {
+                setOptions(prevOptions => ({
+                    ...prevOptions,
+                    prioridades: response.data
+                }));
+            })
+            .catch(error => {
+                console.error("Erro ao buscar prioridades:", error);
             });
     }, []);
 
@@ -641,7 +617,7 @@ const Modal = ({ data, onClose }) => {
             status: statusParam === null ? toTitleCase(ultimoItem?.status ?? data.status) : statusParam,
             executor: id_executor === null ? (ultimoItem?.id_executor ?? data.executor) : id_executor,
             grupo: executor === null ? (ultimoItem?.executor ?? data.grupo) : executor,
-            sla: prioridades.find(line => line.prioridade === prioridadeSelecionada)?.sla ?? data.sla,
+            sla: options.prioridades.find(line => line.prioridade === prioridadeSelecionada)?.sla ?? data.sla,
             //resposta_chamado: resposta_chamado === '' ? null : resposta_chamado
         };
 
@@ -1097,7 +1073,7 @@ const Modal = ({ data, onClose }) => {
 
                         <p><strong className="data">Abertura:</strong> {formatDate(data.abertura)}</p>
                         <p><strong className="data">Data Limite:</strong> {formatDate(data.data_limite)}</p>
-                        <p><strong className="data">Tipo da SLA:</strong> {prioridades.find(p => p.prioridade === prioridadeSelecionada)?.tipo_tempo.toUpperCase() || ''}</p>
+                        <p><strong className="data">Tipo da SLA:</strong> {options.prioridades.find(p => p.prioridade === prioridadeSelecionada)?.tipo_tempo.toUpperCase() || ''}</p>
 
                         <div className="campo-editavel">
                             <strong>Analista Atual: <span className="campo-obrigatorio">*</span></strong>
@@ -1115,11 +1091,11 @@ const Modal = ({ data, onClose }) => {
                             <strong>Prioridade: <span className="campo-obrigatorio">*</span></strong>
                             <select
                                 value={prioridadeSelecionada}
-                                onChange={(e) => handlePrioridadeClick(e.target.value)}
+                                onChange={(e) => setPrioridadeSelecionada(e.target.value)}
                             >
-                                {prioridades.map(prioridade => (
+                                {options.prioridades.map(prioridade => (
                                     <option key={prioridade.prioridade} value={prioridade.prioridade}>
-                                        {prioridade.prioridade}
+                                        {prioridade.prioridade} - {prioridade.descricao}
                                     </option>
                                 ))}
                             </select>
