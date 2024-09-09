@@ -893,6 +893,14 @@ const Modal = ({ data, onClose }) => {
         value: destinatario.value,
         label: destinatario.label,
     }));
+    const filteredPrioridades = options.prioridades.filter(prioridade => {
+        if (prioridadeSelecionada === 'P6') {
+            return prioridade.prioridade !== 'P7';
+        } else if (prioridadeSelecionada === 'P7') {
+            return prioridade.prioridade !== 'P6';
+        }
+        return true;
+    });
 
     return (
         <div className="modal-overlay" onClick={handleOverlayClick}>
@@ -928,7 +936,7 @@ const Modal = ({ data, onClose }) => {
                             options={categoriaOptions}
                             isClearable
                             placeholder=""
-                            styles={customStyles} // Adiciona o estilo customizado aqui
+                            styles={customStyles}
                         />
                     </div>
                     <div className="campo-selecao">
@@ -941,7 +949,7 @@ const Modal = ({ data, onClose }) => {
                             isClearable
                             placeholder=""
                             isDisabled={!selectedCategoria}
-                            styles={customStyles} // Adiciona o estilo customizado aqui
+                            styles={customStyles}
                         />
                     </div>
                     <div className="campo-selecao">
@@ -954,7 +962,7 @@ const Modal = ({ data, onClose }) => {
                             isClearable
                             placeholder=""
                             isDisabled={!selectedSubcategoria}
-                            styles={customStyles} // Adiciona o estilo customizado aqui
+                            styles={customStyles}
                         />
                     </div>
                 </div>
@@ -1069,8 +1077,6 @@ const Modal = ({ data, onClose }) => {
                             </div>
                         </div>
 
-
-
                         <p><strong className="data">Abertura:</strong> {formatDate(data.abertura)}</p>
                         <p><strong className="data">Data Limite:</strong> {formatDate(data.data_limite)}</p>
                         <p><strong className="data">Tipo da SLA:</strong> {options.prioridades.find(p => p.prioridade === prioridadeSelecionada)?.tipo_tempo.toUpperCase() || ''}</p>
@@ -1093,9 +1099,11 @@ const Modal = ({ data, onClose }) => {
                                 value={prioridadeSelecionada}
                                 onChange={(e) => setPrioridadeSelecionada(e.target.value)}
                             >
-                                {options.prioridades.map(prioridade => (
+                                {filteredPrioridades.map(prioridade => (
                                     <option key={prioridade.prioridade} value={prioridade.prioridade}>
-                                        {prioridade.prioridade} - {prioridade.descricao}
+                                        {prioridade.prioridade}
+                                        {prioridade.prioridade !== 'P6' && prioridade.prioridade !== 'P7' &&
+                                            ` - ${prioridade.descricao}`}
                                     </option>
                                 ))}
                             </select>
