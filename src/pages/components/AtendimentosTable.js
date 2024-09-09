@@ -91,14 +91,24 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                 const response = await axios.request(config);
                 const fetchedAtendimentos = response.data.tickets;
                 const totalItems = response.data.total_items;
-                
+
+                const slaData = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/sla`);
+
+                const atendimentosWithSla = fetchedAtendimentos.map(atendimento => {
+                    const slaInfo = slaData?.data.find(sla => sla.prioridade === atendimento.ds_nivel);
+                    return {
+                        ...atendimento,
+                        slaDescricao: slaInfo ? `${slaInfo.prioridade} - ${slaInfo.descricao}` : atendimento.ds_nivel
+                    };
+                });
+
                 hideLoadingOverlay();
 
-                setAtendimentos(fetchedAtendimentos);
+                setAtendimentos(atendimentosWithSla);
                 setTotalPages(Math.ceil(totalItems / itemsPerPage));
                 localStorage.setItem(
                     cacheKey,
-                    JSON.stringify({ tickets: fetchedAtendimentos, totalItems })
+                    JSON.stringify({ tickets: atendimentosWithSla, totalItems })
                 );
 
                 setLoading(false);
@@ -389,6 +399,18 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                     SLA
                                 </th>
                                 <th
+                                    onClick={() => handleSort('ds_nivel')}
+                                    className={
+                                        sortColumn === 'ds_nivel'
+                                            ? sortDirection === 'asc'
+                                                ? 'sorted-asc'
+                                                : 'sorted-desc'
+                                            : ''
+                                    }
+                                >
+                                    Prioridade
+                                </th>
+                                <th
                                     onClick={() => handleSort('categoria')}
                                     className={
                                         sortColumn === 'categoria'
@@ -539,6 +561,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                             {atendimento.sla_util}
                                         </span>
                                     </td>
+                                    <td id='cont-tabela'>{atendimento.slaDescricao}</td>
                                     <td id='cont-tabela'>{atendimento.categoria}</td>
                                     <td id='cont-tabela'>{atendimento.subcategoria}</td>
                                     <td id='cont-tabela'>{atendimento.assunto}</td>
