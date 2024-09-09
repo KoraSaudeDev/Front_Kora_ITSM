@@ -7,8 +7,8 @@ body, html {
 .background-branco-home {
     background: white url('../../assets/images/fundo_site.png') no-repeat center top;
     background-size: cover;
-    min-height: 137.1vh;
-    zoom: 0.9;
+    min-height: 123.5vh;
+    zoom: 1;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -32,6 +32,7 @@ body, html {
     align-items: center;
     margin-top: 5%;
     max-width: 100%;
+    margin-left: 10%;
 }
 
 .cartao-helper-home {
@@ -42,7 +43,7 @@ body, html {
     position: relative;
     width: 100%;
     aspect-ratio: 1;
-    max-width: 195px;
+    max-width: 270px;
     border-radius: 0px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
     transition: transform 0.5s ease, box-shadow 0.3s ease;
@@ -119,8 +120,8 @@ body, html {
 }
 
 .nome-helper-home {
-    font-size: 1.125rem;
-    font-weight: 600;
+    font-size: 1.200rem;
+    font-weight: bold;
     margin-top: 0.625rem;
     text-align: center;
     width: 100%;
@@ -173,15 +174,15 @@ body, html {
     left: 1rem;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1600px) {
     .cartoes-container-helper-home {
         grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
         grid-auto-rows: 1fr;
-        margin-top: 2%;
+        margin-top: 6%;
     }
 
     .cartao-helper-home {
-        max-width: 140px;
+        max-width: 230px;
     }
 
     .icone-helper-home {
@@ -192,6 +193,28 @@ body, html {
         font-size: 1rem;
     }
 }
+
+/* Responsividade para telas de até 1400px */
+@media (max-width: 1400px) {
+    .cartoes-container-helper-home {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        grid-auto-rows: 1fr;
+        margin-top: 2%;
+    }
+
+    .cartao-helper-home {
+        max-width: 170px;
+    }
+
+    .icone-helper-home {
+        font-size: 4rem;
+    }
+
+    .nome-helper-home {
+        font-size: 1rem;
+    }
+}
+
 
 .cartao-helper-home svg {
     font-size: 2rem;
