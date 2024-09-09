@@ -24,8 +24,17 @@ const Login = () => {
     }
   }, [login, navigate]);
 
+  const showLoadingOverlay = () => {
+    document.getElementById('loading-overlay').style.display = 'flex';
+  };
+
+  const hideLoadingOverlay = () => {
+    document.getElementById('loading-overlay').style.display = 'none';
+  };
+
   const onSuccess = async (res) => {
     try {
+      showLoadingOverlay();
       const token = res?.credential;
       const user = jwtDecode(token);
 
@@ -38,15 +47,37 @@ const Login = () => {
 
       const response = await axios.request(config);
 
-      if (response.data.filas) user.filas = response.data.filas;
-      if (response.data.filas_id) user.filas_id = response.data.filas_id;
-      if (response.data.id_user) user.id_user = response.data.id_user;
+      if (response.data.gestor) {
+        const uniqueIds = new Set();
+
+        for (const filaId in response.data.gestor) {
+          if (response.data.gestor.hasOwnProperty(filaId)) {
+            const fila = response.data.gestor[filaId];
+
+            uniqueIds.add(filaId);
+
+            fila.usuarios.forEach(userId => uniqueIds.add(userId));
+          }
+        }
+
+        user.filas_id = Array.from(uniqueIds);
+
+        if (response.data.filas) user.filas = response.data.filas;
+        if (response.data.id_user) user.id_user = response.data.id_user;
+      }
+      else {
+        if (response.filas) user.filas = response.data.filas;
+        if (response.data.filas_id) user.filas_id = response.data.filas_id;
+        if (response.data.id_user) user.id_user = response.data.id_user;
+      }
 
       setUserData(user);
       login(user);
       navigate('/suporte/minha-equipe');
+      hideLoadingOverlay();
     } catch (error) {
       console.error(error);
+      hideLoadingOverlay();
     }
   };
 
@@ -60,6 +91,9 @@ const Login = () => {
 
   return (
     <div className="custom-login-background">
+      <div id="loading-overlay" className="loading-overlay">
+        <div className="loading-spinner"></div>
+      </div>
       <div className="custom-login-container">
         <div className="custom-login-box">
           <img
@@ -93,7 +127,7 @@ const Login = () => {
             </label>
           </div>
           <div className="sidebar-footer">
-            <p>Version 1.010</p>
+            <p>Version 1.011</p>
           </div>
         </div>
       </div>
