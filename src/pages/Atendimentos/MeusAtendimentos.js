@@ -12,6 +12,7 @@ const MeusAtendimentos = ({ selectedTicket, onResetTicket }) => {
             selectedTicket={selectedTicket}
             onResetTicket={onResetTicket}
             tipoTela='meus_atendimentos'
+            filtroUrl={`${process.env.REACT_APP_API_BASE_URL}/tickets/meus-atendimentos/distinct?user_id=${user.id_user}`}
         />
     );
 };

@@ -6,7 +6,7 @@ import caixaVazia from '../../assets/images/caixa-vazia.png';
 
 import axios from 'axios';
 
-const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket, onResetTicket, tipoTela }) => {
+const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket, onResetTicket, tipoTela, filtroUrl }) => {
     const [atendimentos, setAtendimentos] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [modalData, setModalData] = useState(null);
@@ -169,7 +169,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         let config = {
             method: 'post',
             maxBodyLength: Infinity,
-            url: `${process.env.REACT_APP_API_BASE_URL}/tickets/minha-equipe/distinct`,
+            url: filtroUrl,
             headers: {
                 'Content-Type': 'application/json'
             },
