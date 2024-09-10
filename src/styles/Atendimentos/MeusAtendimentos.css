@@ -1829,3 +1829,45 @@ th.sorted-desc::before {
     font-size: 20px;
     font-weight: bold;
 }
+
+
+.campo {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.campo label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #3E4676;
+    margin-bottom: 5px;
+}
+
+.campo input[type="text"],
+.campo input[type="number"],
+.campo input[type="email"],
+.campo textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.campo input[type="text"]:focus,
+.campo input[type="number"]:focus,
+.campo input[type="email"]:focus,
+.campo textarea:focus {
+    border-color: #007aff; /* Cor quando o campo está em foco */
+}
+
+
+
+.campo-obrigatorio {
+    color: #007aff; /* Cor azul para o asterisco */
+    font-size: 12px;
+}
+

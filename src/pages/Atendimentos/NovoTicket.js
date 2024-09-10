@@ -4,6 +4,178 @@ import axios from 'axios';
 import 'styles/Atendimentos/NovoTicket.css';
 import { useAuth } from '../../context/AuthContext';
 
+const camposAcessoRede = {
+    "Acesso/Rede": {
+        "Alias (Apelido) de E-mail": {
+            "Exclusão": [
+                { id: "emailRecebimentoAlias", label: "Email Recebimento Alias", type: "email", className: "campo" },
+                { id: "enderecoAlias", label: "Endereço Alias", type: "text", className: "campo" }
+            ],
+            "Novo": [
+                { id: "emailRecebimentoAlias", label: "Email Recebimento Alias", type: "email", className: "campo" },
+                { id: "enderecoAlias", label: "Endereço Alias", type: "text", className: "campo" }
+            ]
+        },
+        "Caixas Compartilhadas": {
+            "Alteração Nome": [
+                { id: "telefone", label: "Telefone para contato", type: "number", className: "campo" },
+                { id: "gestor", label: "Gestor Imediato", type: "text", className: "campo" },
+                { id: "emailGestor", label: "E-mail Gestor Imediato", type: "email", className: "campo" },
+                { id: "gerenteArea", label: "Gerente da Área", type: "text", className: "campo" },
+                { id: "emailGerente", label: "E-mail Gerente", type: "email", className: "campo" }
+            ],
+            "Exclusão": [
+                { id: "telefone", label: "Telefone para contato", type: "number", className: "campo" },
+                { id: "gestor", label: "Gestor Imediato", type: "text", className: "campo" },
+                { id: "emailGestor", label: "E-mail Gestor Imediato", type: "email", className: "campo" },
+                { id: "gerenteArea", label: "Gerente da Área", type: "text", className: "campo" },
+                { id: "emailGerente", label: "E-mail Gerente", type: "email", className: "campo" }
+            ],
+            "Novo": [
+                { id: "telefone", label: "Telefone para contato", type: "number", className: "campo" },
+                { id: "gestor", label: "Gestor Imediato", type: "text", className: "campo" },
+                { id: "emailGestor", label: "E-mail Gestor Imediato", type: "email", className: "campo" },
+                { id: "gerenteArea", label: "Gerente da Área", type: "text", className: "campo" },
+                { id: "emailGerente", label: "E-mail Gerente", type: "email", className: "campo" }
+            ],
+            "Permissões": [
+                { id: "telefone", label: "Telefone para contato", type: "number", className: "campo" },
+                { id: "gestor", label: "Gestor Imediato", type: "text", className: "campo" },
+                { id: "emailGestor", label: "E-mail Gestor Imediato", type: "email", className: "campo" },
+                { id: "gerenteArea", label: "Gerente da Área", type: "text", className: "campo" },
+                { id: "emailGerente", label: "E-mail Gerente", type: "email", className: "campo" }
+            ]
+        },
+        "Contas de E-mail/Rede": {
+            "Alteração Nome": [
+                { id: "nomeCompleto", label: "Nome Completo Usuário", type: "text", className: "campo" },
+                { id: "telefone", label: "Telefone para contato", type: "number", className: "campo" },
+                { id: "gestor", label: "Gestor Imediato", type: "text", className: "campo" },
+                { id: "emailGestor", label: "E-mail Gestor Imediato", type: "email", className: "campo" },
+                { id: "gerenteArea", label: "Gerente da Área", type: "text", className: "campo" },
+                { id: "emailGerente", label: "E-mail Gerente", type: "email", className: "campo" }
+            ],
+            "Criação de E-mail e Login de Rede": [
+                { id: "nomeCompleto", label: "Nome Completo Usuário", type: "text", className: "campo" },
+                { id: "matricula", label: "Matrícula no Sênio (RH)", type: "text", className: "campo" },
+                { id: "tipoColaborador", label: "Tipo Colaborador", type: "radio", options: ["Funcionário", "Terceirizado"], className: "campo" },
+                { id: "hub", label: "HUB Novo Usuário", type: "select", api: "/api/hubs", className: "campo" },
+                { id: "cargo", label: "Cargo", type: "select", api: "/api/cargos", className: "campo" },
+                { id: "departamento", label: "Departamento", type: "select", api: "/api/departamentos", className: "campo" },
+                { id: "telefone", label: "Telefone para contato", type: "number", className: "campo" },
+                { id: "licenca", label: "Licença do Novo Usuário", type: "select", options: ["Frontline Starter", "Enterprise Starter", "Enterprise Standard"], className: "campo" },
+                { id: "custo", label: "Custo", type: "number", className: "campo" },
+                { id: "gestor", label: "Gestor Imediato", type: "text", className: "campo" },
+                { id: "emailGestor", label: "E-mail Gestor Imediato", type: "email", className: "campo" },
+                { id: "gerenteArea", label: "Gerente da Área", type: "text", className: "campo" },
+                { id: "emailGerente", label: "E-mail Gerente", type: "email", className: "campo" }
+            ],
+            "E-mail": [
+                { id: "nomeCompleto", label: "Nome Completo Usuário", type: "text", className: "campo" },
+                { id: "matricula", label: "Matrícula no Sênio (RH)", type: "text", className: "campo" },
+                { id: "tipoColaborador", label: "Tipo Colaborador", type: "radio", options: ["Funcionário", "Terceirizado"], className: "campo" },
+                { id: "hub", label: "HUB Novo Usuário", type: "select", api: "/api/hubs", className: "campo" },
+                { id: "cargo", label: "Cargo", type: "select", api: "/api/cargos", className: "campo" },
+                { id: "departamento", label: "Departamento", type: "select", api: "/api/departamentos", className: "campo" },
+                { id: "telefone", label: "Telefone para contato", type: "number", className: "campo" },
+                { id: "licenca", label: "Licença do Novo Usuário", type: "select", options: ["Frontline Starter", "Enterprise Starter", "Enterprise Standard"], className: "campo" },
+                { id: "custo", label: "Custo", type: "number", className: "campo" },
+                { id: "gestor", label: "Gestor Imediato", type: "text", className: "campo" },
+                { id: "emailGestor", label: "E-mail Gestor Imediato", type: "email", className: "campo" },
+                { id: "gerenteArea", label: "Gerente da Área", type: "text", className: "campo" },
+                { id: "emailGerente", label: "E-mail Gerente", type: "email", className: "campo" }
+            ],
+            "Exclusão de Usuário": [
+                { id: "nomeCompleto", label: "Nome Completo Usuário", type: "text", className: "campo" },
+                { id: "telefone", label: "Telefone para contato", type: "number", className: "campo" },
+                { id: "gestor", label: "Gestor Imediato", type: "text", className: "campo" },
+                { id: "emailGestor", label: "E-mail Gestor Imediato", type: "email", className: "campo" },
+                { id: "gerenteArea", label: "Gerente da Área", type: "text", className: "campo" },
+                { id: "emailGerente", label: "E-mail Gerente", type: "email", className: "campo" }
+            ],
+            "Rede": [
+                { id: "nomeCompleto", label: "Nome Completo Usuário", type: "text", className: "campo" },
+                { id: "matricula", label: "Matrícula no Sênio (RH)", type: "text", className: "campo" },
+                { id: "tipoColaborador", label: "Tipo Colaborador", type: "radio", options: ["Funcionário", "Terceirizado"], className: "campo" },
+                { id: "hub", label: "HUB Novo Usuário", type: "select", api: "/api/hubs", className: "campo" },
+                { id: "cargo", label: "Cargo", type: "select", api: "/api/cargos", className: "campo" },
+                { id: "departamento", label: "Departamento", type: "select", api: "/api/departamentos", className: "campo" },
+                { id: "telefone", label: "Telefone para contato", type: "number", className: "campo" },
+                { id: "gestor", label: "Gestor Imediato", type: "text", className: "campo" },
+                { id: "emailGestor", label: "E-mail Gestor Imediato", type: "email", className: "campo" },
+                { id: "gerenteArea", label: "Gerente da Área", type: "text", className: "campo" },
+                { id: "emailGerente", label: "E-mail Gerente", type: "email", className: "campo" }
+            ]
+        },
+        "Drives Compartilhados": {
+            "Alteração Nome": [
+                { id: "telefone", label: "Telefone para contato", type: "number", className: "campo" },
+                { id: "gestor", label: "Gestor Imediato", type: "text", className: "campo" },
+                { id: "emailGestor", label: "E-mail Gestor Imediato", type: "email", className: "campo" },
+                { id: "gerenteArea", label: "Gerente da Área", type: "text", className: "campo" },
+                { id: "emailGerente", label: "E-mail Gerente", type: "email", className: "campo" }
+            ],
+            "Exclusão": [
+                { id: "telefone", label: "Telefone para contato", type: "number", className: "campo" },
+                { id: "gestor", label: "Gestor Imediato", type: "text", className: "campo" },
+                { id: "emailGestor", label: "E-mail Gestor Imediato", type: "email", className: "campo" },
+                { id: "gerenteArea", label: "Gerente da Área", type: "text", className: "campo" },
+                { id: "emailGerente", label: "E-mail Gerente", type: "email", className: "campo" }
+            ],
+            "Novo": [
+                { id: "telefone", label: "Telefone para contato", type: "number", className: "campo" },
+                { id: "gestor", label: "Gestor Imediato", type: "text", className: "campo" },
+                { id: "emailGestor", label: "E-mail Gestor Imediato", type: "email", className: "campo" },
+                { id: "gerenteArea", label: "Gerente da Área", type: "text", className: "campo" },
+                { id: "emailGerente", label: "E-mail Gerente", type: "email", className: "campo" }
+            ],
+            "Permissões": [
+                { id: "telefone", label: "Telefone para contato", type: "number", className: "campo" },
+                { id: "gestor", label: "Gestor Imediato", type: "text", className: "campo" },
+                { id: "emailGestor", label: "E-mail Gestor Imediato", type: "email", className: "campo" },
+                { id: "gerenteArea", label: "Gerente da Área", type: "text", className: "campo" },
+                { id: "emailGerente", label: "E-mail Gerente", type: "email", className: "campo" }
+            ]
+        },
+        "Lista/Grupo de Distribuição": {
+            "Alteração Nome": [
+                { id: "telefone", label: "Telefone para contato", type: "number", className: "campo" },
+                { id: "gestor", label: "Gestor Imediato", type: "text", className: "campo" },
+                { id: "emailGestor", label: "E-mail Gestor Imediato", type: "email", className: "campo" },
+                { id: "gerenteArea", label: "Gerente da Área", type: "text", className: "campo" },
+                { id: "emailGerente", label: "E-mail Gerente", type: "email", className: "campo" }
+            ],
+            "Exclusão": [
+                { id: "telefone", label: "Telefone para contato", type: "number", className: "campo" },
+                { id: "gestor", label: "Gestor Imediato", type: "text", className: "campo" },
+                { id: "emailGestor", label: "E-mail Gestor Imediato", type: "email", className: "campo" },
+                { id: "gerenteArea", label: "Gerente da Área", type: "text", className: "campo" },
+                { id: "emailGerente", label: "E-mail Gerente", type: "email", className: "campo" }
+            ],
+            "Novo": [
+                { id: "telefone", label: "Telefone para contato", type: "number", className: "campo" },
+                { id: "gestor", label: "Gestor Imediato", type: "text", className: "campo" },
+                { id: "emailGestor", label: "E-mail Gestor Imediato", type: "email", className: "campo" },
+                { id: "gerenteArea", label: "Gerente da Área", type: "text", className: "campo" },
+                { id: "emailGerente", label: "E-mail Gerente", type: "email", className: "campo" }
+            ],
+            "Permissões": [
+                { id: "telefone", label: "Telefone para contato", type: "number", className: "campo" },
+                { id: "gestor", label: "Gestor Imediato", type: "text", className: "campo" },
+                { id: "emailGestor", label: "E-mail Gestor Imediato", type: "email", className: "campo" },
+                { id: "gerenteArea", label: "Gerente da Área", type: "text", className: "campo" },
+                { id: "emailGerente", label: "E-mail Gerente", type: "email", className: "campo" }
+            ]
+        },
+        "Reset de senha E-mail Google": {
+            "Solicitar": [
+                { id: "nomeCompleto", label: "Nome Completo Usuário", type: "text", className: "campo" },
+                { id: "telefone", label: "Telefone para contato", type: "number", className: "campo" }
+            ]
+        }
+    }
+};
+
 const NovoTicket = () => {
     const { user } = useAuth();
     const [options, setOptions] = useState({
@@ -19,14 +191,15 @@ const NovoTicket = () => {
     const [selectedCategoria, setSelectedCategoria] = useState(null);
     const [selectedSubcategoria, setSelectedSubcategoria] = useState(null);
     const [selectedAssunto, setSelectedAssunto] = useState(null);
+    const [dynamicFields, setDynamicFields] = useState([]);
 
     const customStyles = {
         control: (provided, state) => ({
             ...provided,
             borderColor: state.isFocused ? '#007aff' : '#ddd',
-            boxShadow: state.isFocused ? '0 0 0 1px #007aff' : 'none', 
+            boxShadow: state.isFocused ? '0 0 0 1px #007aff' : 'none',
             '&:hover': {
-                borderColor: '#007aff', 
+                borderColor: '#007aff',
             },
         }),
         singleValue: (provided) => ({
@@ -46,6 +219,7 @@ const NovoTicket = () => {
         return `${dia}/${mes}/${ano} ${horas}:${minutos}:${segundos}`;
     };
 
+    // Carregar hubs e categorias no início
     useEffect(() => {
         axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/hub`)
             .then(response => {
@@ -62,6 +236,7 @@ const NovoTicket = () => {
             .catch(error => console.error('Erro ao carregar categorias:', error));
     }, []);
 
+    // Carregar unidades ao selecionar hub
     useEffect(() => {
         if (selectedHub) {
             axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/unidade?hub=${selectedHub.value}`)
@@ -75,6 +250,7 @@ const NovoTicket = () => {
         }
     }, [selectedHub]);
 
+    // Carregar subcategorias ao selecionar categoria
     useEffect(() => {
         if (selectedCategoria) {
             axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/subcategorias?categoria=${selectedCategoria.value}`)
@@ -89,9 +265,10 @@ const NovoTicket = () => {
         }
     }, [selectedCategoria]);
 
+    // Carregar assuntos ao selecionar subcategoria
     useEffect(() => {
         if (selectedSubcategoria) {
-            axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/assuntos?categoria=${selectedCategoria.value}&subcategoria=${selectedSubcategoria.value}`)
+            axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/assuntos?categoria=${selectedCategoria?.value}&subcategoria=${selectedSubcategoria?.value}`)
                 .then(response => {
                     const assuntos = response.data.map(assunto => ({ value: assunto.assunto, label: assunto.assunto }));
                     setOptions(prev => ({ ...prev, assunto: assuntos }));
@@ -102,8 +279,28 @@ const NovoTicket = () => {
         }
     }, [selectedSubcategoria]);
 
+    // Atualizar campos dinâmicos ao selecionar categoria, subcategoria e assunto
+    useEffect(() => {
+        if (selectedCategoria && selectedSubcategoria && selectedAssunto) {
+            const categoria = selectedCategoria.value;
+            const subcategoria = selectedSubcategoria.value;
+            const assunto = selectedAssunto.value;
+
+            // Verifique se a categoria, subcategoria e assunto existem no objeto camposAcessoRede
+            const campos = camposAcessoRede?.[categoria]?.[subcategoria]?.[assunto];
+            if (campos) {
+                setDynamicFields(campos);
+            } else {
+                setDynamicFields([]);
+            }
+        } else {
+            setDynamicFields([]);
+        }
+    }, [selectedCategoria, selectedSubcategoria, selectedAssunto]);
+
     const handleSubmit = (e) => {
         e.preventDefault();
+        // Função para tratar o envio do formulário
     };
 
     return (
@@ -122,7 +319,7 @@ const NovoTicket = () => {
                         </div>
                         <div className="campo">
                             <label htmlFor="email">E-mail Solicitante <span className="campo-obrigatorio">*</span></label>
-                            <input type="email" value={user.email} id="email" name="email" required  readOnly className="campo-leitura"/>
+                            <input type="email" value={user.email} id="email" name="email" required readOnly className="campo-leitura" />
                         </div>
                         <div className="campo">
                             <label htmlFor="matricula">Matrícula <span className="campo-obrigatorio">*</span></label>
@@ -195,6 +392,38 @@ const NovoTicket = () => {
                                 isDisabled={!selectedSubcategoria}
                             />
                         </div>
+
+                        {/* Renderizar campos dinâmicos */}
+                        {dynamicFields.length > 0 && (
+                            <div className="campo-dinamico">
+                                
+                                {dynamicFields.map(field => (
+                                    <div key={field.id} className="campo">
+                                        <label htmlFor={field.id}>{field.label} <span className="campo-obrigatorio">*</span></label>
+                                        {field.type === 'text' && (
+                                            <input type="text" id={field.id} name={field.id} required />
+                                        )}
+                                        {field.type === 'email' && (
+                                            <input type="email" id={field.id} name={field.id} required />
+                                        )}
+                                        {field.type === 'number' && (
+                                            <input type="number" id={field.id} name={field.id} required />
+                                        )}
+                                        {field.type === 'radio' && field.options && (
+                                            <div>
+                                                {field.options.map(option => (
+                                                    <label key={option}>
+                                                        <input type="radio" name={field.id} value={option} required />
+                                                        {option}
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
                         <div className="campo">
                             <label htmlFor="descricao">Descrição <span className="campo-obrigatorio">*</span></label>
                             <textarea id="descricao" name="descricao" rows="5" required></textarea>
