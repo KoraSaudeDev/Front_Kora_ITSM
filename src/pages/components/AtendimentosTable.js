@@ -18,7 +18,35 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
     const [showNoDataMessage, setShowNoDataMessage] = useState(false);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+    const [filterOptions, setFilterOptions] = useState({});
     const [sortOrders, setSortOrders] = useState({});
+    const [dateFilters, setDateFilters] = useState({
+        abertura: { startDate: '', endDate: '' },
+        data_limite: { startDate: '', endDate: '' }
+    });
+    const [dateErrors, setDateErrors] = useState({
+        abertura: '',
+        data_limite: ''
+    });
+
+    const columnOptions = [
+        'abertura', 'status', 'st_sla', 'categoria', 'subcategoria',
+        'assunto', 'data_limite', 'grupo', 'nome', 'area_negocio', 'hub', 'unidade'
+    ];
+    const columnDescriptions = {
+        abertura: 'Abertura',
+        status: 'Status',
+        st_sla: 'SLA',
+        categoria: 'Categoria',
+        subcategoria: 'Subcategoria',
+        assunto: 'Assunto',
+        data_limite: 'Data limite',
+        grupo: 'Analista Atual',
+        nome: 'Nome',
+        area_negocio: 'Área de negócio',
+        hub: 'HUB',
+        unidade: 'Unidade de negócio'
+    };
 
     const prevPageRef = useRef(currentPage);
     const prevItemsPerPageRef = useRef(itemsPerPage);
@@ -137,6 +165,30 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         }
     }, [selectedTicket]);
 
+    useEffect(() => {
+        let config = {
+            method: 'post',
+            maxBodyLength: Infinity,
+            url: `${process.env.REACT_APP_API_BASE_URL}/tickets/minha-equipe/distinct`,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: filtrosExtras
+        };
+
+        axios.request(config)
+            .then(response => {
+                if (response.data.sla_util) {
+                    response.data.st_sla = response.data.sla_util;
+                    delete response.data.sla_util;
+                }
+                setFilterOptions(response.data);
+            })
+            .catch(error => {
+                console.error('Error fetching filter options:', error);
+            });
+    }, []);
+
     const showLoadingOverlay = () => {
         document.getElementById('loading-overlay').style.display = 'flex';
     };
@@ -208,6 +260,40 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         });
     };
 
+    const handleDateChange = (column, type, value) => {
+        const newDateFilters = {
+            ...dateFilters,
+            [column]: {
+                ...dateFilters[column],
+                [type]: value
+            }
+        };
+
+        if (newDateFilters[column].startDate && newDateFilters[column].endDate) {
+            if (new Date(newDateFilters[column].startDate) > new Date(newDateFilters[column].endDate)) {
+                setDateErrors(prev => ({
+                    ...prev,
+                    [column]: 'A data de início não pode ser posterior à data de fim.'
+                }));
+                
+                setTimeout(() => {
+                    setDateErrors(prev => ({
+                        ...prev,
+                        [column]: ''
+                    }));
+                }, 3000);
+                return;
+            } else {
+                setDateErrors(prev => ({
+                    ...prev,
+                    [column]: ''
+                }));
+            }
+        }
+
+        setDateFilters(newDateFilters);
+    };
+
     const handleSaveFilters = () => {
         console.log('Filter and Sort Orders:', sortOrders);
         setShowFilterDropdown(false);
@@ -276,25 +362,6 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         return pageButtons;
     };
 
-    const columnOptions = [
-        'abertura', 'status', 'st_sla', 'categoria', 'subcategoria',
-        'assunto', 'data_limite', 'grupo', 'nome', 'area_negocio', 'hub', 'unidade'
-    ];
-    const columnDescriptions = {
-        abertura: 'Abertura',
-        status: 'Status',
-        st_sla: 'SLA',
-        categoria: 'Categoria',
-        subcategoria: 'Subcategoria',
-        assunto: 'Assunto',
-        data_limite: 'Data limite',
-        grupo: 'Analista Atual',
-        nome: 'Nome',
-        area_negocio: 'Área de negócio',
-        hub: 'HUB',
-        unidade: 'Unidade de negócio'
-    };
-
     return (
         <div className="container-meus-atendimentos" onClick={handleClearFiltro}>
             <div id="loading-overlay" className="loading-overlay">
@@ -322,11 +389,35 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                 <div key={col} className="filter-option">
                                     <h5>{columnDescriptions[col] || col.charAt(0).toUpperCase() + col.slice(1)}</h5>
                                     <div className="filter-select-container">
-                                        <select className="filter-column-select">
-                                            <option value={col}>
-                                                {col.charAt(0).toUpperCase() + col.slice(1)}
-                                            </option>
-                                        </select>
+                                        {col === 'abertura' || col === 'data_limite' ? (
+                                            <>
+                                                <input
+                                                    type="date"
+                                                    placeholder="Data Início"
+                                                    value={dateFilters[col].startDate}
+                                                    onChange={(e) => handleDateChange(col, 'startDate', e.target.value)}
+                                                />
+                                                <input
+                                                    type="date"
+                                                    placeholder="Data Fim"
+                                                    value={dateFilters[col].endDate}
+                                                    onChange={(e) => handleDateChange(col, 'endDate', e.target.value)}
+                                                />
+                                                {dateErrors[col] && <p className="error-message">{dateErrors[col]}</p>}
+                                            </>
+                                        ) : (
+                                            <>
+                                                <select className="filter-column-select">
+                                                    <option value="">Selecione...</option>
+                                                    {(filterOptions[col] || []).map(option => (
+                                                        <option key={option} value={option}>
+                                                            {option}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </>
+                                        )}
+
                                         <div
                                             className="sort-order-icons"
                                             onClick={() => handleSortOrderToggle(col)}
