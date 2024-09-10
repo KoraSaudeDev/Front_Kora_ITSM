@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FaSearch, FaChevronLeft, FaChevronRight, FaFilter } from 'react-icons/fa';
+import { FaSearch, FaChevronLeft, FaChevronRight, FaFilter, FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import Modal from './ModalTicket';
 import caixaVazia from '../../assets/images/caixa-vazia.png';
 
@@ -18,7 +18,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
     const [showNoDataMessage, setShowNoDataMessage] = useState(false);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [showFilterDropdown, setShowFilterDropdown] = useState(false);
-    const [selectedColumnFilter, setSelectedColumnFilter] = useState('');
+    const [sortOrders, setSortOrders] = useState({});
 
     const prevPageRef = useRef(currentPage);
     const prevItemsPerPageRef = useRef(itemsPerPage);
@@ -29,15 +29,15 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
     const [sortDirection, setSortDirection] = useState(null);
 
     const statusOptions = {
-        "Em Andamento": "#20C997",        
-        "Em Atendimento": "#43A825",     
-        "Aguardando Retorno Fornecedor": "#E87C86", 
-        "Aguardando Retorno": "#F50057",  
-        "Em Aberto": "#3B7DDD",          
-        "Agendada": "#D500F9",          
-        "Criação de Usuário": "#FF3D00", 
-        "Finalizado": "#434343",         
-        "Cancelado": "#D50000"            
+        "Em Andamento": "#20C997",
+        "Em Atendimento": "#43A825",
+        "Aguardando Retorno Fornecedor": "#E87C86",
+        "Aguardando Retorno": "#F50057",
+        "Em Aberto": "#3B7DDD",
+        "Agendada": "#D500F9",
+        "Criação de Usuário": "#FF3D00",
+        "Finalizado": "#434343",
+        "Cancelado": "#D50000"
     };
 
     const slaOptions = {
@@ -51,8 +51,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         const fetchAtendimentos = async () => {
             try {
                 if (prevPageRef.current !== currentPage || prevItemsPerPageRef.current !== itemsPerPage ||
-                    prevStatusFilterRef.current !== filtroStatus || prevSLAFilterPageRef.current !== filtroSLA) 
-                {
+                    prevStatusFilterRef.current !== filtroStatus || prevSLAFilterPageRef.current !== filtroSLA) {
                     showLoadingOverlay();
                 }
                 setLoading(true);
@@ -65,7 +64,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                 }
 
                 let url = `${apiUrl}page=${currentPage}&per_page=${itemsPerPage}`;
-                
+
                 if (sortColumn && sortDirection) {
                     url += `&sort_by=${sortColumn}&sort_order=${sortDirection}`;
                 }
@@ -191,6 +190,29 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         setTotalPages(Math.ceil(response.data.total_items / itemsPerPage));
     };
 
+    const handleSortOrderToggle = (column) => {
+        setSortOrders((prev) => {
+            const currentOrder = prev[column];
+            let newOrder = 'asc';
+
+            if (currentOrder === 'asc') {
+                newOrder = 'desc';
+            } else if (currentOrder === 'desc') {
+                newOrder = null;
+            }
+
+            return {
+                ...prev,
+                [column]: newOrder
+            };
+        });
+    };
+
+    const handleSaveFilters = () => {
+        console.log('Filter and Sort Orders:', sortOrders);
+        setShowFilterDropdown(false);
+    };
+
     const handlePageClick = (pageNumber) => {
         if (pageNumber >= 1 && pageNumber <= totalPages) {
             setCurrentPage(pageNumber);
@@ -258,6 +280,20 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         'abertura', 'status', 'st_sla', 'categoria', 'subcategoria',
         'assunto', 'data_limite', 'grupo', 'nome', 'area_negocio', 'hub', 'unidade'
     ];
+    const columnDescriptions = {
+        abertura: 'Abertura',
+        status: 'Status',
+        st_sla: 'SLA',
+        categoria: 'Categoria',
+        subcategoria: 'Subcategoria',
+        assunto: 'Assunto',
+        data_limite: 'Data limite',
+        grupo: 'Analista Atual',
+        nome: 'Nome',
+        area_negocio: 'Área de negócio',
+        hub: 'HUB',
+        unidade: 'Unidade de negócio'
+    };
 
     return (
         <div className="container-meus-atendimentos" onClick={handleClearFiltro}>
@@ -274,26 +310,39 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                 </select>
 
                 <div className="filter-icon-container">
-                    <FaFilter 
-                        className="filter-icon" 
-                        onClick={() => setShowFilterDropdown(!showFilterDropdown)} 
+                    <FaFilter
+                        className="filter-icon"
+                        onClick={() => setShowFilterDropdown(!showFilterDropdown)}
                     />
                     {showFilterDropdown && (
                         <div className="filter-dropdown">
-                            <h4>Selecione a Coluna para Filtrar</h4>
-                            <select
-                                value={selectedColumnFilter}
-                                onChange={(e) => setSelectedColumnFilter(e.target.value)}
-                                className="filter-column-select"
-                            >
-                                <option value="">Selecione uma Coluna</option>
-                                {columnOptions.map((col) => (
-                                    <option key={col} value={col}>
-                                        {col.charAt(0).toUpperCase() + col.slice(1)}
-                                    </option>
-                                ))}
-                            </select>
-                            <button className="save-filter-button" onClick={() => setShowFilterDropdown(false)}>
+                            <h4>Escolha seu Filtro</h4>
+
+                            {columnOptions.map((col) => (
+                                <div key={col} className="filter-option">
+                                    <h5>{columnDescriptions[col] || col.charAt(0).toUpperCase() + col.slice(1)}</h5>
+                                    <div className="filter-select-container">
+                                        <select className="filter-column-select">
+                                            <option value={col}>
+                                                {col.charAt(0).toUpperCase() + col.slice(1)}
+                                            </option>
+                                        </select>
+                                        <div
+                                            className="sort-order-icons"
+                                            onClick={() => handleSortOrderToggle(col)}
+                                        >
+                                            <FaArrowUp
+                                                className={`sort-icon ${sortOrders[col] === 'asc' ? 'active' : ''}`}
+                                            />
+                                            <FaArrowDown
+                                                className={`sort-icon ${sortOrders[col] === 'desc' ? 'active' : ''}`}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+
+                            <button className="save-filter-button" onClick={handleSaveFilters}>
                                 Salvar
                             </button>
                         </div>
