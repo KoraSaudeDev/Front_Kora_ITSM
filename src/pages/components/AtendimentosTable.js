@@ -2,11 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { FaSearch, FaChevronLeft, FaChevronRight, FaFilter, FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import Modal from './ModalTicket';
 import caixaVazia from '../../assets/images/caixa-vazia.png';
-
-
+import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 
-const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket, onResetTicket, tipoTela, filtroUrl }) => {
+const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket, onResetTicket, tipoTela, filtroOptionsUrl, filtro }) => {
+    const { user } = useAuth();
     const [atendimentos, setAtendimentos] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [modalData, setModalData] = useState(null);
@@ -19,6 +19,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [showFilterDropdown, setShowFilterDropdown] = useState(false);
     const [filterOptions, setFilterOptions] = useState({});
+    const [filterSelectedOptions, setFilterSelectedOptions] = useState({});
     const [sortOrders, setSortOrders] = useState({});
     const [dateFilters, setDateFilters] = useState({
         abertura: { startDate: '', endDate: '' },
@@ -31,7 +32,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
 
     const columnOptions = [
         'abertura', 'status', 'st_sla', 'categoria', 'subcategoria',
-        'assunto', 'data_limite', 'grupo', 'nome', 'area_negocio', 'hub', 'unidade'
+        'assunto', 'ds_nivel', 'data_limite', 'grupo', 'nome', 'area_negocio', 'hub', 'unidade'
     ];
     const columnDescriptions = {
         abertura: 'Abertura',
@@ -40,6 +41,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         categoria: 'Categoria',
         subcategoria: 'Subcategoria',
         assunto: 'Assunto',
+        ds_nivel: 'Prioridade',
         data_limite: 'Data limite',
         grupo: 'Analista Atual',
         nome: 'Nome',
@@ -169,7 +171,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         let config = {
             method: 'post',
             maxBodyLength: Infinity,
-            url: filtroUrl,
+            url: filtroOptionsUrl,
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -188,6 +190,30 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                 console.error('Error fetching filter options:', error);
             });
     }, []);
+
+    useEffect(() => {
+        const fetchSavedFilters = async () => {
+            try {
+                const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/${filtro}/${user.id_user}`);
+                const { dateFilters, filterOptions, sortOrders } = response.data;
+
+                setDateFilters(dateFilters);
+                setFilterOptions(filterOptions);
+                setSortOrders(sortOrders);
+
+                const newFilterSelectedOptions = Object.keys(filterOptions).reduce((acc, key) => {
+                    acc[key] = filterOptions[key][0];
+                    return acc;
+                }, {});
+                setFilterSelectedOptions(newFilterSelectedOptions);
+
+            } catch (error) {
+                console.error('Error fetching saved filters:', error);
+            }
+        };
+
+        fetchSavedFilters();
+    }, [filtro, user.id_user]);
 
     const showLoadingOverlay = () => {
         document.getElementById('loading-overlay').style.display = 'flex';
@@ -275,7 +301,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                     ...prev,
                     [column]: 'A data de início não pode ser posterior à data de fim.'
                 }));
-                
+
                 setTimeout(() => {
                     setDateErrors(prev => ({
                         ...prev,
@@ -290,12 +316,76 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                 }));
             }
         }
-
-        setDateFilters(newDateFilters);
+        else{
+            setDateFilters(newDateFilters);
+        }
     };
 
-    const handleSaveFilters = () => {
-        console.log('Filter and Sort Orders:', sortOrders);
+    const cleanFilters = (filters) => {
+        return {
+            sortOrders: Object.keys(filters.sortOrders).reduce((acc, key) => {
+                const value = filters.sortOrders[key];
+                if (value !== null) {
+                    acc[key] = value;
+                }
+                return acc;
+            }, {}),
+            filterOptions: Object.keys(filters.filterOptions).reduce((acc, key) => {
+                const values = filters.filterOptions[key].filter(option => option !== "");
+                if (values.length > 0) {
+                    acc[key] = values;
+                }
+                return acc;
+            }, {}),
+            dateFilters: Object.keys(filters.dateFilters).reduce((acc, key) => {
+                const { startDate, endDate } = filters.dateFilters[key];
+                if (startDate || endDate) {
+                    acc[key] = { startDate, endDate };
+                }
+                return acc;
+            }, {})
+        };
+    };
+
+    const handleSaveFilters = async () => {
+        const savedFilters = {
+            sortOrders,
+            filterOptions: Object.keys(filterOptions).reduce((acc, key) => {
+                const selectedOptions = document.querySelectorAll(`.filter-column-select[data-column="${key}"] option:checked`);
+                acc[key] = Array.from(selectedOptions).map(option => option.value);
+                return acc;
+            }, {}),
+            dateFilters
+        };
+
+        const cleanedFilters = cleanFilters(savedFilters);
+
+        const hasData = Object.keys(cleanedFilters.sortOrders).length > 0 ||
+            Object.keys(cleanedFilters.filterOptions).length > 0 ||
+            Object.keys(cleanedFilters.dateFilters).length > 0;
+
+        if (hasData) {
+            try {
+                showLoadingOverlay();
+                const ticketConfig = {
+                    method: 'post',
+                    url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/${filtro}?user_id=${user.id_user}`,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    data: JSON.stringify(cleanedFilters)
+                };
+
+                const response = await axios.request(ticketConfig);
+
+                console.log(response.data);
+                hideLoadingOverlay();
+            } catch (error) {
+                console.error('Error saving filters:', error);
+                hideLoadingOverlay();
+            }
+        }
+
         setShowFilterDropdown(false);
     };
 
@@ -394,23 +484,30 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                                 <input
                                                     type="date"
                                                     placeholder="Data Início"
-                                                    value={dateFilters[col].startDate}
+                                                    defaultValue={dateFilters[col]?.startDate || ''}
                                                     onChange={(e) => handleDateChange(col, 'startDate', e.target.value)}
                                                 />
                                                 <input
                                                     type="date"
                                                     placeholder="Data Fim"
-                                                    value={dateFilters[col].endDate}
+                                                    defaultValue={dateFilters[col]?.endDate || ''}
                                                     onChange={(e) => handleDateChange(col, 'endDate', e.target.value)}
                                                 />
                                                 {dateErrors[col] && <p className="error-message">{dateErrors[col]}</p>}
                                             </>
                                         ) : (
                                             <>
-                                                <select className="filter-column-select">
-                                                    <option value="">Selecione...</option>
+                                                <select
+                                                    className="filter-column-select"
+                                                    data-column={col}
+                                                    defaultValue={filterSelectedOptions[col] || ''}
+                                                >
+                                                    <option value=""></option>
                                                     {(filterOptions[col] || []).map(option => (
-                                                        <option key={option} value={option}>
+                                                        <option
+                                                            key={option}
+                                                            value={option}
+                                                        >
                                                             {option}
                                                         </option>
                                                     ))}

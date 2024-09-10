@@ -12,7 +12,8 @@ const MinhaEquipe = ({ selectedTicket, onResetTicket }) => {
             selectedTicket={selectedTicket}
             onResetTicket={onResetTicket}
             tipoTela='minha_equipe'
-            filtroUrl={`${process.env.REACT_APP_API_BASE_URL}/tickets/minha-equipe/distinct`}
+            filtroOptionsUrl={`${process.env.REACT_APP_API_BASE_URL}/tickets/minha-equipe/distinct`}
+            filtro='filtro-me'
         />
     );
 };
