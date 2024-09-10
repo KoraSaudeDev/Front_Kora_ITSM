@@ -59,9 +59,9 @@ const camposAcessoRede = {
                 { id: "nomeCompleto", label: "Nome Completo Usuário", type: "text", className: "campo" },
                 { id: "matricula", label: "Matrícula no Sênio (RH)", type: "text", className: "campo" },
                 { id: "tipoColaborador", label: "Tipo Colaborador", type: "radio", options: ["Funcionário", "Terceirizado"], className: "campo" },
-                { id: "hub", label: "HUB Novo Usuário", type: "select", api: "/api/hubs", className: "campo" },
-                { id: "cargo", label: "Cargo", type: "select", api: "/api/cargos", className: "campo" },
-                { id: "departamento", label: "Departamento", type: "select", api: "/api/departamentos", className: "campo" },
+                { id: "hub", label: "HUB Novo Usuário", type: "text", className: "campo" },
+                { id: "cargoo", label: "Cargo", type: "text", className: "campo" },
+                { id: "departamento", label: "Departamento", type: "text", className: "campo" },
                 { id: "telefone", label: "Telefone para contato", type: "number", className: "campo" },
                 { id: "licenca", label: "Licença do Novo Usuário", type: "select", options: ["Frontline Starter", "Enterprise Starter", "Enterprise Standard"], className: "campo" },
                 { id: "custo", label: "Custo", type: "number", className: "campo" },
@@ -74,16 +74,15 @@ const camposAcessoRede = {
                 { id: "nomeCompleto", label: "Nome Completo Usuário", type: "text", className: "campo" },
                 { id: "matricula", label: "Matrícula no Sênio (RH)", type: "text", className: "campo" },
                 { id: "tipoColaborador", label: "Tipo Colaborador", type: "radio", options: ["Funcionário", "Terceirizado"], className: "campo" },
-                { id: "hub", label: "HUB Novo Usuário", type: "select", api: "/api/hubs", className: "campo" },
-                { id: "cargo", label: "Cargo", type: "select", api: "/api/cargos", className: "campo" },
-                { id: "departamento", label: "Departamento", type: "select", api: "/api/departamentos", className: "campo" },
+                { id: "hub", label: "HUB Novo Usuário", type: "text", className: "campo" },
+                { id: "cargo", label: "Cargo", type: "text", className: "campo" },
+                { id: "departamento", label: "Departamento", type: "text", className: "campo" },
                 { id: "telefone", label: "Telefone para contato", type: "number", className: "campo" },
                 { id: "licenca", label: "Licença do Novo Usuário", type: "select", options: ["Frontline Starter", "Enterprise Starter", "Enterprise Standard"], className: "campo" },
                 { id: "custo", label: "Custo", type: "number", className: "campo" },
                 { id: "gestor", label: "Gestor Imediato", type: "text", className: "campo" },
                 { id: "emailGestor", label: "E-mail Gestor Imediato", type: "email", className: "campo" },
-                { id: "gerenteArea", label: "Gerente da Área", type: "text", className: "campo" },
-                { id: "emailGerente", label: "E-mail Gerente", type: "email", className: "campo" }
+                { id: "gerenteArea", label: "Gerente da Área", type: "text", className: "campo" }
             ],
             "Exclusão de Usuário": [
                 { id: "nomeCompleto", label: "Nome Completo Usuário", type: "text", className: "campo" },
@@ -97,14 +96,15 @@ const camposAcessoRede = {
                 { id: "nomeCompleto", label: "Nome Completo Usuário", type: "text", className: "campo" },
                 { id: "matricula", label: "Matrícula no Sênio (RH)", type: "text", className: "campo" },
                 { id: "tipoColaborador", label: "Tipo Colaborador", type: "radio", options: ["Funcionário", "Terceirizado"], className: "campo" },
-                { id: "hub", label: "HUB Novo Usuário", type: "select", api: "/api/hubs", className: "campo" },
-                { id: "cargo", label: "Cargo", type: "select", api: "/api/cargos", className: "campo" },
-                { id: "departamento", label: "Departamento", type: "select", api: "/api/departamentos", className: "campo" },
+                { id: "hub", label: "HUB Novo Usuário", type: "text", className: "campo" },
+                { id: "cargo", label: "Cargo", type: "text", className: "campo" },
+                { id: "departamento", label: "Departamento", type: "text", className: "campo" },
                 { id: "telefone", label: "Telefone para contato", type: "number", className: "campo" },
+                { id: "licenca", label: "Licença do Novo Usuário", type: "select", options: ["Frontline Starter", "Enterprise Starter", "Enterprise Standard"], className: "campo" },
+                { id: "custo", label: "Custo", type: "number", className: "campo" },
                 { id: "gestor", label: "Gestor Imediato", type: "text", className: "campo" },
                 { id: "emailGestor", label: "E-mail Gestor Imediato", type: "email", className: "campo" },
-                { id: "gerenteArea", label: "Gerente da Área", type: "text", className: "campo" },
-                { id: "emailGerente", label: "E-mail Gerente", type: "email", className: "campo" }
+                { id: "gerenteArea", label: "Gerente da Área", type: "text", className: "campo" }
             ]
         },
         "Drives Compartilhados": {
@@ -219,7 +219,6 @@ const NovoTicket = () => {
         return `${dia}/${mes}/${ano} ${horas}:${minutos}:${segundos}`;
     };
 
-    // Carregar hubs e categorias no início
     useEffect(() => {
         axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/hub`)
             .then(response => {
@@ -236,7 +235,6 @@ const NovoTicket = () => {
             .catch(error => console.error('Erro ao carregar categorias:', error));
     }, []);
 
-    // Carregar unidades ao selecionar hub
     useEffect(() => {
         if (selectedHub) {
             axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/unidade?hub=${selectedHub.value}`)
@@ -250,7 +248,6 @@ const NovoTicket = () => {
         }
     }, [selectedHub]);
 
-    // Carregar subcategorias ao selecionar categoria
     useEffect(() => {
         if (selectedCategoria) {
             axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/subcategorias?categoria=${selectedCategoria.value}`)
@@ -265,7 +262,6 @@ const NovoTicket = () => {
         }
     }, [selectedCategoria]);
 
-    // Carregar assuntos ao selecionar subcategoria
     useEffect(() => {
         if (selectedSubcategoria) {
             axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/assuntos?categoria=${selectedCategoria?.value}&subcategoria=${selectedSubcategoria?.value}`)
@@ -279,28 +275,130 @@ const NovoTicket = () => {
         }
     }, [selectedSubcategoria]);
 
-    // Atualizar campos dinâmicos ao selecionar categoria, subcategoria e assunto
     useEffect(() => {
-        if (selectedCategoria && selectedSubcategoria && selectedAssunto) {
-            const categoria = selectedCategoria.value;
-            const subcategoria = selectedSubcategoria.value;
+        if (selectedAssunto) {
             const assunto = selectedAssunto.value;
-
-            // Verifique se a categoria, subcategoria e assunto existem no objeto camposAcessoRede
-            const campos = camposAcessoRede?.[categoria]?.[subcategoria]?.[assunto];
-            if (campos) {
-                setDynamicFields(campos);
-            } else {
-                setDynamicFields([]);
+            let campos = [];
+    
+        
+            if (selectedCategoria?.value === 'Acesso/Rede' && selectedSubcategoria?.value) {
+                const categoriaAcessoRede = camposAcessoRede['Acesso/Rede'];
+                const subcategoria = categoriaAcessoRede[selectedSubcategoria.value];
+    
+                if (subcategoria && subcategoria[assunto]) {
+                    campos = subcategoria[assunto];
+                }
             }
+    
+            if (assunto === 'Ajuste de acesso') {
+                campos = [
+                    { id: 'nomeCompleto', label: 'Nome Completo Usuário', type: 'text', required: true },
+                    { id: 'usuarioMV', label: 'Usuário do MV', type: 'text', required: true },
+                    { id: 'departamento', label: 'Departamento', type: 'text', required: true },
+                    { id: 'matriculaSenior', label: 'Matrícula do Sênior (RH)', type: 'text', required: true },
+                    { id: 'cargo', label: 'Cargo', type: 'text', required: true },
+                    { id: 'unidadeUsuario', label: 'Unidade do Usuário', type: 'text', required: true },
+                    { id: 'usuarioSimilar', label: 'Usuário Similar', type: 'text', required: true },
+                    { id: 'acessoSolicitado', label: 'Acesso Solicitado', type: 'text', required: true },
+                    { id: 'telefoneContato', label: 'Telefone para Contato', type: 'number', required: true },
+                    { id: 'vinculoEmpregatício', label: 'Vínculo Empregatício', type: 'select', options: ['Funcionário da Rede', 'Terceiros (Cooperativa)'], required: true }
+                ];
+            }
+    
+            if (assunto === 'Criação de usuário') {
+                campos = [
+                    { id: 'nomeCompleto', label: 'Nome Completo Usuário', type: 'text', required: true },
+                    { id: 'departamento', label: 'Departamento', type: 'text', required: true },
+                    { id: 'dataNascimento', label: 'Data de Nascimento', type: 'date', required: true },
+                    { id: 'matriculaSenior', label: 'Matrícula do Sênior (RH)', type: 'text', required: true },
+                    { id: 'cpf', label: 'CPF (Apenas Número)', type: 'number', required: true },
+                    { id: 'cargo', label: 'Cargo', type: 'text', required: true },
+                    { id: 'unidadeUsuario', label: 'Unidade do Usuário', type: 'text', required: true },
+                    { id: 'usuarioSimilar', label: 'Usuário Similar', type: 'text', required: true },
+                    { id: 'acessoSolicitado', label: 'Acesso Solicitado', type: 'text', required: true },
+                    { id: 'telefoneContato', label: 'Telefone para Contato', type: 'number', required: true },
+                    { id: 'codigoPrestador', label: 'Código do prestador no sistema MV', type: 'text', required: false },
+                    { id: 'tipoUsuario', label: 'Tipo de Usuário', type: 'select', options: ['Funcionário da Rede', 'Terceiros (Cooperativa)'], required: true }
+                ];
+            }
+    
+         
+            if (assunto === 'Troca de senha') {
+                campos = [
+                    { id: 'nomeCompleto', label: 'Nome Completo Usuário', type: 'text', required: true },
+                    { id: 'usuarioMV', label: 'Usuário do MV', type: 'text', required: true },
+                    { id: 'departamento', label: 'Departamento', type: 'text', required: true },
+                    { id: 'unidadeUsuario', label: 'Unidade do Usuário', type: 'text', required: true },
+                    { id: 'telefoneContato', label: 'Telefone para Contato', type: 'number', required: true }
+                ];
+            }
+    
+       
+            if (assunto === 'Ajuste no Perfil de Acesso') {
+                campos = [
+                    { id: 'ambienteSap', label: 'Ambiente SAP', type: 'select', options: ['Produção', 'Desenvolvimento', 'Qualidade'], required: true },
+                    { id: 'usuarioSap', label: 'Usuário SAP', type: 'text', required: true },
+                    { id: 'perfilAtribuido', label: 'Perfil a serem Atribuídos', type: 'select', options: ['Perfil 1', 'Perfil 2', 'Perfil 3'], required: true },
+                    { id: 'motivoAjuste', label: 'Motivo Ajuste', type: 'select', options: ['Mudança de Cargo/Função', 'Substituição Temporária de Colaborador', 'Transferência de Departamento/Local', 'Outro'], required: true },
+                    { id: 'descricaoAlteracao', label: 'Descrição da Alteração Solicitada', type: 'text', required: true }
+                ];
+            }
+    
+        
+            if (assunto === 'Criação Login SAP') {
+                campos = [
+                    { id: 'ambienteSap', label: 'Ambiente SAP', type: 'select', options: ['Produção', 'Desenvolvimento', 'Qualidade'], required: true },
+                    { id: 'nomeCompleto', label: 'Nome Completo Usuário', type: 'text', required: true },
+                    { id: 'matriculaSenior', label: 'Matrícula no Sênior (RH)', type: 'text', required: true },
+                    { id: 'cpf', label: 'CPF (Apenas Números)', type: 'number', required: true },
+                    { id: 'cargo', label: 'Cargo', type: 'text', required: true },
+                    { id: 'departamento', label: 'Departamento', type: 'text', required: true },
+                    { id: 'email', label: 'E-mail Usuário', type: 'email', required: true },
+                    { id: 'diretoria', label: 'Diretoria', type: 'text', required: true },
+                    { id: 'substituirColaborador', label: 'Estou substituindo colaborador desligado?', type: 'select', options: ['Sim', 'Não'], required: true },
+                    { id: 'perfilAtribuido', label: 'Perfil a serem Atribuídos', type: 'select', options: ['Perfil 1', 'Perfil 2', 'Perfil 3'], required: true },
+                    { id: 'centroCusto', label: 'Centro de custo', type: 'select', options: ['Centro 1', 'Centro 2', 'Centro 3'], required: true },
+                    { id: 'emailGestor', label: 'E-mail Gestor Imediato', type: 'email', required: true },
+                    { id: 'descricao', label: 'Descrição', type: 'text', required: true },
+                    { id: 'anexoAutorizacao', label: 'Anexar Autorização Gestor', type: 'file', required: true },
+                    { id: 'termoAceitacao', label: 'Termo de Aceitação', type: 'select', options: ['Sim', 'Não'], required: true }
+                ];
+            }
+    
+           
+            if (assunto === 'Reset de Senha SAP') {
+                campos = [
+                    { id: 'ambienteSap', label: 'Ambiente SAP', type: 'select', options: ['Produção', 'Desenvolvimento', 'Qualidade'], required: true },
+                    { id: 'usuarioSap', label: 'Usuário SAP', type: 'text', required: true }
+                ];
+            }
+    
+           
+            if (selectedCategoria?.value === 'TASY' && selectedSubcategoria?.value === 'Criação de Usuário') {
+                campos = [
+                    { id: 'nomeCompleto', label: 'Nome Completo Usuário', type: 'text', required: true },
+                    { id: 'departamento', label: 'Departamento', type: 'text', required: true },
+                    { id: 'dataNascimento', label: 'Data de Nascimento', type: 'date', required: true },
+                    { id: 'matriculaUsuario', label: 'Matrícula do Usuário', type: 'text', required: true },
+                    { id: 'cpf', label: 'CPF (Apenas Números)', type: 'number', required: true },
+                    { id: 'cargo', label: 'Cargo', type: 'text', required: true },
+                    { id: 'unidadeUsuario', label: 'Unidade do Usuário', type: 'text', required: true },
+                    { id: 'usuarioSimilar', label: 'Usuário Similar', type: 'text', required: true },
+                    { id: 'telefoneContato', label: 'Telefone para Contato (Apenas Números)', type: 'number', required: true },
+                    { id: 'tipoUsuario', label: 'Tipo do Usuário', type: 'select', options: ['Administrativo', 'Assistencial'], required: true }
+                ];
+            }
+    
+            setDynamicFields(campos);
         } else {
             setDynamicFields([]);
         }
-    }, [selectedCategoria, selectedSubcategoria, selectedAssunto]);
+    }, [selectedAssunto, selectedSubcategoria, selectedCategoria]);
+    
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Função para tratar o envio do formulário
+        
     };
 
     return (
@@ -393,31 +491,35 @@ const NovoTicket = () => {
                             />
                         </div>
 
-                        {/* Renderizar campos dinâmicos */}
+                        
                         {dynamicFields.length > 0 && (
                             <div className="campo-dinamico">
-                                
                                 {dynamicFields.map(field => (
                                     <div key={field.id} className="campo">
                                         <label htmlFor={field.id}>{field.label} <span className="campo-obrigatorio">*</span></label>
                                         {field.type === 'text' && (
-                                            <input type="text" id={field.id} name={field.id} required />
+                                            <input type="text" id={field.id} name={field.id} required={field.required} />
                                         )}
                                         {field.type === 'email' && (
-                                            <input type="email" id={field.id} name={field.id} required />
+                                            <input type="email" id={field.id} name={field.id} required={field.required} />
                                         )}
                                         {field.type === 'number' && (
-                                            <input type="number" id={field.id} name={field.id} required />
+                                            <input type="number" id={field.id} name={field.id} required={field.required} />
                                         )}
-                                        {field.type === 'radio' && field.options && (
-                                            <div>
+                                        {field.type === 'date' && (
+                                            <input type="date" id={field.id} name={field.id} required={field.required} />
+                                        )}
+                                        {field.type === 'select' && field.options && (
+                                            <select id={field.id} name={field.id} required={field.required}>
                                                 {field.options.map(option => (
-                                                    <label key={option}>
-                                                        <input type="radio" name={field.id} value={option} required />
+                                                    <option key={option} value={option}>
                                                         {option}
-                                                    </label>
+                                                    </option>
                                                 ))}
-                                            </div>
+                                            </select>
+                                        )}
+                                        {field.type === 'file' && (
+                                            <input type="file" id={field.id} name={field.id} required={field.required} />
                                         )}
                                     </div>
                                 ))}
