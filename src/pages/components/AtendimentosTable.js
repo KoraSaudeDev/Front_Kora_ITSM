@@ -60,7 +60,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
             ...provided,
             borderColor: '#007aff', // Cor da borda do select
             boxShadow: 'none',
-            width: '250px',
+            width: '325px',
             '&:hover': {
                 borderColor: '#007aff', // Cor da borda ao passar o mouse
             },
@@ -73,6 +73,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
 
     const prevPageRef = useRef(currentPage);
     const prevItemsPerPageRef = useRef(itemsPerPage);
+    const prevSavedFilters = useRef(savedFilters);
 
     const statusOptions = {
         "Em Andamento": "#20C997",
@@ -96,7 +97,8 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
     useEffect(() => {
         const fetchAtendimentos = async () => {
             try {
-                if (prevPageRef.current !== currentPage || prevItemsPerPageRef.current !== itemsPerPage) {
+                console.log(prevSavedFilters.current,savedFilters)
+                if (prevPageRef.current !== currentPage || prevItemsPerPageRef.current !== itemsPerPage || prevSavedFilters.current !== savedFilters) {
                     showLoadingOverlay();
                 }
                 setLoading(true);
@@ -165,6 +167,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
 
         prevPageRef.current = currentPage;
         prevItemsPerPageRef.current = itemsPerPage;
+        prevSavedFilters.current = savedFilters;
 
         return () => clearTimeout(timer);
     }, [currentPage, itemsPerPage, savedFilters, sortOrders]);
@@ -473,12 +476,12 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
 
                 const response = await axios.request(filterConfig);
 
+                hideLoadingOverlay();
+
                 console.log(response.data);
 
                 setSavedFilters(cleanedFilters);
                 setFiltersOn(true);
-
-                hideLoadingOverlay();
             } catch (error) {
                 console.error('Error saving filters:', error);
                 hideLoadingOverlay();
@@ -497,9 +500,9 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
 
                 console.log(response.data);
 
-                clearFilters();
-
                 hideLoadingOverlay();
+
+                clearFilters();
             } catch (error) {
                 console.error('Error deleting filters:', error);
                 hideLoadingOverlay();
@@ -522,9 +525,9 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
 
             console.log(response.data);
 
-            clearFilters();
-
             hideLoadingOverlay();
+
+            clearFilters();
         } catch (error) {
             console.error('Error deleting filters:', error);
             hideLoadingOverlay();
