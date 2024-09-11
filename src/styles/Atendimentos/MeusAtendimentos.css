@@ -1900,13 +1900,108 @@ th.sorted-desc::before {
 .campo input[type="number"]:focus,
 .campo input[type="email"]:focus,
 .campo textarea:focus {
-    border-color: #007aff; /* Cor quando o campo está em foco */
+    border-color: #007aff; 
 }
 
 
 
 .campo-obrigatorio {
-    color: #007aff; /* Cor azul para o asterisco */
+    color: #007aff; 
     font-size: 12px;
 }
 
+
+.filter-icon-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+  
+  .filter-icon {
+    font-size: 20px;
+    cursor: pointer;
+    color: #007aff;
+    transition: color 0.3s ease;
+  }
+  
+  .filter-icon:hover {
+    color: #005bb5;
+  }
+  
+  .filter-icon-active {
+    color: #007aff;
+  }
+  
+
+  .filter-dropdown {
+    position: absolute;
+    top: 40px;
+    right: 0;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 350px;
+    z-index: 1000;
+    border: 1px solid #d1d1d1;
+  }
+  
+  .filter-dropdown h4 {
+    font-size: 18px;
+    color: #3E4676;
+    font-weight: 500;
+    margin-bottom: 15px;
+  }
+  
+  .filter-option {
+    margin-bottom: 20px;
+  }
+  
+  .filter-option h5 {
+    font-size: 15px;
+    font-weight: 400;
+    color: #3E4676;
+    margin-bottom: 8px;
+  }
+  
+
+  .filter-select-container input[type="date"] {
+    width: 45%;
+    padding: 8px 10px;
+    font-size: 14px;
+    border: 1px solid #b3b3b3; 
+    border-radius: 8px;
+    color: #3E4676;
+    background-color: white;
+    transition: border-color 0.2s;
+  }
+  
+  .filter-select-container input[type="date"]:hover,
+  .filter-select-container input[type="date"]:focus {
+    border-color: #007aff;
+    outline: none;
+  }
+  
+  .error-message {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 5px;
+  }
+  
+
+  .save-filter-button {
+    background-color: #007aff;
+    color: white;
+    font-size: 15px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-right: 10px;
+  }
+  
+  .save-filter-button:hover {
+    background-color: #005bb5;
+  }
+  
