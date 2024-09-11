@@ -576,6 +576,7 @@ const Modal = ({ data, onClose }) => {
 
         function toTitleCase(str) {
             if (str === "EM ATENDIMENTO") return "Em Andamento";
+            if (str === "CANCELADA") return "Cancelado";
             return str
                 .toLowerCase()
                 .split(' ')
