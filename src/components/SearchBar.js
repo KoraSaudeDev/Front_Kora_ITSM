@@ -45,8 +45,8 @@ const SearchBar = () => {
     }
 
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/tickets-preview?id=${inputValue}`);
-      return response.data.tickets.slice(0, 3).map((ticket) => ({
+      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/tickets-preview?p=${inputValue}`);
+      return response.data.tickets.map((ticket) => ({
         name: `${ticket.cod_fluxo} - ${ticket.nome}`,
         status: ticket.status, 
         ticketData: ticket 
