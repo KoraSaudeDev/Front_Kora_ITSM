@@ -22,6 +22,10 @@ body, html {
     margin-left: 40px;
 }
 
+.filter-icon-active {
+    color: blue;
+}
+
 .filter-dropdown {
     position: absolute;
     top: 40px;
@@ -78,16 +82,31 @@ body, html {
 }
 
 .option-p1 {
-    background-color: lightgreen;
+    background-color: #ff9999; /* Vermelho claro */
+    font-weight: bold;
 }
 
 .option-p2 {
-    background-color: lightblue;
+    background-color: #ffcc99; /* Laranja claro */
+    font-weight: bold;
 }
 
 .option-p3 {
-    background-color: lightcoral;
+    background-color: #ffff99; /* Amarelo claro */
+    font-weight: bold;
 }
+
+.option-p4 {
+    background-color: #ccffcc; /* Verde claro */
+    font-weight: bold;
+}
+
+.option-p5 {
+    background-color: #99ff99; /* Verde */;
+    font-weight: bold;
+}
+
+
 
 .save-filter-button {
     background-color: #043972;

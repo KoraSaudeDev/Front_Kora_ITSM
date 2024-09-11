@@ -554,13 +554,13 @@ const Modal = ({ data, onClose }) => {
 
         function toTitleCase(str) {
             if (str === "EM ATENDIMENTO") return "Em Andamento";
+            if (str === "CANCELADA") return "Cancelado";
             return str
                 .toLowerCase()
                 .split(' ')
                 .map(word => word.charAt(0).toUpperCase() + word.slice(1))
                 .join(' ');
         }
-
         showLoadingOverlay();
 
         const insert_anexos = anexos.filter(task => task.alterar === 1 && task.id === undefined);
@@ -880,6 +880,10 @@ const Modal = ({ data, onClose }) => {
                 return 'option-p2';
             case 'P3':
                 return 'option-p3';
+            case 'P4':
+                return 'option-p4';
+            case 'P5':
+                return 'option-p5';
             default:
                 return '';
         }
