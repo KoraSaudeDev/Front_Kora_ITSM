@@ -82,55 +82,36 @@ body, html {
 }
 
 .option-p1 {
-    background-color: #ff9999; /* Vermelho claro */
+    background-color: #7d0202; /* Vermelho claro */
+    color: white;
     font-weight: bold;
 }
 
 .option-p2 {
-    background-color: #ffcc99; /* Laranja claro */
+    background-color: #a85400; /* Laranja claro */
+    color: white;
     font-weight: bold;
 }
 
 .option-p3 {
-    background-color: #ffff99; /* Amarelo claro */
+    background-color: #b4b411; /* Amarelo claro */
+    color: white;
     font-weight: bold;
 }
 
 .option-p4 {
-    background-color: #ccffcc; /* Verde claro */
+    background-color: #2d00d1; /* Verde claro */
+    color: white;
     font-weight: bold;
 }
 
 .option-p5 {
-    background-color: #99ff99; /* Verde */;
+    background-color: #046704; /* Verde */;
+    color: white;
     font-weight: bold;
 }
 
 /* Aplicando as classes às opções */
-.priority-select__option.option-p1 {
-    background-color: #ff9999; /* Vermelho claro */
-    font-weight: bold;
-}
-
-.priority-select__option.option-p2 {
-    background-color: #ffcc99; /* Laranja claro */
-    font-weight: bold;
-}
-
-.priority-select__option.option-p3 {
-    background-color: #ffff99; /* Amarelo claro */
-    font-weight: bold;
-}
-
-.priority-select__option.option-p4 {
-    background-color: #ccffcc; /* Verde claro */
-    font-weight: bold;
-}
-
-.priority-select__option.option-p5 {
-    background-color: #99ff99; /* Verde claro */
-    font-weight: bold;
-}
 
 
 .save-filter-button {
@@ -1223,6 +1204,8 @@ a {
 .card-atividade:hover {
     background-color: #e9ecef;
 }
+
+
 
 
 

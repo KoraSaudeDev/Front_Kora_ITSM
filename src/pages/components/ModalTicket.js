@@ -1111,24 +1111,24 @@ const Modal = ({ data, onClose }) => {
                             />
                         </div>
                         <div className="campo-editavel">
-    <strong>Prioridade: <span className="campo-obrigatorio">*</span></strong>
-    <select
-        value={prioridadeSelecionada}
-        onChange={(e) => setPrioridadeSelecionada(e.target.value)}
-        className={getOptionClass(prioridadeSelecionada)} // Aplica a cor à opção selecionada
-    >
-        {filteredPrioridades.map(prioridade => (
-            <option
-                key={prioridade.prioridade}
-                value={prioridade.prioridade}
-                className={getOptionClass(prioridade.prioridade)}
-            >
-                {prioridade.prioridade}
-                {prioridade.prioridade !== 'P6' && prioridade.prioridade !== 'P7' && ` - ${prioridade.descricao}`}
-            </option>
-        ))}
-    </select>
-</div>
+                        <strong>Prioridade: <span className="campo-obrigatorio">*</span></strong>
+                        <select
+                            value={prioridadeSelecionada}
+                            onChange={(e) => setPrioridadeSelecionada(e.target.value)}
+                            className={getOptionClass(prioridadeSelecionada)}
+                        >
+                            {filteredPrioridades.map(prioridade => (
+                                <option
+                                    key={prioridade.prioridade}
+                                    value={prioridade.prioridade}
+                                    className={getOptionClass(prioridade.prioridade)}
+                                >
+                                    {prioridade.prioridade}
+                                    {prioridade.prioridade !== 'P6' && prioridade.prioridade !== 'P7' && ` - ${prioridade.descricao}`}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
 
                         <div className="campo-editavel">
                             <strong>Hub: <span className="campo-obrigatorio">*</span></strong>
