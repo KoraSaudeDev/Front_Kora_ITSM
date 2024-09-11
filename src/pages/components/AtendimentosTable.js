@@ -11,8 +11,6 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
     const [atendimentos, setAtendimentos] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [modalData, setModalData] = useState(null);
-    const [filtroStatus, setFiltroStatus] = useState('');
-    const [filtroSLA, setFiltroSLA] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(true);
@@ -22,6 +20,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
     const [filterOptions, setFilterOptions] = useState({});
     const [filterSelectedOptions, setFilterSelectedOptions] = useState({});
     const [savedFilters, setSavedFilters] = useState(null);
+    const [filtersOn, setFiltersOn] = useState(false);
     const [selectedHubs, setSelectedHubs] = useState([]);
     const [sortOrders, setSortOrders] = useState({});
     const [dateFilters, setDateFilters] = useState({
@@ -75,9 +74,6 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
     const prevPageRef = useRef(currentPage);
     const prevItemsPerPageRef = useRef(itemsPerPage);
 
-    const [sortColumn, setSortColumn] = useState('');
-    const [sortDirection, setSortDirection] = useState(null);
-
     const statusOptions = {
         "Em Andamento": "#20C997",
         "Em Atendimento": "#43A825",
@@ -114,14 +110,12 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
 
                 let url = `${apiUrl}page=${currentPage}&per_page=${itemsPerPage}`;
 
-                if (sortColumn && sortDirection) {
-                    url += `&sort_by=${sortColumn}&sort_order=${sortDirection}`;
-                }
+                if (savedFilters) filtrosExtras["filtros"] = savedFilters;
+                else delete filtrosExtras["filtros"];
 
-                if(savedFilters){
-                    filtrosExtras["filtros"] = savedFilters
-                }
-                
+                if (sortOrders) filtrosExtras["sort"] = sortOrders;
+                else delete filtrosExtras["sort"];
+
                 let config = {
                     method: 'post',
                     maxBodyLength: Infinity,
@@ -134,6 +128,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
 
                 const response = await axios.request(config);
                 const fetchedAtendimentos = response.data.tickets;
+
                 const totalItems = response.data.total_items;
 
                 const slaData = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/sla`);
@@ -172,7 +167,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         prevItemsPerPageRef.current = itemsPerPage;
 
         return () => clearTimeout(timer);
-    }, [currentPage, itemsPerPage, sortColumn, sortDirection, savedFilters]);
+    }, [currentPage, itemsPerPage, savedFilters, sortOrders]);
 
     useEffect(() => {
         if (selectedTicket) {
@@ -249,15 +244,15 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         const fetchSavedFilters = async () => {
             try {
                 const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/${filtro}/${user.id_user}`);
+
+                if (response.data.length === 0) return;
                 console.log(response.data)
-                const { dateFilters: apiDateFilters, filterOptions, sortOrders } = response.data;
-                                
+                const { dateFilters: apiDateFilters, filterOptions } = response.data;
+
                 setDateFilters(prevDateFilters => ({
                     ...prevDateFilters,
                     ...apiDateFilters
                 }));
-
-                setSortOrders(sortOrders);
 
                 const updatedFilterSelectedOptions = {};
                 for (const key in filterOptions) {
@@ -273,6 +268,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                 setFilterSelectedOptions(updatedFilterSelectedOptions);
 
                 setSavedFilters(response.data);
+                setFiltersOn(true);
             } catch (error) {
                 console.error('Error fetching saved filters:', error);
             }
@@ -317,23 +313,23 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         setTotalPages(Math.ceil(response.data.total_items / itemsPerPage));
     };
 
-    const handleSortOrderToggle = (column) => {
-        setSortOrders((prev) => {
-            const currentOrder = prev[column];
-            let newOrder = 'asc';
+    // const handleSortOrderToggle = (column) => {
+    //     setSortOrders((prev) => {
+    //         const currentOrder = prev[column];
+    //         let newOrder = 'asc';
 
-            if (currentOrder === 'asc') {
-                newOrder = 'desc';
-            } else if (currentOrder === 'desc') {
-                newOrder = null;
-            }
+    //         if (currentOrder === 'asc') {
+    //             newOrder = 'desc';
+    //         } else if (currentOrder === 'desc') {
+    //             newOrder = null;
+    //         }
 
-            return {
-                ...prev,
-                [column]: newOrder
-            };
-        });
-    };
+    //         return {
+    //             ...prev,
+    //             [column]: newOrder
+    //         };
+    //     });
+    // };
 
     const handleDateChange = useCallback((column, type, value) => {
         const newDateFilters = {
@@ -409,33 +405,44 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         });
     };
 
-    const cleanFilters = (filters) => {
-        return {
-            sortOrders: Object.keys(filters.sortOrders).reduce((acc, key) => {
-                const value = filters.sortOrders[key];
-                if (value !== null) {
-                    acc[key] = value;
-                }
-                return acc;
-            }, {}),
-            filterOptions: Object.keys(filters.filterOptions).reduce((acc, key) => {
-                const values = filters.filterOptions[key].filter(option => option !== "");
-                if (values.length > 0) {
-                    acc[key] = values;
-                }
-                return acc;
-            }, {}),
-            dateFilters: Object.keys(filters.dateFilters).reduce((acc, key) => {
-                const { startDate, endDate } = filters.dateFilters[key];
-                if (startDate || endDate) {
-                    acc[key] = { startDate, endDate };
-                }
-                return acc;
-            }, {})
-        };
-    };
-
     const handleSaveFilters = async () => {
+        const cleanFilters = (filters) => {
+            return {
+                // sortOrders: Object.keys(filters.sortOrders).reduce((acc, key) => {
+                //     const value = filters.sortOrders[key];
+                //     if (value !== null) {
+                //         acc[key] = value;
+                //     }
+                //     return acc;
+                // }, {}),
+                filterOptions: Object.keys(filters.filterOptions).reduce((acc, key) => {
+                    const values = filters.filterOptions[key].filter(option => option !== "");
+                    if (values.length > 0) {
+                        acc[key] = values;
+                    }
+                    return acc;
+                }, {}),
+                dateFilters: Object.keys(filters.dateFilters).reduce((acc, key) => {
+                    const { startDate, endDate } = filters.dateFilters[key];
+                    if (startDate || endDate) {
+                        acc[key] = { startDate, endDate };
+                    }
+                    return acc;
+                }, {})
+            };
+        };
+
+        const validateDateFilters = (filters) => {
+            for (const key in filters.dateFilters) {
+                const { startDate, endDate } = filters.dateFilters[key];
+                if ((startDate && !endDate) || (!startDate && endDate)) {
+                    alert(`Para o filtro "${key}", por favor, preencha tanto a data de início quanto a data de término.`);
+                    return false;
+                }
+            }
+            return true;
+        };
+
         const savedFiltersLocal = {
             sortOrders,
             filterOptions: Object.keys(filterSelectedOptions).reduce((acc, key) => {
@@ -445,18 +452,17 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
             dateFilters
         };
 
+        if (!validateDateFilters(savedFiltersLocal)) return;
+
         const cleanedFilters = cleanFilters(savedFiltersLocal);
 
-        console.log(cleanedFilters)
-
-        const hasData = Object.keys(cleanedFilters.sortOrders).length > 0 ||
-            Object.keys(cleanedFilters.filterOptions).length > 0 ||
+        const hasData = Object.keys(cleanedFilters.filterOptions).length > 0 ||
             Object.keys(cleanedFilters.dateFilters).length > 0;
 
         if (hasData) {
             try {
                 showLoadingOverlay();
-                const ticketConfig = {
+                const filterConfig = {
                     method: 'post',
                     url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/${filtro}?user_id=${user.id_user}`,
                     headers: {
@@ -465,11 +471,12 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                     data: JSON.stringify(cleanedFilters)
                 };
 
-                const response = await axios.request(ticketConfig);
+                const response = await axios.request(filterConfig);
 
                 console.log(response.data);
 
                 setSavedFilters(cleanedFilters);
+                setFiltersOn(true);
 
                 hideLoadingOverlay();
             } catch (error) {
@@ -477,8 +484,63 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                 hideLoadingOverlay();
             }
         }
+        else {
+            try {
+                showLoadingOverlay();
+
+                const filterConfig = {
+                    method: 'post',
+                    url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/delete-${filtro}?user_id=${user.id_user}`
+                };
+
+                const response = await axios.request(filterConfig);
+
+                console.log(response.data);
+
+                clearFilters();
+
+                hideLoadingOverlay();
+            } catch (error) {
+                console.error('Error deleting filters:', error);
+                hideLoadingOverlay();
+            }
+        }
 
         setShowFilterDropdown(false);
+    };
+
+    const handleDeleteFilters = async () => {
+        try {
+            showLoadingOverlay();
+
+            const filterConfig = {
+                method: 'post',
+                url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/delete-${filtro}?user_id=${user.id_user}`
+            };
+
+            const response = await axios.request(filterConfig);
+
+            console.log(response.data);
+
+            clearFilters();
+
+            hideLoadingOverlay();
+        } catch (error) {
+            console.error('Error deleting filters:', error);
+            hideLoadingOverlay();
+        }
+
+        setShowFilterDropdown(false);
+    };
+
+    const clearFilters = () => {
+        setSavedFilters(null);
+        setFiltersOn(false);
+        setFilterSelectedOptions({});
+        setDateFilters({
+            abertura: { startDate: '', endDate: '' },
+            data_limite: { startDate: '', endDate: '' }
+        });
     };
 
     const handlePageClick = (pageNumber) => {
@@ -505,19 +567,27 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
     };
 
     const handleSort = (column) => {
-        if (sortColumn === column) {
-            if (sortDirection === 'asc') {
-                setSortDirection('desc');
-            } else if (sortDirection === 'desc') {
-                setSortDirection(null);
-                setSortColumn('');
+        setSortOrders(prevSortOrders => {
+            const newSortOrders = { ...prevSortOrders };
+            if (newSortOrders[column]) {
+                if (newSortOrders[column] === 'asc') {
+                    newSortOrders[column] = 'desc';
+                } else if (newSortOrders[column] === 'desc') {
+                    delete newSortOrders[column];
+                }
             } else {
-                setSortDirection('asc');
+                newSortOrders[column] = 'asc';
             }
-        } else {
-            setSortColumn(column);
-            setSortDirection('asc');
+            return newSortOrders;
+        });
+        console.log(sortOrders)
+    };
+
+    const getSortClass = (column) => {
+        if (sortOrders[column]) {
+            return sortOrders[column] === 'asc' ? 'sorted-asc' : 'sorted-desc';
         }
+        return '';
     };
 
     const atendimentosFiltrados = atendimentos;
@@ -560,7 +630,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
 
                 <div className="filter-icon-container">
                     <FaFilter
-                        className="filter-icon"
+                        className={`filter-icon ${filtersOn ? 'filter-icon-active' : ''}`}
                         onClick={() => setShowFilterDropdown(!showFilterDropdown)}
                     />
                     {showFilterDropdown && (
@@ -605,7 +675,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                             />
                                         )}
 
-                                        <div
+                                        {/* <div
                                             className="sort-order-icons"
                                             onClick={() => handleSortOrderToggle(col)}
                                         >
@@ -615,14 +685,18 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                             <FaArrowDown
                                                 className={`sort-icon ${sortOrders[col] === 'desc' ? 'active' : ''}`}
                                             />
-                                        </div>
+                                        </div> */}
                                     </div>
                                 </div>
                             ))}
-
-                            <button className="save-filter-button" onClick={handleSaveFilters}>
-                                Salvar
-                            </button>
+                            <div style={{ display: 'flex' }}>
+                                <button className="save-filter-button" onClick={handleSaveFilters}>
+                                    Salvar
+                                </button>
+                                <button className="save-filter-button" onClick={handleDeleteFilters}>
+                                    Limpar
+                                </button>
+                            </div>
                         </div>
                     )}
                 </div>
@@ -653,169 +727,85 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                 <th
                                     id='ticket'
                                     onClick={() => handleSort('cod_fluxo')}
-                                    className={
-                                        sortColumn === 'cod_fluxo'
-                                            ? sortDirection === 'asc'
-                                                ? 'sorted-asc'
-                                                : 'sorted-desc'
-                                            : ''
-                                    }
+                                    className={getSortClass('cod_fluxo')}
                                 >
                                     Ticket
                                 </th>
                                 <th
                                     onClick={() => handleSort('abertura')}
-                                    className={
-                                        sortColumn === 'abertura'
-                                            ? sortDirection === 'asc'
-                                                ? 'sorted-asc'
-                                                : 'sorted-desc'
-                                            : ''
-                                    }
+                                    className={getSortClass('abertura')}
                                 >
                                     Abertura
                                 </th>
                                 <th
                                     onClick={() => handleSort('status')}
-                                    className={
-                                        sortColumn === 'status'
-                                            ? sortDirection === 'asc'
-                                                ? 'sorted-asc'
-                                                : 'sorted-desc'
-                                            : ''
-                                    }
+                                    className={getSortClass('status')}
                                 >
                                     Status
                                 </th>
                                 <th
                                     onClick={() => handleSort('st_sla')}
-                                    className={
-                                        sortColumn === 'st_sla'
-                                            ? sortDirection === 'asc'
-                                                ? 'sorted-asc'
-                                                : 'sorted-desc'
-                                            : ''
-                                    }
+                                    className={getSortClass('st_sla')}
                                 >
                                     SLA
                                 </th>
                                 <th
                                     onClick={() => handleSort('ds_nivel')}
-                                    className={
-                                        sortColumn === 'ds_nivel'
-                                            ? sortDirection === 'asc'
-                                                ? 'sorted-asc'
-                                                : 'sorted-desc'
-                                            : ''
-                                    }
+                                    className={getSortClass('ds_nivel')}
                                 >
                                     Prioridade
                                 </th>
                                 <th
                                     onClick={() => handleSort('categoria')}
-                                    className={
-                                        sortColumn === 'categoria'
-                                            ? sortDirection === 'asc'
-                                                ? 'sorted-asc'
-                                                : 'sorted-desc'
-                                            : ''
-                                    }
+                                    className={getSortClass('categoria')}
                                 >
                                     Categoria
                                 </th>
                                 <th
                                     onClick={() => handleSort('subcategoria')}
-                                    className={
-                                        sortColumn === 'subcategoria'
-                                            ? sortDirection === 'asc'
-                                                ? 'sorted-asc'
-                                                : 'sorted-desc'
-                                            : ''
-                                    }
+                                    className={getSortClass('subcategoria')}
                                 >
                                     Subcategoria
                                 </th>
                                 <th
                                     onClick={() => handleSort('assunto')}
-                                    className={
-                                        sortColumn === 'assunto'
-                                            ? sortDirection === 'asc'
-                                                ? 'sorted-asc'
-                                                : 'sorted-desc'
-                                            : ''
-                                    }
+                                    className={getSortClass('assunto')}
                                 >
                                     Assunto
                                 </th>
                                 <th
                                     onClick={() => handleSort('data_limite')}
-                                    className={
-                                        sortColumn === 'data_limite'
-                                            ? sortDirection === 'asc'
-                                                ? 'sorted-asc'
-                                                : 'sorted-desc'
-                                            : ''
-                                    }
+                                    className={getSortClass('data_limite')}
                                 >
                                     Data Limite
                                 </th>
                                 <th
                                     onClick={() => handleSort('grupo')}
-                                    className={
-                                        sortColumn === 'grupo'
-                                            ? sortDirection === 'asc'
-                                                ? 'sorted-asc'
-                                                : 'sorted-desc'
-                                            : ''
-                                    }
+                                    className={getSortClass('grupo')}
                                 >
                                     Analista Atual
                                 </th>
                                 <th
                                     onClick={() => handleSort('nome')}
-                                    className={
-                                        sortColumn === 'nome'
-                                            ? sortDirection === 'asc'
-                                                ? 'sorted-asc'
-                                                : 'sorted-desc'
-                                            : ''
-                                    }
+                                    className={getSortClass('nome')}
                                 >
                                     Nome
                                 </th>
                                 <th
                                     onClick={() => handleSort('area_negocio')}
-                                    className={
-                                        sortColumn === 'area_negocio'
-                                            ? sortDirection === 'asc'
-                                                ? 'sorted-asc'
-                                                : 'sorted-desc'
-                                            : ''
-                                    }
+                                    className={getSortClass('area_negocio')}
                                 >
                                     Área de Negócio
                                 </th>
                                 <th
                                     onClick={() => handleSort('hub')}
-                                    className={
-                                        sortColumn === 'hub'
-                                            ? sortDirection === 'asc'
-                                                ? 'sorted-asc'
-                                                : 'sorted-desc'
-                                            : ''
-                                    }
+                                    className={getSortClass('hub')}
                                 >
                                     HUB
                                 </th>
                                 <th
                                     onClick={() => handleSort('unidade')}
-                                    className={
-                                        sortColumn === 'unidade'
-                                            ? sortDirection === 'asc'
-                                                ? 'sorted-asc'
-                                                : 'sorted-desc'
-                                            : ''
-                                    }
+                                    className={getSortClass('unidade')}
                                 >
                                     Unidade de Negócio
                                 </th>
