@@ -27,6 +27,8 @@ const Modal = ({ data, onClose }) => {
     const [selectedSubcategoria, setSelectedSubcategoria] = useState(data.subcategoria || '');
     const [selectedAssunto, setSelectedAssunto] = useState(data.assunto || '');
     const [selectedDestinatario, setSelectedDestinatario] = useState(data.executor || '');
+    const [dataLimite, setDataLimite] = useState(data.data_limite);
+    const [sla, setSla] = useState('');
     const [emailDomains, setEmailDomains] = useState([]);
     const [isEmailDomainEditable, setIsEmailDomainEditable] = useState(false);
     const [isAllowedCreateUser, setIsAllowedCreateUser] = useState(false);
@@ -297,6 +299,13 @@ const Modal = ({ data, onClose }) => {
                     ...prevOptions,
                     prioridades: response.data
                 }));
+                const prioridadeAtual = response.data.find(e => e.prioridade === prioridadeSelecionada);
+                if(prioridadeAtual?.tipo_tempo === "Útil"){
+                    setSla(data.st_sla)
+                }
+                else{
+                    setSla(data.sla_corrido)
+                }
             })
             .catch(error => {
                 console.error("Erro ao buscar prioridades:", error);
@@ -404,11 +413,6 @@ const Modal = ({ data, onClose }) => {
         }, 500);
     };
 
-    const handleAbrirAnexosModal = () => {
-        setAnexoSelecionado(null);
-        setShowAnexosModal(true);
-    };
-
     const handleFecharAnexosModal = () => {
         setIsClosingAnexosModal(true);
         setTimeout(() => {
@@ -418,7 +422,7 @@ const Modal = ({ data, onClose }) => {
     };
 
     const handleSalvarAtividade = () => {
-        const aberto_em = document.querySelector('#inicio-task').value;
+        const aberto_em = formatDate(document.querySelector('#inicio-task').value, 2);
         const aberto_por = document.querySelector('#aberto-por-task').value;
         const descricao = document.querySelector('#descricao-task').value.trim();
         const status = document.querySelector('#status-task').value;
@@ -492,12 +496,6 @@ const Modal = ({ data, onClose }) => {
         setShowAtividadesModal(true);
     };
 
-    const handleAbrirDetalhesAnexo = (anexo) => {
-        setAnexoSelecionado(anexo);
-        setIsEditMode(false);
-        setShowAnexosModal(true);
-    };
-
     const handleFieldChange = (field, value) => {
         switch (field) {
             case 'hub':
@@ -542,8 +540,32 @@ const Modal = ({ data, onClose }) => {
         setOrganizacaoDomains(selectedOrganization);
     };
 
-    const handlePrioridadeClick = (prioridade) => {
-        setPrioridadeSelecionada(prioridade);
+    const handlePrioridadeChange = async (event) => {
+        setPrioridadeSelecionada(event.target.value)
+
+        const prioridade = options.prioridades.find(p => p.prioridade === event.target.value);
+        
+        if (!prioridade) {
+            console.error('Prioridade não encontrada');
+            return;
+        }
+
+        let data_atualizada = null;
+        const sla = parseInt(prioridade.sla, 10);
+        
+        if (prioridade.tipo_tempo === "Corrido") {
+            data_atualizada = await adicionaMinutosCorridos(data.abertura, sla);
+            const tempo_minutos_corridos = parseInt(data.tempo_minutos_corridos, 10);
+            console.log(sla, tempo_minutos_corridos, tempo_minutos_corridos <= sla);
+            setSla(tempo_minutos_corridos <= sla ? "No Prazo" : "Em Atraso");
+        } else {
+            data_atualizada = await adicionaMinutosUteis(data.abertura, sla);
+            const tempo_minutos = parseInt(data.tempo_minutos, 10);
+            console.log(sla, tempo_minutos, tempo_minutos <= sla);
+            setSla(tempo_minutos <= sla  ? "No Prazo" : "Em Atraso");
+        }
+
+        setDataLimite(data_atualizada);
     };
 
     const handleSalvarTicket = async (statusParam = null, senha = null) => {
@@ -618,6 +640,7 @@ const Modal = ({ data, onClose }) => {
             executor: id_executor === null ? (ultimoItem?.id_executor ?? data.executor) : id_executor,
             grupo: executor === null ? (ultimoItem?.executor ?? data.grupo) : executor,
             sla: options.prioridades.find(line => line.prioridade === prioridadeSelecionada)?.sla ?? data.sla,
+            data_limite: dataLimite ?? data.data_limite
             //resposta_chamado: resposta_chamado === '' ? null : resposta_chamado
         };
 
@@ -762,6 +785,75 @@ const Modal = ({ data, onClose }) => {
             console.error("Error saving ticket and tasks:", error);
         }
     };
+
+    async function adicionaMinutosUteis(dataInicio, minutos, horarioInicio = "08:00:00", horarioFim = "18:00:00") {
+        let dataAtual = new Date(dataInicio);
+        let horasDeTrabalhoPorDia = (new Date(`01/01/2000 ${horarioFim}`).getHours() - new Date(`01/01/2000 ${horarioInicio}`).getHours()) * 60;
+    
+        let dias = 0;
+        let minutosRestantes = parseInt(minutos);
+    
+        function ehDiaUtil(data) {
+            const diaDaSemana = data.getDay();
+            return diaDaSemana > 0 && diaDaSemana < 6;
+        }
+    
+        let horaAtualMinutos = dataAtual.getHours() * 60 + dataAtual.getMinutes();
+        let inicioMinutos = parseInt(horarioInicio.split(":")[0]) * 60 + parseInt(horarioInicio.split(":")[1]);
+        let fimMinutos = parseInt(horarioFim.split(":")[0]) * 60 + parseInt(horarioFim.split(":")[1]);
+        
+        if (horaAtualMinutos < inicioMinutos) {
+            dataAtual.setHours(parseInt(horarioInicio.split(":")[0]), parseInt(horarioInicio.split(":")[1]), 0);
+        } else if (horaAtualMinutos > fimMinutos) {
+            dataAtual.setDate(dataAtual.getDate() + 1);
+            dataAtual.setHours(parseInt(horarioInicio.split(":")[0]), parseInt(horarioInicio.split(":")[1]), 0);
+        }
+    
+        while (minutosRestantes > 0) {
+            if (ehDiaUtil(dataAtual)) {
+                let horaAtual = dataAtual.getHours() * 60 + dataAtual.getMinutes();
+                let minutosAteOFinalDoDia = fimMinutos - horaAtual;
+    
+                if (minutosRestantes <= minutosAteOFinalDoDia) {
+                    dataAtual.setMinutes(dataAtual.getMinutes() + minutosRestantes);
+                    minutosRestantes = 0;
+                } else {
+                    minutosRestantes -= minutosAteOFinalDoDia;
+                    dataAtual.setDate(dataAtual.getDate() + 1);
+                    dataAtual.setHours(parseInt(horarioInicio.split(":")[0]), parseInt(horarioInicio.split(":")[1]), 0);
+                    dias++;
+                }
+            } else {
+                dataAtual.setDate(dataAtual.getDate() + 1);
+            }
+        }
+    
+        // Formatação da data de retorno no formato "YYYY-MM-DD HH:MM:SS"
+        let year = dataAtual.getFullYear();
+        let month = dataAtual.getMonth() + 1;
+        let day = dataAtual.getDate();
+        let hour = dataAtual.getHours();
+        let minute = dataAtual.getMinutes();
+        let second = dataAtual.getSeconds();
+        let formattedDate = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')} ${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:${second.toString().padStart(2, '0')}`;
+    
+        return formattedDate;
+    }
+    
+    async function adicionaMinutosCorridos(dataInicio, minutos) {
+        let dataAtual = new Date(dataInicio);
+        dataAtual.setMinutes(dataAtual.getMinutes() + parseInt(minutos));
+    
+        let year = dataAtual.getFullYear();
+        let month = dataAtual.getMonth() + 1;
+        let day = dataAtual.getDate();
+        let hour = dataAtual.getHours();
+        let minute = dataAtual.getMinutes();
+        let second = dataAtual.getSeconds();
+        let formattedDate = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')} ${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:${second.toString().padStart(2, '0')}`;
+    
+        return formattedDate;
+    }
 
     const handleCreateUser = async () => {
         if (!selectedDomain || !organizacaoDomains) {
@@ -1054,7 +1146,8 @@ const Modal = ({ data, onClose }) => {
                                 return (
                                     value !== null && value !== undefined && value !== '' && value !== 'R$ 0/Mês' && (
                                         <p key={key}>
-                                            <strong>{formsEspecificosLabels[key]}:</strong> {value}
+                                            <strong>{formsEspecificosLabels[key]}:</strong>
+                                            {key === "dt_nascimento" ? formatDate(value) : value}
                                         </p>
                                     )
                                 );
@@ -1086,16 +1179,16 @@ const Modal = ({ data, onClose }) => {
                                 <span
                                     className="sla-rect"
                                     style={{
-                                        backgroundColor: slaOptions[data.st_sla] || '#000',
+                                        backgroundColor: slaOptions[sla] || '#000',
                                     }}
                                 >
-                                    {data.st_sla}
+                                    {sla}
                                 </span>
                             </div>
                         </div>
 
                         <p><strong className="data">Abertura:</strong> {formatDate(data.abertura)}</p>
-                        <p><strong className="data">Data Limite:</strong> {formatDate(data.data_limite)}</p>
+                        <p><strong className="data">Data Limite:</strong> {formatDate(dataLimite)}</p>
                         <p><strong className="data">Tipo da SLA:</strong> {options.prioridades.find(p => p.prioridade === prioridadeSelecionada)?.tipo_tempo.toUpperCase() || ''}</p>
 
                         <div className="campo-editavel">
@@ -1114,7 +1207,7 @@ const Modal = ({ data, onClose }) => {
                         <strong>Prioridade: <span className="campo-obrigatorio">*</span></strong>
                         <select
                             value={prioridadeSelecionada}
-                            onChange={(e) => setPrioridadeSelecionada(e.target.value)}
+                            onChange={handlePrioridadeChange}
                             className={getOptionClass(prioridadeSelecionada)}
                         >
                             {filteredPrioridades.map(prioridade => (
@@ -1263,8 +1356,8 @@ const Modal = ({ data, onClose }) => {
                                     <p><label>Aberto Por:</label> {atividadeSelecionada.aberto_por}</p>
                                     <p><label>Concluído Por:</label> {atividadeSelecionada.ds_concluido_por}</p>
                                     <p><label>Status:</label> {atividadeSelecionada.status}</p>
-                                    <p><label>Início:</label> {atividadeSelecionada.aberto_em}</p>
-                                    <p><label>Fim:</label> {atividadeSelecionada.dt_fim}</p>
+                                    <p><label>Início:</label> {formatDate(atividadeSelecionada.aberto_em)}</p>
+                                    <p><label>Fim:</label> {formatDate(atividadeSelecionada.dt_fim)}</p>
                                     <p><label>Destinatário:</label> {atividadeSelecionada.executor}</p>
                                     <p><label>Descrição:</label> {atividadeSelecionada.descricao}</p>
                                     <p><label>Visibilidade:</label> {atividadeSelecionada.tipo_atividade}</p>
@@ -1301,7 +1394,7 @@ const Modal = ({ data, onClose }) => {
                                 <div className="conteudo-modal-atividades">
                                     <div className="campo-detalhe">
                                         <label htmlFor="inicio-task">Início:</label>
-                                        <input type="text" id="inicio-task" value={inicio} readOnly />
+                                        <input type="text" id="inicio-task" value={formatDate(inicio)} readOnly />
                                     </div>
                                     <div className="campo-detalhe">
                                         <label htmlFor="aberto-por-task">Aberto Por:</label>
