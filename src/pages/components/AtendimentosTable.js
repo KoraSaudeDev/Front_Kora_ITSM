@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaSearch, FaChevronLeft, FaChevronRight, FaFilter, FaArrowUp, FaArrowDown } from 'react-icons/fa';
+import Select from 'react-select';
 import Modal from './ModalTicket';
 import caixaVazia from '../../assets/images/caixa-vazia.png';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 
-const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket, onResetTicket, tipoTela, filtroOptionsUrl, filtro }) => {
+const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket, onResetTicket, tipoTela, filtro }) => {
     const { user } = useAuth();
     const [atendimentos, setAtendimentos] = useState([]);
     const [showModal, setShowModal] = useState(false);
@@ -31,23 +32,41 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
     });
 
     const columnOptions = [
-        'abertura', 'status', 'st_sla', 'categoria', 'subcategoria',
-        'assunto', 'ds_nivel', 'data_limite', 'grupo', 'nome', 'area_negocio', 'hub', 'unidade'
+        'abertura', 'status', 'st_sla', 'categoria', 'ds_nivel',
+        'data_limite', 'grupo', 'area_negocio', 'hub', 'unidade'
     ];
     const columnDescriptions = {
         abertura: 'Abertura',
         status: 'Status',
         st_sla: 'SLA',
         categoria: 'Categoria',
-        subcategoria: 'Subcategoria',
-        assunto: 'Assunto',
         ds_nivel: 'Prioridade',
         data_limite: 'Data limite',
         grupo: 'Analista Atual',
-        nome: 'Nome',
         area_negocio: 'Área de negócio',
         hub: 'HUB',
         unidade: 'Unidade de negócio'
+    };
+    const customStyles = {
+        option: (provided, state) => ({
+            ...provided,
+            backgroundColor: state.isSelected ? '#007aff' : state.isFocused ? '#e0f7fa' : 'white', // Cor de fundo
+            color: state.isSelected ? 'white' : '#3E4676', // Cor do texto
+            padding: 10,
+        }),
+        control: (provided) => ({
+            ...provided,
+            borderColor: '#007aff', // Cor da borda do select
+            boxShadow: 'none',
+            width: '250px',
+            '&:hover': {
+                borderColor: '#007aff', // Cor da borda ao passar o mouse
+            },
+        }),
+        singleValue: (provided) => ({
+            ...provided,
+            color: '#3E4676', // Cor do valor selecionado
+        }),
     };
 
     const prevPageRef = useRef(currentPage);
@@ -168,52 +187,83 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
     }, [selectedTicket]);
 
     useEffect(() => {
-        let config = {
-            method: 'post',
-            maxBodyLength: Infinity,
-            url: filtroOptionsUrl,
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            data: filtrosExtras
-        };
-
-        axios.request(config)
-            .then(response => {
-                if (response.data.sla_util) {
-                    response.data.st_sla = response.data.sla_util;
-                    delete response.data.sla_util;
-                }
-                setFilterOptions(response.data);
-            })
-            .catch(error => {
-                console.error('Error fetching filter options:', error);
-            });
-    }, []);
-
-    useEffect(() => {
-        const fetchSavedFilters = async () => {
+        const fetchFilterOptions = async () => {
             try {
-                const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/${filtro}/${user.id_user}`);
-                const { dateFilters, filterOptions, sortOrders } = response.data;
+                const responses = await Promise.all([
+                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/hub`),
+                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/categorias`),
+                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/status-tickets`),
+                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/usuarios-executores`),
+                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/sla`),
+                ]);
 
-                setDateFilters(dateFilters);
-                setFilterOptions(filterOptions);
-                setSortOrders(sortOrders);
+                const [hubResponse, categoriasResponse, statusResponse, usuariosExecutoresResponse, slaResponse] = responses;
 
-                const newFilterSelectedOptions = Object.keys(filterOptions).reduce((acc, key) => {
-                    acc[key] = filterOptions[key][0];
-                    return acc;
-                }, {});
-                setFilterSelectedOptions(newFilterSelectedOptions);
+                const options = {
+                    hub: hubResponse.data.map(hub => ({
+                        value: hub,
+                        label: hub
+                    })),
+                    categoria: categoriasResponse.data.map(categoria => ({
+                        value: categoria,
+                        label: categoria
+                    })),
+                    status: statusResponse.data.map(status => ({
+                        value: status,
+                        label: status
+                    })),
+                    grupo: usuariosExecutoresResponse.data.map(user => ({
+                        value: user.id,
+                        label: user.fila
+                    })),
+                    st_sla: [
+                        {
+                            value: "Em Atraso",
+                            label: "Em Atraso"
+                        },
+                        {
+                            value: "No Prazo",
+                            label: "No Prazo"
+                        }
+                    ],
+                    ds_nivel: slaResponse.data.map(sla => ({
+                        value: sla.prioridade,
+                        label: `${sla.prioridade} - ${sla.descricao}`
+                    })),
+                };
 
+                setFilterOptions(options);
             } catch (error) {
-                console.error('Error fetching saved filters:', error);
+                console.error('Error fetching filter options:', error);
             }
         };
 
-        fetchSavedFilters();
-    }, [filtro, user.id_user]);
+        fetchFilterOptions();
+    }, []);
+
+    // useEffect(() => {
+    //     const fetchSavedFilters = async () => {
+    //         try {
+    //             const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/${filtro}/${user.id_user}`);
+    //             const { dateFilters, filterOptions, sortOrders } = response.data;
+
+    //             setDateFilters(dateFilters);
+    //             setFilterOptions(filterOptions);
+    //             setSortOrders(sortOrders);
+
+    //             const newFilterSelectedOptions = Object.keys(filterOptions).reduce((acc, key) => {
+    //                 acc[key] = filterOptions[key];
+    //                 return acc;
+    //             }, {});
+    //             setFilterSelectedOptions(newFilterSelectedOptions);
+
+    //         } catch (error) {
+    //             console.error('Error fetching saved filters:', error);
+    //         }
+    //     };
+
+    //     fetchSavedFilters();
+    // }, [filtro, user.id_user]);
 
     const showLoadingOverlay = () => {
         document.getElementById('loading-overlay').style.display = 'flex';
@@ -316,9 +366,16 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                 }));
             }
         }
-        else{
+        else {
             setDateFilters(newDateFilters);
         }
+    };
+
+    const handleSelectChange = (col, selectedOptions) => {
+        setFilterSelectedOptions(prevOptions => ({
+            ...prevOptions,
+            [col]: selectedOptions
+        }));
     };
 
     const cleanFilters = (filters) => {
@@ -496,23 +553,15 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                                 {dateErrors[col] && <p className="error-message">{dateErrors[col]}</p>}
                                             </>
                                         ) : (
-                                            <>
-                                                <select
-                                                    className="filter-column-select"
-                                                    data-column={col}
-                                                    defaultValue={filterSelectedOptions[col] || ''}
-                                                >
-                                                    <option value=""></option>
-                                                    {(filterOptions[col] || []).map(option => (
-                                                        <option
-                                                            key={option}
-                                                            value={option}
-                                                        >
-                                                            {option}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            </>
+                                            <Select
+                                                className="filter-column-select"
+                                                isMulti
+                                                options={filterOptions[col] || []}
+                                                value={filterSelectedOptions[col] || []}
+                                                placeholder=""
+                                                onChange={(selectedOptions) => handleSelectChange(col, selectedOptions)}
+                                                styles={customStyles}
+                                            />
                                         )}
 
                                         <div
