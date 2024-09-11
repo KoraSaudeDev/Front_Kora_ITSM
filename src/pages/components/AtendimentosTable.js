@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { FaSearch, FaChevronLeft, FaChevronRight, FaFilter, FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import Select from 'react-select';
 import Modal from './ModalTicket';
@@ -21,6 +21,8 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
     const [showFilterDropdown, setShowFilterDropdown] = useState(false);
     const [filterOptions, setFilterOptions] = useState({});
     const [filterSelectedOptions, setFilterSelectedOptions] = useState({});
+    const [savedFilters, setSavedFilters] = useState(null);
+    const [selectedHubs, setSelectedHubs] = useState([]);
     const [sortOrders, setSortOrders] = useState({});
     const [dateFilters, setDateFilters] = useState({
         abertura: { startDate: '', endDate: '' },
@@ -30,6 +32,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         abertura: '',
         data_limite: ''
     });
+    const [errorTimeouts, setErrorTimeouts] = useState({});
 
     const columnOptions = [
         'abertura', 'status', 'st_sla', 'categoria', 'ds_nivel',
@@ -71,8 +74,6 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
 
     const prevPageRef = useRef(currentPage);
     const prevItemsPerPageRef = useRef(itemsPerPage);
-    const prevStatusFilterRef = useRef(filtroStatus);
-    const prevSLAFilterPageRef = useRef(filtroSLA);
 
     const [sortColumn, setSortColumn] = useState('');
     const [sortDirection, setSortDirection] = useState(null);
@@ -99,8 +100,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
     useEffect(() => {
         const fetchAtendimentos = async () => {
             try {
-                if (prevPageRef.current !== currentPage || prevItemsPerPageRef.current !== itemsPerPage ||
-                    prevStatusFilterRef.current !== filtroStatus || prevSLAFilterPageRef.current !== filtroSLA) {
+                if (prevPageRef.current !== currentPage || prevItemsPerPageRef.current !== itemsPerPage) {
                     showLoadingOverlay();
                 }
                 setLoading(true);
@@ -118,14 +118,10 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                     url += `&sort_by=${sortColumn}&sort_order=${sortDirection}`;
                 }
 
-                if (filtroStatus) {
-                    url += `&status=${filtroStatus}`;
+                if(savedFilters){
+                    filtrosExtras["filtros"] = savedFilters
                 }
-
-                if (filtroSLA) {
-                    url += `&st_sla=${filtroSLA}`;
-                }
-
+                
                 let config = {
                     method: 'post',
                     maxBodyLength: Infinity,
@@ -174,11 +170,9 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
 
         prevPageRef.current = currentPage;
         prevItemsPerPageRef.current = itemsPerPage;
-        prevStatusFilterRef.current = filtroStatus;
-        prevSLAFilterPageRef.current = filtroSLA;
 
         return () => clearTimeout(timer);
-    }, [currentPage, itemsPerPage, sortColumn, sortDirection, filtroStatus, filtroSLA]);
+    }, [currentPage, itemsPerPage, sortColumn, sortDirection, savedFilters]);
 
     useEffect(() => {
         if (selectedTicket) {
@@ -187,7 +181,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
     }, [selectedTicket]);
 
     useEffect(() => {
-        const fetchFilterOptions = async () => {
+        const fetchFilterOptions = async (hubs = []) => {
             try {
                 const responses = await Promise.all([
                     axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/hub`),
@@ -195,9 +189,11 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                     axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/status-tickets`),
                     axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/usuarios-executores`),
                     axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/sla`),
+                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/areas-negocio`),
+                    hubs.length > 0 ? axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/unidade?hub=${hubs.join(',')}`) : Promise.resolve({ data: [] })
                 ]);
 
-                const [hubResponse, categoriasResponse, statusResponse, usuariosExecutoresResponse, slaResponse] = responses;
+                const [hubResponse, categoriasResponse, statusResponse, usuariosExecutoresResponse, slaResponse, areasNegocioResponse, unidadeResponse] = responses;
 
                 const options = {
                     hub: hubResponse.data.map(hub => ({
@@ -228,8 +224,16 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                     ],
                     ds_nivel: slaResponse.data.map(sla => ({
                         value: sla.prioridade,
-                        label: `${sla.prioridade} - ${sla.descricao}`
+                        label: `${sla.prioridade} ${sla.descricao == null ? '' : `- ${sla.descricao}`}`
                     })),
+                    area_negocio: areasNegocioResponse.data.map(area => ({
+                        value: area,
+                        label: area
+                    })),
+                    unidade: unidadeResponse.data.map(unidade => ({
+                        value: unidade,
+                        label: unidade
+                    }))
                 };
 
                 setFilterOptions(options);
@@ -238,32 +242,44 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
             }
         };
 
-        fetchFilterOptions();
+        fetchFilterOptions(selectedHubs);
+    }, [selectedHubs]);
+
+    useEffect(() => {
+        const fetchSavedFilters = async () => {
+            try {
+                const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/${filtro}/${user.id_user}`);
+                console.log(response.data)
+                const { dateFilters: apiDateFilters, filterOptions, sortOrders } = response.data;
+                                
+                setDateFilters(prevDateFilters => ({
+                    ...prevDateFilters,
+                    ...apiDateFilters
+                }));
+
+                setSortOrders(sortOrders);
+
+                const updatedFilterSelectedOptions = {};
+                for (const key in filterOptions) {
+                    if (filterOptions[key].length) {
+                        updatedFilterSelectedOptions[key] = filterOptions[key].map(option => ({
+                            value: option,
+                            label: option
+                        }));
+                    } else {
+                        updatedFilterSelectedOptions[key] = [];
+                    }
+                }
+                setFilterSelectedOptions(updatedFilterSelectedOptions);
+
+                setSavedFilters(response.data);
+            } catch (error) {
+                console.error('Error fetching saved filters:', error);
+            }
+        };
+
+        fetchSavedFilters();
     }, []);
-
-    // useEffect(() => {
-    //     const fetchSavedFilters = async () => {
-    //         try {
-    //             const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/${filtro}/${user.id_user}`);
-    //             const { dateFilters, filterOptions, sortOrders } = response.data;
-
-    //             setDateFilters(dateFilters);
-    //             setFilterOptions(filterOptions);
-    //             setSortOrders(sortOrders);
-
-    //             const newFilterSelectedOptions = Object.keys(filterOptions).reduce((acc, key) => {
-    //                 acc[key] = filterOptions[key];
-    //                 return acc;
-    //             }, {});
-    //             setFilterSelectedOptions(newFilterSelectedOptions);
-
-    //         } catch (error) {
-    //             console.error('Error fetching saved filters:', error);
-    //         }
-    //     };
-
-    //     fetchSavedFilters();
-    // }, [filtro, user.id_user]);
 
     const showLoadingOverlay = () => {
         document.getElementById('loading-overlay').style.display = 'flex';
@@ -280,23 +296,6 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
             setShowModal(true);
         } catch (error) {
             console.error("Erro ao buscar informações do ticket:", error);
-        }
-    };
-
-    const handleFiltroClick = (status) => {
-        setFiltroStatus(filtroStatus === status ? '' : status);
-        setCurrentPage(1);
-    };
-
-    const handleSLAClick = (sla) => {
-        setFiltroSLA(filtroSLA === sla ? '' : sla);
-        setCurrentPage(1);
-    };
-
-    const handleClearFiltro = (e) => {
-        if (e.target.className === 'container-meus-atendimentos') {
-            setFiltroStatus('');
-            setFiltroSLA('');
         }
     };
 
@@ -336,7 +335,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         });
     };
 
-    const handleDateChange = (column, type, value) => {
+    const handleDateChange = useCallback((column, type, value) => {
         const newDateFilters = {
             ...dateFilters,
             [column]: {
@@ -346,36 +345,68 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         };
 
         if (newDateFilters[column].startDate && newDateFilters[column].endDate) {
-            if (new Date(newDateFilters[column].startDate) > new Date(newDateFilters[column].endDate)) {
+            const startDate = new Date(newDateFilters[column].startDate);
+            const endDate = new Date(newDateFilters[column].endDate);
+
+            if (startDate > endDate) {
                 setDateErrors(prev => ({
                     ...prev,
                     [column]: 'A data de início não pode ser posterior à data de fim.'
                 }));
 
-                setTimeout(() => {
+                if (errorTimeouts[column]) {
+                    clearTimeout(errorTimeouts[column]);
+                }
+
+                const timeoutId = setTimeout(() => {
                     setDateErrors(prev => ({
                         ...prev,
                         [column]: ''
                     }));
                 }, 3000);
+
+                setErrorTimeouts(prev => ({
+                    ...prev,
+                    [column]: timeoutId
+                }));
+
                 return;
             } else {
                 setDateErrors(prev => ({
                     ...prev,
                     [column]: ''
                 }));
+
+                if (errorTimeouts[column]) {
+                    clearTimeout(errorTimeouts[column]);
+                }
             }
         }
-        else {
-            setDateFilters(newDateFilters);
-        }
-    };
+
+        setDateFilters(newDateFilters);
+    }, [dateFilters, errorTimeouts]);
 
     const handleSelectChange = (col, selectedOptions) => {
-        setFilterSelectedOptions(prevOptions => ({
-            ...prevOptions,
-            [col]: selectedOptions
-        }));
+        setFilterSelectedOptions(prevOptions => {
+            const updatedOptions = {
+                ...prevOptions,
+                [col]: selectedOptions
+            };
+
+            if (col === 'hub') {
+                const newSelectedHubs = selectedOptions.map(option => option.value);
+                setSelectedHubs(newSelectedHubs);
+
+                updatedOptions.unidade = [];
+
+                setFilterSelectedOptions(prev => ({
+                    ...prev,
+                    unidade: []
+                }));
+            }
+
+            return updatedOptions;
+        });
     };
 
     const cleanFilters = (filters) => {
@@ -405,17 +436,18 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
     };
 
     const handleSaveFilters = async () => {
-        const savedFilters = {
+        const savedFiltersLocal = {
             sortOrders,
-            filterOptions: Object.keys(filterOptions).reduce((acc, key) => {
-                const selectedOptions = document.querySelectorAll(`.filter-column-select[data-column="${key}"] option:checked`);
-                acc[key] = Array.from(selectedOptions).map(option => option.value);
+            filterOptions: Object.keys(filterSelectedOptions).reduce((acc, key) => {
+                acc[key] = filterSelectedOptions[key].map(option => option.value);
                 return acc;
             }, {}),
             dateFilters
         };
 
-        const cleanedFilters = cleanFilters(savedFilters);
+        const cleanedFilters = cleanFilters(savedFiltersLocal);
+
+        console.log(cleanedFilters)
 
         const hasData = Object.keys(cleanedFilters.sortOrders).length > 0 ||
             Object.keys(cleanedFilters.filterOptions).length > 0 ||
@@ -436,6 +468,9 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                 const response = await axios.request(ticketConfig);
 
                 console.log(response.data);
+
+                setSavedFilters(cleanedFilters);
+
                 hideLoadingOverlay();
             } catch (error) {
                 console.error('Error saving filters:', error);
@@ -510,7 +545,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
     };
 
     return (
-        <div className="container-meus-atendimentos" onClick={handleClearFiltro}>
+        <div className="container-meus-atendimentos">
             <div id="loading-overlay" className="loading-overlay">
                 <div className="loading-spinner"></div>
             </div>
@@ -538,18 +573,24 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                     <div className="filter-select-container">
                                         {col === 'abertura' || col === 'data_limite' ? (
                                             <>
-                                                <input
-                                                    type="date"
-                                                    placeholder="Data Início"
-                                                    defaultValue={dateFilters[col]?.startDate || ''}
-                                                    onChange={(e) => handleDateChange(col, 'startDate', e.target.value)}
-                                                />
-                                                <input
-                                                    type="date"
-                                                    placeholder="Data Fim"
-                                                    defaultValue={dateFilters[col]?.endDate || ''}
-                                                    onChange={(e) => handleDateChange(col, 'endDate', e.target.value)}
-                                                />
+                                                {dateFilters[col] ? (
+                                                    <>
+                                                        <input
+                                                            type="date"
+                                                            placeholder="Data Início"
+                                                            value={dateFilters[col].startDate || ''}
+                                                            onChange={(e) => handleDateChange(col, 'startDate', e.target.value)}
+                                                        />
+                                                        <input
+                                                            type="date"
+                                                            placeholder="Data Fim"
+                                                            value={dateFilters[col].endDate || ''}
+                                                            onChange={(e) => handleDateChange(col, 'endDate', e.target.value)}
+                                                        />
+                                                    </>
+                                                ) : (
+                                                    <p>Selecione uma data</p>
+                                                )}
                                                 {dateErrors[col] && <p className="error-message">{dateErrors[col]}</p>}
                                             </>
                                         ) : (
@@ -594,32 +635,6 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                         placeholder="Pesquisar pelo número do ticket"
                         onChange={handleSearchChange}
                     />
-                </div>
-                <div className="filtro-sla">
-                    <span
-                        className={`sla-bolinha ${filtroSLA === 'No Prazo' ? 'active' : ''}`}
-                        style={{ backgroundColor: slaOptions['No Prazo'] }}
-                        onClick={() => handleSLAClick('No Prazo')}
-                    ></span>
-                    <span
-                        className={`sla-bolinha ${filtroSLA === 'Em Atraso' ? 'active' : ''}`}
-                        style={{ backgroundColor: slaOptions['Em Atraso'] }}
-                        onClick={() => handleSLAClick('Em Atraso')}
-                    ></span>
-                </div>
-                <div className="dropdown-filtro-status">
-                    <select
-                        value={filtroStatus}
-                        onChange={(e) => handleFiltroClick(e.target.value)}
-                        className="dropdown-status-select"
-                    >
-                        <option value="">Todos os Status</option>
-                        {Object.keys(statusOptions).map((status) => (
-                            <option key={status} value={status}>
-                                {status}
-                            </option>
-                        ))}
-                    </select>
                 </div>
             </div>
 

@@ -872,6 +872,19 @@ const Modal = ({ data, onClose }) => {
         }
     };
 
+    const getOptionClass = (prioridade) => {
+        switch (prioridade) {
+            case 'P1':
+                return 'option-p1';
+            case 'P2':
+                return 'option-p2';
+            case 'P3':
+                return 'option-p3';
+            default:
+                return '';
+        }
+    };
+
     const categoriaOptions = options.categoria.map(option => ({ value: option, label: option }));
     const subcategoriaOptions = selectedCategoria
         ? [
@@ -1100,7 +1113,7 @@ const Modal = ({ data, onClose }) => {
                                 onChange={(e) => setPrioridadeSelecionada(e.target.value)}
                             >
                                 {filteredPrioridades.map(prioridade => (
-                                    <option key={prioridade.prioridade} value={prioridade.prioridade}>
+                                    <option key={prioridade.prioridade} value={prioridade.prioridade} className={getOptionClass(prioridade.prioridade)}>
                                         {prioridade.prioridade}
                                         {prioridade.prioridade !== 'P6' && prioridade.prioridade !== 'P7' &&
                                             ` - ${prioridade.descricao}`}

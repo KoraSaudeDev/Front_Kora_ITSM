@@ -36,7 +36,15 @@ const Sidebar = () => {
 
       const fetchMeusAtendimentosCount = async () => {
         try {
-          const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/tickets/meus-atendimentos?user_id=${user.id_user}&page=1&per_page=1`);
+          const response = await axios.post(
+            `${process.env.REACT_APP_API_BASE_URL}/tickets/meus-atendimentos?user_id=${user.id_user}&page=1&per_page=1`,
+            { filtros: {}},
+            {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            }
+          );
           setMeusAtendimentosCount(response.data.total_items);
         } catch (error) {
           console.error("Erro ao buscar contagem de Meus Atendimentos", error);

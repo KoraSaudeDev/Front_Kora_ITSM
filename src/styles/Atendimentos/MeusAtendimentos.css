@@ -77,6 +77,18 @@ body, html {
     color: rgb(58, 52, 52);
 }
 
+.option-p1 {
+    background-color: lightgreen;
+}
+
+.option-p2 {
+    background-color: lightblue;
+}
+
+.option-p3 {
+    background-color: lightcoral;
+}
+
 .save-filter-button {
     background-color: #043972;
     color: white;
