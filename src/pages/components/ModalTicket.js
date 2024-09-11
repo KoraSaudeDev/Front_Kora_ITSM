@@ -554,13 +554,13 @@ const Modal = ({ data, onClose }) => {
 
         function toTitleCase(str) {
             if (str === "EM ATENDIMENTO") return "Em Andamento";
-            if (str === "CANCELADA") return "Cancelado";
             return str
                 .toLowerCase()
                 .split(' ')
                 .map(word => word.charAt(0).toUpperCase() + word.slice(1))
                 .join(' ');
         }
+
         showLoadingOverlay();
 
         const insert_anexos = anexos.filter(task => task.alterar === 1 && task.id === undefined);
@@ -1111,20 +1111,25 @@ const Modal = ({ data, onClose }) => {
                             />
                         </div>
                         <div className="campo-editavel">
-                            <strong>Prioridade: <span className="campo-obrigatorio">*</span></strong>
-                            <select
-                                value={prioridadeSelecionada}
-                                onChange={(e) => setPrioridadeSelecionada(e.target.value)}
-                            >
-                                {filteredPrioridades.map(prioridade => (
-                                    <option key={prioridade.prioridade} value={prioridade.prioridade} className={getOptionClass(prioridade.prioridade)}>
-                                        {prioridade.prioridade}
-                                        {prioridade.prioridade !== 'P6' && prioridade.prioridade !== 'P7' &&
-                                            ` - ${prioridade.descricao}`}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+    <strong>Prioridade: <span className="campo-obrigatorio">*</span></strong>
+    <select
+        value={prioridadeSelecionada}
+        onChange={(e) => setPrioridadeSelecionada(e.target.value)}
+        className={getOptionClass(prioridadeSelecionada)} // Aplica a cor à opção selecionada
+    >
+        {filteredPrioridades.map(prioridade => (
+            <option
+                key={prioridade.prioridade}
+                value={prioridade.prioridade}
+                className={getOptionClass(prioridade.prioridade)}
+            >
+                {prioridade.prioridade}
+                {prioridade.prioridade !== 'P6' && prioridade.prioridade !== 'P7' && ` - ${prioridade.descricao}`}
+            </option>
+        ))}
+    </select>
+</div>
+
                         <div className="campo-editavel">
                             <strong>Hub: <span className="campo-obrigatorio">*</span></strong>
                             <select

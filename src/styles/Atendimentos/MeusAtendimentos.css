@@ -106,6 +106,31 @@ body, html {
     font-weight: bold;
 }
 
+/* Aplicando as classes às opções */
+.priority-select__option.option-p1 {
+    background-color: #ff9999; /* Vermelho claro */
+    font-weight: bold;
+}
+
+.priority-select__option.option-p2 {
+    background-color: #ffcc99; /* Laranja claro */
+    font-weight: bold;
+}
+
+.priority-select__option.option-p3 {
+    background-color: #ffff99; /* Amarelo claro */
+    font-weight: bold;
+}
+
+.priority-select__option.option-p4 {
+    background-color: #ccffcc; /* Verde claro */
+    font-weight: bold;
+}
+
+.priority-select__option.option-p5 {
+    background-color: #99ff99; /* Verde claro */
+    font-weight: bold;
+}
 
 
 .save-filter-button {
