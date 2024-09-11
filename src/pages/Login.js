@@ -46,6 +46,7 @@ const Login = () => {
       };
 
       const response = await axios.request(config);
+      
 
       if (response.data.gestor) {
         const uniqueIds = new Set();
@@ -66,7 +67,7 @@ const Login = () => {
         if (response.data.id_user) user.id_user = response.data.id_user;
       }
       else {
-        if (response.filas) user.filas = response.data.filas;
+        if (response.data.filas) user.filas = response.data.filas;
         if (response.data.filas_id) user.filas_id = response.data.filas_id;
         if (response.data.id_user) user.id_user = response.data.id_user;
       }
