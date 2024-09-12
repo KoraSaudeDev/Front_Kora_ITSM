@@ -1152,7 +1152,7 @@ const Modal = ({ data, onClose }) => {
                                 <span
                                     className="status-rect"
                                     style={{
-                                        backgroundColor: statusOptions[data.status] || '#000',
+                                        backgroundColor: statusOptions[data.status] || '#ffffff',
                                     }}
                                 >
                                     {data.status}
@@ -1163,7 +1163,7 @@ const Modal = ({ data, onClose }) => {
                                 <span
                                     className="sla-rect"
                                     style={{
-                                        backgroundColor: slaOptions[sla] || '#000',
+                                        backgroundColor: slaOptions[sla] || '#ffffff',
                                     }}
                                 >
                                     {sla}
@@ -1266,7 +1266,7 @@ const Modal = ({ data, onClose }) => {
                                     <p
                                         id='status-bolinha'
                                         style={{
-                                            backgroundColor: statusOptions[convertStatusToTitleCase(atividade.status)] || '#000',
+                                            backgroundColor: statusOptions[convertStatusToTitleCase(atividade.status)] || '#ffffff',
                                             color: 'white',
                                             padding: '4px 8px 4px 8px',
                                             borderRadius: '4px',
