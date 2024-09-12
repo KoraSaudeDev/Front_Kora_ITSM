@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import ReactDOM from 'react-dom';
 import { FaSearch, FaChevronLeft, FaChevronRight, FaFilter, FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import Select from 'react-select';
 import Modal from './ModalTicket';
@@ -52,8 +53,8 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
     const customStyles = {
         option: (provided, state) => ({
             ...provided,
-            backgroundColor: state.isSelected ? '#007aff' : state.isFocused ? '#e0f7fa' : 'white', 
-            color: state.isSelected ? 'white' : '#3E4676', 
+            backgroundColor: state.isSelected ? '#007aff' : state.isFocused ? '#e0f7fa' : 'white',
+            color: state.isSelected ? 'white' : '#3E4676',
             padding: 10,
         }),
         control: (provided) => ({
@@ -62,12 +63,12 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
             boxShadow: 'none',
             width: '325px',
             '&:hover': {
-                borderColor: '#007aff', 
+                borderColor: '#007aff',
             },
         }),
         singleValue: (provided) => ({
             ...provided,
-            color: '#3E4676', 
+            color: '#3E4676',
         }),
     };
 
@@ -93,20 +94,22 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
     };
 
     const prioridadeOptions = {
-        "P1": "#FF0000",    
-        "P2": "#FF8C00",        
-        "P3": "#E5C200",       
-        "P4": "#1E90FF",       
-        "P5": "#28a745"  
+        "P1": "#FF0000",
+        "P2": "#FF8C00",
+        "P3": "#E5C200",
+        "P4": "#1E90FF",
+        "P5": "#28a745"
     };
-    
+
+    const [menuPosition, setMenuPosition] = React.useState({ x: 0, y: 0 });
+    const [showMenu, setShowMenu] = React.useState(false);
+    const [selectedAtendimento, setSelectedAtendimento] = React.useState(null);
 
     const cacheKey = `${tipoTela}_page_${currentPage}_items_${itemsPerPage}`;
 
     useEffect(() => {
         const fetchAtendimentos = async () => {
             try {
-                console.log(prevSavedFilters.current,savedFilters)
                 if (prevPageRef.current !== currentPage || prevItemsPerPageRef.current !== itemsPerPage || prevSavedFilters.current !== savedFilters) {
                     showLoadingOverlay();
                 }
@@ -258,7 +261,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                 const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/${filtro}/${user.id_user}`);
 
                 if (response.data.length === 0) return;
-                console.log(response.data)
+
                 const { dateFilters: apiDateFilters, filterOptions } = response.data;
 
                 setDateFilters(prevDateFilters => ({
@@ -289,6 +292,21 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         fetchSavedFilters();
     }, []);
 
+    useEffect(() => {
+        if (showMenu) {
+            window.addEventListener('click', handleClickOutside);
+            window.addEventListener('scroll', handleClickOutside);
+        } else {
+            window.removeEventListener('click', handleClickOutside);
+            window.removeEventListener('scroll', handleClickOutside);
+        }
+    
+        return () => {
+            window.removeEventListener('click', handleClickOutside);
+            window.removeEventListener('scroll', handleClickOutside);
+        };
+    }, [showMenu]);
+
     const showLoadingOverlay = () => {
         document.getElementById('loading-overlay').style.display = 'flex';
     };
@@ -305,6 +323,38 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         } catch (error) {
             console.error("Erro ao buscar informações do ticket:", error);
         }
+    };
+
+    const handleRightClick = (e, atendimento) => {
+        e.preventDefault();
+    
+        const zoomFactor = 0.87;
+        
+        const clickX = (e.clientX / zoomFactor) + ((e.clientX / zoomFactor) * 0.15);
+        const clickY = (e.clientY / zoomFactor) + ((e.clientY / zoomFactor) * 0.17);
+    
+        setMenuPosition({ x: clickX, y: clickY });
+        setSelectedAtendimento(atendimento);
+        setShowMenu(true);
+    };    
+
+    const handleClickOutside = () => {
+        setShowMenu(false);
+    };
+
+    const handleOpen = async (ticket) => {
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/ticket?cod_fluxo=${ticket.cod_fluxo}`);
+            setModalData(response.data);
+            setShowModal(true);
+        } catch (error) {
+            console.error("Erro ao buscar informações do ticket:", error);
+        }
+    };
+
+    const handleOpenInNewPage = (atendimento) => {
+        console.log('Abrindo atendimento em nova página:', atendimento);
+        setShowMenu(false);
     };
 
     const handleSearchChange = async (e) => {
@@ -592,7 +642,6 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
             }
             return newSortOrders;
         });
-        console.log(sortOrders)
     };
 
     const getSortClass = (column) => {
@@ -601,7 +650,6 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         }
         return '';
     };
-    
 
     const atendimentosFiltrados = atendimentos;
 
@@ -826,11 +874,14 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                         </thead>
                         <tbody>
                             {atendimentosFiltrados.map((atendimento, index) => (
-                                <tr key={atendimento.cod_fluxo} onClick={() => handleClick(atendimento)} style={{ '--stagger': index + 1 }}>
+                                <tr
+                                    key={atendimento.cod_fluxo}
+                                    onClick={() => handleClick(atendimento)}
+                                    onContextMenu={(e) => handleRightClick(e, atendimento)}
+                                    style={{ '--stagger': index + 1 }}
+                                >
                                     <td id='cont-tabela'>{atendimento.cod_fluxo}</td>
                                     <td id='cont-tabela'>{new Date(atendimento.abertura).toLocaleString().replace(',', '')}</td>
-
-                                    
                                     <td id='cont-tabela'>
                                         <span
                                             className="status"
@@ -849,8 +900,6 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                             {atendimento.status}
                                         </span>
                                     </td>
-
-                                
                                     <td id='cont-tabela'>
                                         <span
                                             className="sla"
@@ -869,15 +918,13 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                             {atendimento.sla_util}
                                         </span>
                                     </td>
-
-                                    
                                     <td id='cont-tabela'>
                                         <span
                                             className="prioridade"
                                             style={{
                                                 backgroundColor: prioridadeOptions[atendimento.ds_nivel] || '#ffffff',
                                                 color: 'white',
-                                                width: '100px',
+                                                width: '120px',
                                                 height: '30px',
                                                 lineHeight: '30px',
                                                 textAlign: 'center',
@@ -889,7 +936,6 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                             {atendimento.slaDescricao}
                                         </span>
                                     </td>
-
                                     <td id='cont-tabela'>{atendimento.categoria}</td>
                                     <td id='cont-tabela'>{atendimento.subcategoria}</td>
                                     <td id='cont-tabela'>{atendimento.assunto}</td>
@@ -902,8 +948,6 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                 </tr>
                             ))}
                         </tbody>
-
-
                     </table>
                 </div>
             )}
@@ -927,6 +971,20 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
             </div>
 
             {showModal && <Modal data={modalData} onClose={() => setShowModal(false)} />}
+
+            {showMenu &&
+                ReactDOM.createPortal(
+                    <div
+                        className="context-menu"
+                        style={{ top: `${menuPosition.y}px`, left: `${menuPosition.x}px` }}
+                    >
+                        <ul>
+                            <li onClick={() => handleOpen(selectedAtendimento)}>Abrir</li>
+                            <li onClick={() => handleOpenInNewPage(selectedAtendimento)}>Abrir em outra página...</li>
+                        </ul>
+                    </div>,
+                    document.body
+                )}
         </div>
     );
 };
