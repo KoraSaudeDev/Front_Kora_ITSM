@@ -1382,7 +1382,7 @@ const Modal = ({ data, onClose }) => {
                                         <label htmlFor="aberto-por-task">Aberto Por:</label>
                                         <input type="text" id="aberto-por-task" value={user.name} readOnly />
                                     </div>
-                                    <textarea className="textarea-atividade" placeholder="Descrição" id="descricao-task" rows="6"></textarea>
+                                    <textarea className="textarea-atividade" placeholder="Descrição" id="descricao-task" rows="3"></textarea>
                                     <p>
                                         <label>Status:</label>
                                         <select id="status-task">

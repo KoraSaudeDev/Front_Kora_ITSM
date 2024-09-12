@@ -818,7 +818,7 @@ a {
 }
 
 .textarea-atividade {
-    width: 90%;
+    width: 100%;
     padding: 10px;
     border-radius: 5px;
     border: 1px solid #ccc;
@@ -1105,7 +1105,6 @@ svg {
 }
 
 .campo-select,
-.textarea-atividade,
 .input-anexo,
 .select-destinatario {
     display: block;
@@ -1972,7 +1971,7 @@ th.sorted-desc::before {
     color: #007aff; 
     font-size: 12px;
 }
-/* Estilo para as prioridades */
+
 .prioridade-rect {
     display: inline-block;
     padding: 4px 8px;
@@ -1981,26 +1980,4 @@ th.sorted-desc::before {
     color: white;
     margin-left: 8px;
     font-size: 14px;
-}
-
-/* Cores para as prioridades */
-.prioridade-p1 {
-    background-color: #FF3D00; /* Vermelho */
-}
-
-.prioridade-p2 {
-    background-color: #FFA500; /* Laranja */
-}
-
-.prioridade-p3 {
-    background-color: #FFEB3B; /* Amarelo */
-    color: black; /* Texto preto para contraste */
-}
-
-.prioridade-p4 {
-    background-color: #8BC34A; /* Verde Claro */
-}
-
-.prioridade-p5 {
-    background-color: #388E3C; /* Verde Escuro */
 }
