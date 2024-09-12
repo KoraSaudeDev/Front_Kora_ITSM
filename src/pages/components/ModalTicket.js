@@ -1188,52 +1188,45 @@ const Modal = ({ data, onClose }) => {
                             />
                         </div>
                         <div className="campo-editavel">
-                        <strong>Prioridade: <span className="campo-obrigatorio">*</span></strong>
-                        <select
-                            value={prioridadeSelecionada}
-                            onChange={handlePrioridadeChange}
-                        >
-                            {filteredPrioridades.map(prioridade => (
-                                <option
-                                    key={prioridade.prioridade}
-                                    value={prioridade.prioridade}
-                                >
-                                    {prioridade.prioridade}
-                                    {prioridade.prioridade !== 'P6' && prioridade.prioridade !== 'P7' && ` - ${prioridade.descricao}`}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                            <strong>Prioridade: <span className="campo-obrigatorio">*</span></strong>
+                            <Select
+                                className="select-destinatario"
+                                value={filteredPrioridades.map(option => ({ value: option.prioridade, label: option.prioridade })).find(option => option.value === prioridadeSelecionada) || null}
+                                onChange={(selectedOption) => handlePrioridadeChange({ target: { value: selectedOption ? selectedOption.value : '' } })}
+                                options={filteredPrioridades.map(option => ({ value: option.prioridade, label: option.prioridade }))}
+                                isClearable
+                                placeholder=""
+                                styles={customStyles}
+                            />
+                        </div>
+
 
                         <div className="campo-editavel">
                             <strong>Hub: <span className="campo-obrigatorio">*</span></strong>
-                            <select
-                                value={selectedHub}
-                                onChange={(e) => handleFieldChange('hub', e.target.value)}
-                            >
-                                <option></option>
-                                {options.hub.map((option, index) => (
-                                    <option key={index} value={option}>
-                                        {option}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="campo-editavel">
+                            <Select
+                                className="select-destinatario"
+                                value={options.hub.map(option => ({ value: option, label: option })).find(option => option.value === selectedHub) || null}
+                                onChange={(selectedOption) => handleFieldChange('hub', selectedOption ? selectedOption.value : '')}
+                                options={options.hub.map(option => ({ value: option, label: option }))}
+                                isClearable
+                                placeholder=""
+                                styles={customStyles}
+                            />
+                            </div>
+
+                            <div className="campo-editavel">
                             <strong>Unidade de Negócio: <span className="campo-obrigatorio">*</span></strong>
-                            <select
-                                value={selectedUnidade}
-                                onChange={(e) => handleFieldChange('unidade', e.target.value)}
-                                disabled={!selectedHub}
-                            >
-                                <option></option>
-                                {options.unidade.map((option, index) => (
-                                    <option key={index} value={option}>
-                                        {option}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+                            <Select
+                                className="select-destinatario"
+                                value={options.unidade.map(option => ({ value: option, label: option })).find(option => option.value === selectedUnidade) || null}
+                                onChange={(selectedOption) => handleFieldChange('unidade', selectedOption ? selectedOption.value : '')}
+                                options={options.unidade.map(option => ({ value: option, label: option }))}
+                                isClearable
+                                placeholder=""
+                                isDisabled={!selectedHub}
+                                styles={customStyles}
+                            />
+                            </div>
                     </div>
                 </div>
 
@@ -1384,14 +1377,15 @@ const Modal = ({ data, onClose }) => {
                                     </div>
                                     <textarea className="textarea-atividade" placeholder="Descrição" id="descricao-task" rows="3"></textarea>
                                     <p>
-                                        <label>Status:</label>
-                                        <select id="status-task">
+                                        <label>Status:</label><br></br>
+                                        <select id="status-task" >
                                             <option></option>
                                             {options.status.map((status, index) => (
                                                 <option key={index} value={status}>{status}</option>
                                             ))}
                                         </select>
                                     </p>
+
                                     <p>
                                         <label>Destinatário:</label>
                                         <Select
