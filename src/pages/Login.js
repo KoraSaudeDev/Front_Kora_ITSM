@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/Login.css';
 import axios from 'axios';
 
@@ -11,6 +11,8 @@ const logoKoraUrl = "https://i.postimg.cc/8k9pdsZV/unnamed.png";
 const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/suporte/meus-atendimentos'; 
   const [userData, setUserData] = useState(null);
   const [stayLoggedIn, setStayLoggedIn] = useState(false);
 
@@ -20,7 +22,7 @@ const Login = () => {
       const user = JSON.parse(storedUser);
       setUserData(user);
       login(user);
-      navigate('/suporte/meus-atendimentos');
+      navigate(from);
     }
   }, [login, navigate]);
 
@@ -74,7 +76,7 @@ const Login = () => {
 
       setUserData(user);
       login(user);
-      navigate('/suporte/minha-equipe');
+      navigate(from);
       hideLoadingOverlay();
     } catch (error) {
       console.error(error);

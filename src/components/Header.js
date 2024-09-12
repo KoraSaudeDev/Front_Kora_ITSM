@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/Header.css';
 import { FaBell } from 'react-icons/fa';
 
-const Header = ({ onSelectTicket, pendentes = [] }) => {
+const Header = ({ pendentes = [] }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [isSwinging, setIsSwinging] = useState(false);
   const navigate = useNavigate();
@@ -30,7 +30,6 @@ const Header = ({ onSelectTicket, pendentes = [] }) => {
   };
 
   const handleNotificationClick = (ticket) => {
-    onSelectTicket(ticket);
     setShowNotifications(false);
     navigate('/atendimentos/meus-atendimentos', { state: { ticket } });
   };
@@ -45,15 +44,6 @@ const Header = ({ onSelectTicket, pendentes = [] }) => {
       return () => clearInterval(intervalId);
     }
   }, [pendentes.length]);
-
-  useEffect(() => {
-    if (
-      location.pathname !== '/atendimentos/meus-atendimentos' &&
-      location.pathname !== '/atendimentos/minha-equipe'
-    ) {
-      onSelectTicket(null);
-    }
-  }, [location.pathname, onSelectTicket]);
 
   return (
     <header>

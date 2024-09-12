@@ -22,16 +22,7 @@ import AllTickets from './pages/Atendimentos/AllTickets';
 import NovoTicket from './pages/Atendimentos/NovoTicket';
 
 const App = () => {
-  const [selectedTicket, setSelectedTicket] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  const handleSelectTicket = (ticket) => {
-    setSelectedTicket(ticket);
-  };
-
-  const handleResetTicket = () => {
-    setSelectedTicket(null);
-  };
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -53,9 +44,7 @@ const App = () => {
             element={
               <div className={`app-container ${isSidebarOpen ? 'sidebar-open' : ''}`}>
                 <Header
-                  onSelectTicket={handleSelectTicket}
                   onToggleSidebar={toggleSidebar}
-                  onResetTicket={handleResetTicket}
                 />
                 <Sidebar isOpen={isSidebarOpen} />
                 <Routes>
@@ -65,7 +54,7 @@ const App = () => {
                       <ProtectedRoute
                         element={
                           <Main title="Meus Atendimentos" description="Atendimentos / Meus Atendimentos">
-                            <MeusAtendimentos selectedTicket={selectedTicket} onResetTicket={handleResetTicket} />
+                            <MeusAtendimentos />
                           </Main>
                         }
                       />
@@ -77,7 +66,7 @@ const App = () => {
                       <ProtectedRoute
                         element={
                           <Main title="Meus Atendimentos" description="Meus Atendimentos">
-                            <MeusAtendimentos selectedTicket={selectedTicket} onResetTicket={handleResetTicket} />
+                            <MeusAtendimentos />
                           </Main>
                         }
                       />
@@ -89,7 +78,7 @@ const App = () => {
                       <ProtectedRoute
                         element={
                           <Main title="Minha Equipe" description="Minha Equipe">
-                            <MinhaEquipe selectedTicket={selectedTicket} onResetTicket={handleResetTicket} />
+                            <MinhaEquipe />
                           </Main>
                         }
                       />
@@ -101,7 +90,7 @@ const App = () => {
                       <ProtectedRoute
                         element={
                           <Main title="All Tickets" description="Atendimentos / All Tickets">
-                            <AllTickets selectedTicket={selectedTicket} onResetTicket={handleResetTicket} />
+                            <AllTickets />
                           </Main>
                         }
                       />

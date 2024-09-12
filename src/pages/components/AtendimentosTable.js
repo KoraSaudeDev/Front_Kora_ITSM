@@ -7,7 +7,7 @@ import caixaVazia from '../../assets/images/caixa-vazia.png';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 
-const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket, onResetTicket, tipoTela, filtro }) => {
+const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtro }) => {
     const { user } = useAuth();
     const [atendimentos, setAtendimentos] = useState([]);
     const [showModal, setShowModal] = useState(false);
@@ -185,12 +185,6 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
     }, [currentPage, itemsPerPage, savedFilters, sortOrders]);
 
     useEffect(() => {
-        if (selectedTicket) {
-            handleClick(selectedTicket);
-        }
-    }, [selectedTicket]);
-
-    useEffect(() => {
         const fetchFilterOptions = async (hubs = []) => {
             try {
                 const responses = await Promise.all([
@@ -293,6 +287,27 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
     }, []);
 
     useEffect(() => {
+        console.log(localStorage.getItem('cod_fluxo'))
+        const cod_fluxo = localStorage.getItem('cod_fluxo');
+        
+        if (cod_fluxo) {
+            const fetchTicketData = async () => {
+                try {
+                    const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/ticket?cod_fluxo=${cod_fluxo}`);
+                    setModalData(response.data);
+                    setShowModal(true);
+                    
+                    localStorage.removeItem('cod_fluxo');
+                } catch (error) {
+                    console.error('Erro ao buscar dados do atendimento:', error);
+                }
+            };
+    
+            fetchTicketData();
+        }
+    }, []);    
+
+    useEffect(() => {
         if (showMenu) {
             window.addEventListener('click', handleClickOutside);
             window.addEventListener('scroll', handleClickOutside);
@@ -347,13 +362,18 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
             const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/ticket?cod_fluxo=${ticket.cod_fluxo}`);
             setModalData(response.data);
             setShowModal(true);
+            setShowMenu(false);
         } catch (error) {
             console.error("Erro ao buscar informações do ticket:", error);
         }
     };
 
     const handleOpenInNewPage = (atendimento) => {
-        console.log('Abrindo atendimento em nova página:', atendimento);
+        localStorage.setItem('cod_fluxo', atendimento.cod_fluxo);
+        
+        const url = `${window.location.origin}${window.location.pathname}`;
+        window.open(url, '_blank');
+        
         setShowMenu(false);
     };
 
