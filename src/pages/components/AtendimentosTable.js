@@ -52,22 +52,22 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
     const customStyles = {
         option: (provided, state) => ({
             ...provided,
-            backgroundColor: state.isSelected ? '#007aff' : state.isFocused ? '#e0f7fa' : 'white', // Cor de fundo
-            color: state.isSelected ? 'white' : '#3E4676', // Cor do texto
+            backgroundColor: state.isSelected ? '#007aff' : state.isFocused ? '#e0f7fa' : 'white', 
+            color: state.isSelected ? 'white' : '#3E4676', 
             padding: 10,
         }),
         control: (provided) => ({
             ...provided,
-            borderColor: '#007aff', // Cor da borda do select
+            borderColor: '#007aff',
             boxShadow: 'none',
             width: '325px',
             '&:hover': {
-                borderColor: '#007aff', // Cor da borda ao passar o mouse
+                borderColor: '#007aff', 
             },
         }),
         singleValue: (provided) => ({
             ...provided,
-            color: '#3E4676', // Cor do valor selecionado
+            color: '#3E4676', 
         }),
     };
 
@@ -91,6 +91,15 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         "Em Atraso": "#dc3545",
         "No Prazo": "#28a745"
     };
+
+    const prioridadeOptions = {
+        "P1": "#FF0000",    
+        "P2": "#FF8C00",        
+        "P3": "#E5C200",       
+        "P4": "#1E90FF",       
+        "P5": "#28a745"  
+    };
+    
 
     const cacheKey = `${tipoTela}_page_${currentPage}_items_${itemsPerPage}`;
 
@@ -592,6 +601,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
         }
         return '';
     };
+    
 
     const atendimentosFiltrados = atendimentos;
 
@@ -819,6 +829,8 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                 <tr key={atendimento.cod_fluxo} onClick={() => handleClick(atendimento)} style={{ '--stagger': index + 1 }}>
                                     <td id='cont-tabela'>{atendimento.cod_fluxo}</td>
                                     <td id='cont-tabela'>{new Date(atendimento.abertura).toLocaleString().replace(',', '')}</td>
+
+                                    
                                     <td id='cont-tabela'>
                                         <span
                                             className="status"
@@ -837,6 +849,8 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                             {atendimento.status}
                                         </span>
                                     </td>
+
+                                
                                     <td id='cont-tabela'>
                                         <span
                                             className="sla"
@@ -855,7 +869,27 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                             {atendimento.sla_util}
                                         </span>
                                     </td>
-                                    <td id='cont-tabela'>{atendimento.slaDescricao}</td>
+
+                                    
+                                    <td id='cont-tabela'>
+                                        <span
+                                            className="prioridade"
+                                            style={{
+                                                backgroundColor: prioridadeOptions[atendimento.ds_nivel] || '#000',
+                                                color: 'white',
+                                                width: '100px',
+                                                height: '30px',
+                                                lineHeight: '30px',
+                                                textAlign: 'center',
+                                                borderRadius: '6px',
+                                                display: 'inline-block',
+                                                fontWeight: '500'
+                                            }}
+                                        >
+                                            {atendimento.slaDescricao}
+                                        </span>
+                                    </td>
+
                                     <td id='cont-tabela'>{atendimento.categoria}</td>
                                     <td id='cont-tabela'>{atendimento.subcategoria}</td>
                                     <td id='cont-tabela'>{atendimento.assunto}</td>
@@ -868,6 +902,8 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                 </tr>
                             ))}
                         </tbody>
+
+
                     </table>
                 </div>
             )}
