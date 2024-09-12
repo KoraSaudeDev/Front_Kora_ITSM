@@ -965,23 +965,6 @@ const Modal = ({ data, onClose }) => {
         }
     };
 
-    const getOptionClass = (prioridade) => {
-        switch (prioridade) {
-            case 'P1':
-                return 'option-p1';
-            case 'P2':
-                return 'option-p2';
-            case 'P3':
-                return 'option-p3';
-            case 'P4':
-                return 'option-p4';
-            case 'P5':
-                return 'option-p5';
-            default:
-                return '';
-        }
-    };
-
     const categoriaOptions = options.categoria.map(option => ({ value: option, label: option }));
     const subcategoriaOptions = selectedCategoria
         ? [
@@ -1209,13 +1192,11 @@ const Modal = ({ data, onClose }) => {
                         <select
                             value={prioridadeSelecionada}
                             onChange={handlePrioridadeChange}
-                            className={getOptionClass(prioridadeSelecionada)}
                         >
                             {filteredPrioridades.map(prioridade => (
                                 <option
                                     key={prioridade.prioridade}
                                     value={prioridade.prioridade}
-                                    className={getOptionClass(prioridade.prioridade)}
                                 >
                                     {prioridade.prioridade}
                                     {prioridade.prioridade !== 'P6' && prioridade.prioridade !== 'P7' && ` - ${prioridade.descricao}`}
@@ -1401,7 +1382,7 @@ const Modal = ({ data, onClose }) => {
                                         <label htmlFor="aberto-por-task">Aberto Por:</label>
                                         <input type="text" id="aberto-por-task" value={user.name} readOnly />
                                     </div>
-                                    <textarea className="textarea-atividade" placeholder="Descrição" id="descricao-task"></textarea>
+                                    <textarea className="textarea-atividade" placeholder="Descrição" id="descricao-task" rows="6"></textarea>
                                     <p>
                                         <label>Status:</label>
                                         <select id="status-task">
