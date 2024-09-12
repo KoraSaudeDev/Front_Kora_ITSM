@@ -835,7 +835,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                         <span
                                             className="status"
                                             style={{
-                                                backgroundColor: statusOptions[atendimento.status] || '#000',
+                                                backgroundColor: statusOptions[atendimento.status] || '#ffffff',
                                                 color: 'white',
                                                 width: '150px',
                                                 height: '30px',
@@ -855,7 +855,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                         <span
                                             className="sla"
                                             style={{
-                                                backgroundColor: slaOptions[atendimento.sla_util] || '#000',
+                                                backgroundColor: slaOptions[atendimento.sla_util] || '#ffffff',
                                                 color: 'white',
                                                 width: '100px',
                                                 height: '30px',
@@ -875,7 +875,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, selectedTicket,
                                         <span
                                             className="prioridade"
                                             style={{
-                                                backgroundColor: prioridadeOptions[atendimento.ds_nivel] || '#000',
+                                                backgroundColor: prioridadeOptions[atendimento.ds_nivel] || '#ffffff',
                                                 color: 'white',
                                                 width: '100px',
                                                 height: '30px',
