@@ -304,7 +304,7 @@ const Modal = ({ data, onClose }) => {
                     setSla(data.st_sla)
                 }
                 else{
-                    setSla(data.sla_corrido)
+                    setSla(data.st_sla_corrido)
                 }
             })
             .catch(error => {
