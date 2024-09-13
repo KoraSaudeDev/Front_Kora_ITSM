@@ -1853,6 +1853,9 @@ input:checked+.slider:before {
 .conteudo-modal-esquerda {
     position: relative;
     padding-top: 16px;
+    overflow: hidden;
+
+    
 }
 
 .botao-ver-mais {
