@@ -1830,7 +1830,6 @@ input:checked+.slider:before {
 .conteudo-modal.reduzido {
     min-height: 482px;
     height: 40%;
-    overflow: hidden;
     transition: height 0.3s ease;
     position: relative;
 }
@@ -2050,20 +2049,22 @@ th.sorted-desc::before {
 
 .filter-select-container {
     display: flex;
-    flex-direction: column; /* Organiza os elementos em coluna */
-    gap: 5px; /* Espaçamento entre os inputs e a mensagem de erro */
+    flex-direction: column; 
+    gap: 5px; 
 }
 
 .date-inputs {
     display: flex;
-    flex-direction: row; /* As datas aparecem lado a lado */
-    gap: 10px; /* Espaçamento entre os campos de data */
-    align-items: flex-start; /* Alinha os inputs corretamente */
+    flex-direction: row; 
+    gap: 10px; 
+    align-items: flex-start; 
 }
 
 .error-message {
     color: #dc3545;
     font-size: 12px;
     margin-top: 5px;
-    display: block; /* Garante que a mensagem de erro fique em uma nova linha */
+    display: block;
 }
+
+
