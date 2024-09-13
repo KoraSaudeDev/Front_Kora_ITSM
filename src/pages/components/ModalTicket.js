@@ -7,6 +7,8 @@ import axios from 'axios';
 const Modal = ({ data, onClose }) => {
     const { user } = useAuth();
     const [inicio, setInicio] = useState('');
+    const [fim, setFim] = useState('');
+    const [erro, setErro] = useState('');
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [showAtividadesModal, setShowAtividadesModal] = useState(false);
     const [showAnexosModal, setShowAnexosModal] = useState(false);
@@ -255,7 +257,7 @@ const Modal = ({ data, onClose }) => {
             const hours = padToTwoDigits(date.getHours());
             const minutes = padToTwoDigits(date.getMinutes());
             const seconds = padToTwoDigits(date.getSeconds());
-            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+            return `${year}-${month}-${day} ${hours}:${minutes}`;
         };
 
         if (showAtividadesModal || showAnexosModal) {
@@ -264,6 +266,16 @@ const Modal = ({ data, onClose }) => {
             setInicio(formattedDate);
         }
     }, [showAtividadesModal, showAnexosModal]);
+
+    useEffect(() => {
+        console.log(inicio, fim)
+        if (inicio && fim && new Date(fim) < new Date(inicio)) {
+            setErro('A data de início não pode ser posterior à data de fim.');
+            setTimeout(() => {
+                setErro('');
+            }, 4000);
+        }
+    }, [inicio, fim]);
 
     useEffect(() => {
         axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/status`)
@@ -300,10 +312,10 @@ const Modal = ({ data, onClose }) => {
                     prioridades: response.data
                 }));
                 const prioridadeAtual = response.data.find(e => e.prioridade === prioridadeSelecionada);
-                if(prioridadeAtual?.tipo_tempo === "Útil"){
+                if (prioridadeAtual?.tipo_tempo === "Útil") {
                     setSla(data.st_sla)
                 }
-                else{
+                else {
                     setSla(data.st_sla_corrido)
                 }
             })
@@ -544,7 +556,7 @@ const Modal = ({ data, onClose }) => {
         setPrioridadeSelecionada(event.target.value)
 
         const prioridade = options.prioridades.find(p => p.prioridade === event.target.value);
-        
+
         if (!prioridade) {
             console.error('Prioridade não encontrada');
             return;
@@ -552,7 +564,7 @@ const Modal = ({ data, onClose }) => {
 
         let data_atualizada = null;
         const sla = parseInt(prioridade.sla, 10);
-        
+
         if (prioridade.tipo_tempo === "Corrido") {
             data_atualizada = await adicionaMinutosCorridos(data.abertura, sla);
             const tempo_minutos_corridos = parseInt(data.tempo_minutos_corridos, 10);
@@ -562,7 +574,7 @@ const Modal = ({ data, onClose }) => {
             data_atualizada = await adicionaMinutosUteis(data.abertura, sla);
             const tempo_minutos = parseInt(data.tempo_minutos, 10);
             console.log(sla, tempo_minutos, tempo_minutos <= sla);
-            setSla(tempo_minutos <= sla  ? "No Prazo" : "Em Atraso");
+            setSla(tempo_minutos <= sla ? "No Prazo" : "Em Atraso");
         }
 
         setDataLimite(data_atualizada);
@@ -790,31 +802,31 @@ const Modal = ({ data, onClose }) => {
     async function adicionaMinutosUteis(dataInicio, minutos, horarioInicio = "08:00:00", horarioFim = "18:00:00") {
         let dataAtual = new Date(dataInicio);
         let horasDeTrabalhoPorDia = (new Date(`01/01/2000 ${horarioFim}`).getHours() - new Date(`01/01/2000 ${horarioInicio}`).getHours()) * 60;
-    
+
         let dias = 0;
         let minutosRestantes = parseInt(minutos);
-    
+
         function ehDiaUtil(data) {
             const diaDaSemana = data.getDay();
             return diaDaSemana > 0 && diaDaSemana < 6;
         }
-    
+
         let horaAtualMinutos = dataAtual.getHours() * 60 + dataAtual.getMinutes();
         let inicioMinutos = parseInt(horarioInicio.split(":")[0]) * 60 + parseInt(horarioInicio.split(":")[1]);
         let fimMinutos = parseInt(horarioFim.split(":")[0]) * 60 + parseInt(horarioFim.split(":")[1]);
-        
+
         if (horaAtualMinutos < inicioMinutos) {
             dataAtual.setHours(parseInt(horarioInicio.split(":")[0]), parseInt(horarioInicio.split(":")[1]), 0);
         } else if (horaAtualMinutos > fimMinutos) {
             dataAtual.setDate(dataAtual.getDate() + 1);
             dataAtual.setHours(parseInt(horarioInicio.split(":")[0]), parseInt(horarioInicio.split(":")[1]), 0);
         }
-    
+
         while (minutosRestantes > 0) {
             if (ehDiaUtil(dataAtual)) {
                 let horaAtual = dataAtual.getHours() * 60 + dataAtual.getMinutes();
                 let minutosAteOFinalDoDia = fimMinutos - horaAtual;
-    
+
                 if (minutosRestantes <= minutosAteOFinalDoDia) {
                     dataAtual.setMinutes(dataAtual.getMinutes() + minutosRestantes);
                     minutosRestantes = 0;
@@ -828,7 +840,7 @@ const Modal = ({ data, onClose }) => {
                 dataAtual.setDate(dataAtual.getDate() + 1);
             }
         }
-    
+
         // Formatação da data de retorno no formato "YYYY-MM-DD HH:MM:SS"
         let year = dataAtual.getFullYear();
         let month = dataAtual.getMonth() + 1;
@@ -837,14 +849,14 @@ const Modal = ({ data, onClose }) => {
         let minute = dataAtual.getMinutes();
         let second = dataAtual.getSeconds();
         let formattedDate = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')} ${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:${second.toString().padStart(2, '0')}`;
-    
+
         return formattedDate;
     }
-    
+
     async function adicionaMinutosCorridos(dataInicio, minutos) {
         let dataAtual = new Date(dataInicio);
         dataAtual.setMinutes(dataAtual.getMinutes() + parseInt(minutos));
-    
+
         let year = dataAtual.getFullYear();
         let month = dataAtual.getMonth() + 1;
         let day = dataAtual.getDate();
@@ -852,7 +864,7 @@ const Modal = ({ data, onClose }) => {
         let minute = dataAtual.getMinutes();
         let second = dataAtual.getSeconds();
         let formattedDate = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')} ${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:${second.toString().padStart(2, '0')}`;
-    
+
         return formattedDate;
     }
 
@@ -1212,9 +1224,9 @@ const Modal = ({ data, onClose }) => {
                                 placeholder=""
                                 styles={customStyles}
                             />
-                            </div>
+                        </div>
 
-                            <div className="campo-editavel">
+                        <div className="campo-editavel">
                             <strong>Unidade de Negócio: <span className="campo-obrigatorio">*</span></strong>
                             <Select
                                 className="select-destinatario"
@@ -1226,7 +1238,7 @@ const Modal = ({ data, onClose }) => {
                                 isDisabled={!selectedHub}
                                 styles={customStyles}
                             />
-                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -1369,7 +1381,23 @@ const Modal = ({ data, onClose }) => {
                                 <div className="conteudo-modal-atividades">
                                     <div className="campo-detalhe">
                                         <label htmlFor="inicio-task">Início:</label>
-                                        <input type="text" id="inicio-task" value={formatDate(inicio)} readOnly />
+                                        <input
+                                            type="datetime-local"
+                                            id="inicio-task"
+                                            value={inicio}
+                                            onChange={(e) => setInicio(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="campo-detalhe">
+                                        <label htmlFor="fim-task">Fim:</label>
+                                        <input
+                                            type="datetime-local"
+                                            id="fim-task"
+                                            onChange={(e) => setFim(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="campo-detalhe">
+                                        {erro && <div className="erro-mensagem">{erro}</div>}
                                     </div>
                                     <div className="campo-detalhe">
                                         <label htmlFor="aberto-por-task">Aberto Por:</label>

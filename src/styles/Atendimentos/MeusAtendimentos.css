@@ -1102,8 +1102,15 @@ svg {
 }
 
 #inicio-task,
+#fim-task,
 #aberto-por-task {
-    width: auto;
+    width: 22%;
+}
+
+.erro-mensagem {
+    color: red;
+    font-weight: bold;
+    margin-top: 10px;
 }
 
 .campo-detalhe input[readonly] {
