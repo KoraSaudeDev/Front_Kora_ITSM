@@ -1127,6 +1127,7 @@ svg {
     margin-bottom: 16px;
     border-radius: 4px;
     font-size: 14px;
+    
 }
 
 .modal-overlay {
@@ -1247,8 +1248,10 @@ a {
     max-height: 400px;
     background-color: #fff;
     border: none;
+    
 
 }
+
 
 .conteudo-modal-esquerda {
     font-size: 14px;
@@ -1834,10 +1837,11 @@ input:checked+.slider:before {
 
 .conteudo-modal.expandido {
     height: auto;
-    min-height: 482px;
+   
     overflow: visible;
     transition: height 0.3s ease;
     position: relative;
+    height: auto;
 }
 
 .conteudo-modal-esquerda {
@@ -2040,4 +2044,26 @@ th.sorted-desc::before {
 
 .context-menu ul li:hover {
     background-color: #eee;
+}
+
+
+
+.filter-select-container {
+    display: flex;
+    flex-direction: column; /* Organiza os elementos em coluna */
+    gap: 5px; /* Espaçamento entre os inputs e a mensagem de erro */
+}
+
+.date-inputs {
+    display: flex;
+    flex-direction: row; /* As datas aparecem lado a lado */
+    gap: 10px; /* Espaçamento entre os campos de data */
+    align-items: flex-start; /* Alinha os inputs corretamente */
+}
+
+.error-message {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 5px;
+    display: block; /* Garante que a mensagem de erro fique em uma nova linha */
 }

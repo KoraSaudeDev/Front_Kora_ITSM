@@ -722,27 +722,27 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
                                 <div key={col} className="filter-option">
                                     <h5>{columnDescriptions[col] || col.charAt(0).toUpperCase() + col.slice(1)}</h5>
                                     <div className="filter-select-container">
-                                        {col === 'abertura' || col === 'data_limite' ? (
-                                            <>
-                                                {dateFilters[col] ? (
-                                                    <>
-                                                        <input
-                                                            type="date"
-                                                            placeholder="Data Início"
-                                                            value={dateFilters[col].startDate || ''}
-                                                            onChange={(e) => handleDateChange(col, 'startDate', e.target.value)}
-                                                        />
-                                                        <input
-                                                            type="date"
-                                                            placeholder="Data Fim"
-                                                            value={dateFilters[col].endDate || ''}
-                                                            onChange={(e) => handleDateChange(col, 'endDate', e.target.value)}
-                                                        />
-                                                    </>
-                                                ) : (
-                                                    <p>Selecione uma data</p>
-                                                )}
-                                                {dateErrors[col] && <p className="error-message">{dateErrors[col]}</p>}
+    {col === 'abertura' || col === 'data_limite' ? (
+        <>
+            {dateFilters[col] ? (
+                <div className="date-inputs">
+                    <input
+                        type="date"
+                        placeholder="Data Início"
+                        value={dateFilters[col].startDate || ''}
+                        onChange={(e) => handleDateChange(col, 'startDate', e.target.value)}
+                    />
+                    <input
+                        type="date"
+                        placeholder="Data Fim"
+                        value={dateFilters[col].endDate || ''}
+                        onChange={(e) => handleDateChange(col, 'endDate', e.target.value)}
+                    />
+                </div>
+            ) : (
+                <p>Selecione uma data</p>
+            )}
+            {dateErrors[col] && <p className="error-message">{dateErrors[col]}</p>}
                                             </>
                                         ) : (
                                             <Select
