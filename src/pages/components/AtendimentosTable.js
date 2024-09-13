@@ -287,7 +287,6 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
     }, []);
 
     useEffect(() => {
-        console.log(localStorage.getItem('cod_fluxo'))
         const cod_fluxo = localStorage.getItem('cod_fluxo');
         
         if (cod_fluxo) {

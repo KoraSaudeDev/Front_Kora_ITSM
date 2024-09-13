@@ -6,6 +6,7 @@ import axios from 'axios';
 
 const Modal = ({ data, onClose }) => {
     const { user } = useAuth();
+    const [inicioCheck, setInicioCheck] = useState('');
     const [inicio, setInicio] = useState('');
     const [fim, setFim] = useState('');
     const [erro, setErro] = useState('');
@@ -257,25 +258,17 @@ const Modal = ({ data, onClose }) => {
             const hours = padToTwoDigits(date.getHours());
             const minutes = padToTwoDigits(date.getMinutes());
             const seconds = padToTwoDigits(date.getSeconds());
-            return `${year}-${month}-${day} ${hours}:${minutes}`;
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
         };
 
         if (showAtividadesModal || showAnexosModal) {
             const now = new Date();
             const formattedDate = formatCustomDate(now);
+            setInicioCheck(formattedDate);
             setInicio(formattedDate);
+            setFim('');
         }
     }, [showAtividadesModal, showAnexosModal]);
-
-    useEffect(() => {
-        console.log(inicio, fim)
-        if (inicio && fim && new Date(fim) < new Date(inicio)) {
-            setErro('A data de início não pode ser posterior à data de fim.');
-            setTimeout(() => {
-                setErro('');
-            }, 4000);
-        }
-    }, [inicio, fim]);
 
     useEffect(() => {
         axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/status`)
@@ -411,6 +404,32 @@ const Modal = ({ data, onClose }) => {
         }
     };
 
+    const handleInicioChange = (e) => {
+        const newInicio = e.target.value;
+        if (fim && new Date(newInicio) > new Date(fim)) {
+            setErro('A data de início não pode ser posterior à data de fim.');
+            setTimeout(() => {
+                setErro('');
+            }, 4000);
+        } else {
+            setInicio(newInicio);
+            setErro('');
+        }
+    };
+
+    const handleFimChange = (e) => {
+        const newFim = e.target.value;
+        if (inicio && new Date(newFim) < new Date(inicio)) {
+            setErro('A data de fim não pode ser anterior à data de início.');
+            setTimeout(() => {
+                setErro('');
+            }, 4000);
+        } else {
+            setFim(newFim);
+            setErro('');
+        }
+    };
+
     const handleAbrirAtividadesModal = () => {
         setAtividadeSelecionada(null);
         setIsEditMode(true);
@@ -434,7 +453,6 @@ const Modal = ({ data, onClose }) => {
     };
 
     const handleSalvarAtividade = () => {
-        const aberto_em = formatDate(document.querySelector('#inicio-task').value, 2);
         const aberto_por = document.querySelector('#aberto-por-task').value;
         const descricao = document.querySelector('#descricao-task').value.trim();
         const status = document.querySelector('#status-task').value;
@@ -445,8 +463,13 @@ const Modal = ({ data, onClose }) => {
             tipo_atividade = 'Pública';
         }
 
-        if (!descricao || !status || !executor) {
+        if (!descricao || !status || !executor || !inicio) {
             alert("Por favor, preencha todos os campos obrigatórios.");
+            return;
+        }
+
+        if (inicio !== inicioCheck && !fim) {
+            alert("Como a data de início foi alterada, é obrigatório o preenchimento da data fim.");
             return;
         }
 
@@ -455,7 +478,7 @@ const Modal = ({ data, onClose }) => {
         const novaAtividade = {
             cod_fluxo: data.id,
             alterar: 1,
-            aberto_em,
+            aberto_em: formatDate(inicio, 2),
             aberto_por,
             status,
             descricao,
@@ -464,6 +487,8 @@ const Modal = ({ data, onClose }) => {
             tipo_atividade,
             ds_anexo: null
         };
+
+        if (fim) novaAtividade.dt_fim = formatDate(fim, 2);
 
         const fileInput = document.getElementById('anexoAtividade');
         const files = fileInput.files;
@@ -605,7 +630,7 @@ const Modal = ({ data, onClose }) => {
             .map(task => ({
                 cod_task: task.cod_task,
                 ds_concluido_por: task.ds_concluido_por,
-                dt_fim: task.dt_fim,
+                dt_fim: formatDate(task.dt_fim, 2),
             }));
 
         const insert_tasks = atividades.filter(task => task.alterar === 1 && task.id === undefined);
@@ -1385,7 +1410,8 @@ const Modal = ({ data, onClose }) => {
                                             type="datetime-local"
                                             id="inicio-task"
                                             value={inicio}
-                                            onChange={(e) => setInicio(e.target.value)}
+                                            onChange={handleInicioChange}
+                                            step="1"
                                         />
                                     </div>
                                     <div className="campo-detalhe">
@@ -1393,7 +1419,9 @@ const Modal = ({ data, onClose }) => {
                                         <input
                                             type="datetime-local"
                                             id="fim-task"
-                                            onChange={(e) => setFim(e.target.value)}
+                                            value={fim}
+                                            onChange={handleFimChange}
+                                            step="1"
                                         />
                                     </div>
                                     <div className="campo-detalhe">
