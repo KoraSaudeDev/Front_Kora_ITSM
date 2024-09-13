@@ -358,6 +358,7 @@ const Modal = ({ data, onClose }) => {
 
         if (type === 1) return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
         else if (type === 2) return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        else if (type === 3) return date.toISOString().slice(0, 19);
         else return '';
     };
 
@@ -413,10 +414,11 @@ const Modal = ({ data, onClose }) => {
             }, 4000);
         } else {
             setInicio(newInicio);
+            setFim('');
             setErro('');
         }
     };
-
+    
     const handleFimChange = (e) => {
         const newFim = e.target.value;
         if (inicio && new Date(newFim) < new Date(inicio)) {
@@ -1412,6 +1414,8 @@ const Modal = ({ data, onClose }) => {
                                             value={inicio}
                                             onChange={handleInicioChange}
                                             step="1"
+                                            min={formatDate(data.abertura, 3)}
+                                            max={formatDate(inicioCheck, 3)}
                                         />
                                     </div>
                                     <div className="campo-detalhe">
@@ -1422,6 +1426,9 @@ const Modal = ({ data, onClose }) => {
                                             value={fim}
                                             onChange={handleFimChange}
                                             step="1"
+                                            min={formatDate(data.abertura, 3)}
+                                            max={formatDate(inicioCheck, 3)}
+                                            disabled={!inicio}
                                         />
                                     </div>
                                     <div className="campo-detalhe">
