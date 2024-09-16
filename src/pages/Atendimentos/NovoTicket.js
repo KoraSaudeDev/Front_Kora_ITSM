@@ -57,12 +57,41 @@ const camposAcessoRede = {
             ],
             "Criação de E-mail e Login de Rede": [
                 { id: "nomeCompleto", label: "Nome Completo Usuário", type: "text", className: "campo" },
-                { id: "matricula", label: "Matrícula no Sênio (RH)", type: "text", className: "campo" },
-                { id: "tipoColaborador", label: "Tipo Colaborador", type: "radio", options: ["Funcionário", "Terceirizado"], className: "campo" },
+                { id: "matriculaa", label: "Matrícula no Sênio (RH)", type: "text", className: "campo" },
+                { id: "tipoColaborador", label: "Tipo Colaborador", type: "select", options: ["Funcionário", "Terceirizado"], className: "campo" },
                 { id: "hub", label: "HUB Novo Usuário", type: "text", className: "campo" },
                 { id: "cargoo", label: "Cargo", type: "text", className: "campo" },
                 { id: "departamento", label: "Departamento", type: "text", className: "campo" },
                 { id: "telefone", label: "Telefone para contato", type: "number", className: "campo" },
+                {
+                    id: "texto",
+                    label: "Informações do Plano",
+                    type: "text",
+                    value: `
+                    FRONTLINE STARTER: Para colaboradores de linha de frente, acesso básico a e-mails e agendas.
+                    - Armazenamento: 5 GB/user
+                    - Meetings: Até 100 usuários
+                    - Funcionalidades: GMail, Calendário, Documentos, Planilhas, Slides, Meet, Chat, Formulários, Sites, Espaços colaborativos, Sala de Aula, Rede Social
+                    - Funcionalidades Adicionais: Google Meet: Meet rooms, Background blur, whiteboarding, Live captions
+                
+                    ENTERPRISE STARTER: Colaboração básica, com segurança e armazenamento padrão. 
+                    - Armazenamento: 1 TB
+                    - Meetings: Até 250 usuários, Live stream (10k)
+                    - Funcionalidades: GMail, Calendário, Documentos, Planilhas, Slides, Meet, Chat, Formulários, Sites, Espaços colaborativos, Sala de Aula, Rede Social
+                
+                    ENTERPRISE STANDARD: Segurança avançada, gestão de dispositivos, armazenamento ampliado.
+                    - Armazenamento: O quanto precisar
+                    - Meetings: Até 500 usuários, Live stream (10k)
+                    - Funcionalidades: GMail, Calendário, Documentos, Planilhas, Slides, Meet, Chat, Formulários, Sites, Espaços colaborativos, Sala de Aula, Rede Social
+                    - Funcionalidades Adicionais: Vault, Advanced Data Loss Prevention, Cloud Identity Premium
+                    `,
+                    readOnly: true,
+                    className: "campo-plano"
+                },
+                
+                
+                
+                
                 { id: "licenca", label: "Licença do Novo Usuário", type: "select", options: ["Frontline Starter", "Enterprise Starter", "Enterprise Standard"], className: "campo" },
                 { id: "custo", label: "Custo", type: "number", className: "campo" },
                 { id: "gestor", label: "Gestor Imediato", type: "text", className: "campo" },
@@ -73,11 +102,36 @@ const camposAcessoRede = {
             "E-mail": [
                 { id: "nomeCompleto", label: "Nome Completo Usuário", type: "text", className: "campo" },
                 { id: "matricula", label: "Matrícula no Sênio (RH)", type: "text", className: "campo" },
-                { id: "tipoColaborador", label: "Tipo Colaborador", type: "radio", options: ["Funcionário", "Terceirizado"], className: "campo" },
+                { id: "tipoColaborador", label: "Tipo Colaborador", type: "select", options: ["Funcionário", "Terceirizado"], className: "campo" },
                 { id: "hub", label: "HUB Novo Usuário", type: "text", className: "campo" },
-                { id: "cargo", label: "Cargo", type: "text", className: "campo" },
+                { id: "cargoo", label: "Cargo", type: "text", className: "campo" },
                 { id: "departamento", label: "Departamento", type: "text", className: "campo" },
                 { id: "telefone", label: "Telefone para contato", type: "number", className: "campo" },
+                {
+                    id: "texto",
+                    label: "Informações do Plano",
+                    type: "text",
+                    value: `
+                    FRONTLINE STARTER: Para colaboradores de linha de frente, acesso básico a e-mails e agendas.
+                    - Armazenamento: 5 GB/user
+                    - Meetings: Até 100 usuários
+                    - Funcionalidades: GMail, Calendário, Documentos, Planilhas, Slides, Meet, Chat, Formulários, Sites, Espaços colaborativos, Sala de Aula, Rede Social
+                    - Funcionalidades Adicionais: Google Meet: Meet rooms, Background blur, whiteboarding, Live captions
+                
+                    ENTERPRISE STARTER: Colaboração básica, com segurança e armazenamento padrão. 
+                    - Armazenamento: 1 TB
+                    - Meetings: Até 250 usuários, Live stream (10k)
+                    - Funcionalidades: GMail, Calendário, Documentos, Planilhas, Slides, Meet, Chat, Formulários, Sites, Espaços colaborativos, Sala de Aula, Rede Social
+                
+                    ENTERPRISE STANDARD: Segurança avançada, gestão de dispositivos, armazenamento ampliado.
+                    - Armazenamento: O quanto precisar
+                    - Meetings: Até 500 usuários, Live stream (10k)
+                    - Funcionalidades: GMail, Calendário, Documentos, Planilhas, Slides, Meet, Chat, Formulários, Sites, Espaços colaborativos, Sala de Aula, Rede Social
+                    - Funcionalidades Adicionais: Vault, Advanced Data Loss Prevention, Cloud Identity Premium
+                    `,
+                    readOnly: true,
+                    className: "campo-plano"
+                },
                 { id: "licenca", label: "Licença do Novo Usuário", type: "select", options: ["Frontline Starter", "Enterprise Starter", "Enterprise Standard"], className: "campo" },
                 { id: "custo", label: "Custo", type: "number", className: "campo" },
                 { id: "gestor", label: "Gestor Imediato", type: "text", className: "campo" },
@@ -95,9 +149,9 @@ const camposAcessoRede = {
             "Rede": [
                 { id: "nomeCompleto", label: "Nome Completo Usuário", type: "text", className: "campo" },
                 { id: "matricula", label: "Matrícula no Sênio (RH)", type: "text", className: "campo" },
-                { id: "tipoColaborador", label: "Tipo Colaborador", type: "radio", options: ["Funcionário", "Terceirizado"], className: "campo" },
+                { id: "tipoColaborador", label: "Tipo Colaborador", type: "select", options: ["Funcionário", "Terceirizado"], className: "campo" },
                 { id: "hub", label: "HUB Novo Usuário", type: "text", className: "campo" },
-                { id: "cargo", label: "Cargo", type: "text", className: "campo" },
+                { id: "cargoo", label: "Cargo", type: "text", className: "campo" },
                 { id: "departamento", label: "Departamento", type: "text", className: "campo" },
                 { id: "telefone", label: "Telefone para contato", type: "number", className: "campo" },
                 { id: "licenca", label: "Licença do Novo Usuário", type: "select", options: ["Frontline Starter", "Enterprise Starter", "Enterprise Standard"], className: "campo" },
@@ -296,7 +350,7 @@ const NovoTicket = () => {
                     { id: 'usuarioMV', label: 'Usuário do MV', type: 'text', required: true },
                     { id: 'departamento', label: 'Departamento', type: 'text', required: true },
                     { id: 'matriculaSenior', label: 'Matrícula do Sênior (RH)', type: 'text', required: true },
-                    { id: 'cargo', label: 'Cargo', type: 'text', required: true },
+                    { id: 'cargoo', label: 'Cargo', type: 'text', required: true },
                     { id: 'unidadeUsuario', label: 'Unidade do Usuário', type: 'text', required: true },
                     { id: 'usuarioSimilar', label: 'Usuário Similar', type: 'text', required: true },
                     { id: 'acessoSolicitado', label: 'Acesso Solicitado', type: 'text', required: true },
@@ -351,15 +405,14 @@ const NovoTicket = () => {
                     { id: 'nomeCompleto', label: 'Nome Completo Usuário', type: 'text', required: true },
                     { id: 'matriculaSenior', label: 'Matrícula no Sênior (RH)', type: 'text', required: true },
                     { id: 'cpf', label: 'CPF (Apenas Números)', type: 'number', required: true },
-                    { id: 'cargo', label: 'Cargo', type: 'text', required: true },
+                    { id: 'cargoo', label: 'Cargo', type: 'text', required: true },
                     { id: 'departamento', label: 'Departamento', type: 'text', required: true },
-                    { id: 'email', label: 'E-mail Usuário', type: 'email', required: true },
+                    { id: 'emailSAP', label: 'E-mail Usuário', type: 'email', required: true },
                     { id: 'diretoria', label: 'Diretoria', type: 'text', required: true },
                     { id: 'substituirColaborador', label: 'Estou substituindo colaborador desligado?', type: 'select', options: ['Sim', 'Não'], required: true },
                     { id: 'perfilAtribuido', label: 'Perfil a serem Atribuídos', type: 'select', options: ['Perfil 1', 'Perfil 2', 'Perfil 3'], required: true },
                     { id: 'centroCusto', label: 'Centro de custo', type: 'select', options: ['Centro 1', 'Centro 2', 'Centro 3'], required: true },
                     { id: 'emailGestor', label: 'E-mail Gestor Imediato', type: 'email', required: true },
-                    { id: 'descricao', label: 'Descrição', type: 'text', required: true },
                     { id: 'anexoAutorizacao', label: 'Anexar Autorização Gestor', type: 'file', required: true },
                     { id: 'termoAceitacao', label: 'Termo de Aceitação', type: 'select', options: ['Sim', 'Não'], required: true }
                 ];
@@ -372,6 +425,14 @@ const NovoTicket = () => {
                     { id: 'usuarioSap', label: 'Usuário SAP', type: 'text', required: true }
                 ];
             }
+
+            if (selectedCategoria?.value === 'Marketing e Comunicação') {
+                campos = [
+                    { id: 'publicoAlvo', label: 'Público Alvo', type: 'text', required: true },
+                    { id: 'objetivoComunicacao', label: 'Objetivo da Comunicação', type: 'text', required: true },
+                    { id: 'materiaReferencia', label: 'Material de Referência', type: 'file', required: true }
+                ];
+            }
     
            
             if (selectedCategoria?.value === 'TASY' && selectedSubcategoria?.value === 'Criação de Usuário') {
@@ -381,11 +442,27 @@ const NovoTicket = () => {
                     { id: 'dataNascimento', label: 'Data de Nascimento', type: 'date', required: true },
                     { id: 'matriculaUsuario', label: 'Matrícula do Usuário', type: 'text', required: true },
                     { id: 'cpf', label: 'CPF (Apenas Números)', type: 'number', required: true },
-                    { id: 'cargo', label: 'Cargo', type: 'text', required: true },
+                    { id: 'cargoo', label: 'Cargo', type: 'text', required: true },
                     { id: 'unidadeUsuario', label: 'Unidade do Usuário', type: 'text', required: true },
                     { id: 'usuarioSimilar', label: 'Usuário Similar', type: 'text', required: true },
                     { id: 'telefoneContato', label: 'Telefone para Contato (Apenas Números)', type: 'number', required: true },
-                    { id: 'tipoUsuario', label: 'Tipo do Usuário', type: 'select', options: ['Administrativo', 'Assistencial'], required: true }
+                    { 
+                        id: 'tipoUsuario', 
+                        label: 'Tipo do Usuário', 
+                        type: 'select', 
+                        options: ['Administrativo', 'Assistencial'], 
+                        defaultValue: 'Administrativo', 
+                        required: true 
+                    },
+                    { id: 'siglaConselho', label: 'Sigla do Conselho Profissional', type: 'text', required: true },
+                    { id: 'registroConselho', label: 'Registro do Conselho Profissional', type: 'text', required: true },
+                    { 
+                        id: 'cargoo', 
+                        label: 'Tipo de Cargo', 
+                        type: 'select', 
+                        options: ['1', '2'], 
+                        required: true 
+                    }
                 ];
             }
     
@@ -495,34 +572,45 @@ const NovoTicket = () => {
                         {dynamicFields.length > 0 && (
                             <div className="campo-dinamico">
                                 {dynamicFields.map(field => (
-                                    <div key={field.id} className="campo">
-                                        <label htmlFor={field.id}>{field.label} <span className="campo-obrigatorio">*</span></label>
-                                        {field.type === 'text' && (
-                                            <input type="text" id={field.id} name={field.id} required={field.required} />
-                                        )}
-                                        {field.type === 'email' && (
-                                            <input type="email" id={field.id} name={field.id} required={field.required} />
-                                        )}
-                                        {field.type === 'number' && (
-                                            <input type="number" id={field.id} name={field.id} required={field.required} />
-                                        )}
-                                        {field.type === 'date' && (
-                                            <input type="date" id={field.id} name={field.id} required={field.required} />
-                                        )}
-                                        {field.type === 'select' && field.options && (
-                                            <select id={field.id} name={field.id} required={field.required}>
-                                                {field.options.map(option => (
-                                                    <option key={option} value={option}>
-                                                        {option}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        )}
-                                        {field.type === 'file' && (
-                                            <input type="file" id={field.id} name={field.id} required={field.required} />
-                                        )}
-                                    </div>
-                                ))}
+                                <div key={field.id} className="campo">
+                                    <label htmlFor={field.id}>{field.label} <span className="campo-obrigatorio">*</span></label>
+                                    {field.type === 'text' && !field.readOnly && (
+                                        <input type="text" id={field.id} name={field.id} required={field.required} />
+                                    )}
+                                    {field.type === 'text' && field.readOnly && (
+                                        <div id={field.id} className={field.className} style={{ textAlign: 'left', whiteSpace: 'normal' }}>
+                                            {field.value.split('\n').map((line, index) => (
+                                                <p key={index} style={{ margin: 0 }}>
+                                                    {line}
+                                                </p>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    {field.type === 'email' && (
+                                        <input type="email" id={field.id} name={field.id} required={field.required} />
+                                    )}
+                                    {field.type === 'number' && (
+                                        <input type="number" id={field.id} name={field.id} required={field.required} />
+                                    )}
+                                    {field.type === 'date' && (
+                                        <input type="date" id={field.id} name={field.id} required={field.required} />
+                                    )}
+                                    {field.type === 'select' && field.options && (
+                                        <select id={field.id} name={field.id} required={field.required}>
+                                            {field.options.map(option => (
+                                                <option key={option} value={option}>
+                                                    {option}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    )}
+                                    {field.type === 'file' && (
+                                        <input type="file" id={field.id} name={field.id} required={field.required} />
+                                    )}
+                                </div>
+                            ))}
+
                             </div>
                         )}
 
@@ -531,7 +619,7 @@ const NovoTicket = () => {
                             <textarea id="descricao" name="descricao" rows="5" required></textarea>
                         </div>
                         <div className="campo campo-upload">
-                            <label htmlFor="anexo">Anexo</label>
+                            <label htmlFor="anexo">Anexo Adicional</label>
                             <input type="file" id="anexo" name="anexo" />
                         </div>
                         <div className="campo">

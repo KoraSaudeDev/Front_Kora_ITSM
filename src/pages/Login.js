@@ -76,8 +76,9 @@ const Login = () => {
 
       setUserData(user);
       login(user);
-      navigate(from);
       hideLoadingOverlay();
+      navigate(from);
+      
     } catch (error) {
       console.error(error);
       hideLoadingOverlay();
