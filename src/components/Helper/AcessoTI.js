@@ -34,7 +34,7 @@ function AcessoTI() {
     const navigate = useNavigate();
     const [imageLoaded, setImageLoaded] = useState(false);
     const [showAlert, setShowAlert] = useState(false); 
-    const [alertMessage, setAlertMessage] = useState(''); 
+    const [alertMessage, setAlertMessage] = useState('');
 
     const secoesMaiores = [
         { nome: 'MV', icone: faServer, link: 'https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#appName=TicketsGeral-448944302&view=Novo%20Ticket&defaults={"categoria":"MV"}' },
@@ -108,18 +108,17 @@ function AcessoTI() {
                 <div className="cartoes-menores-acessoti">
                     {secoesMenores.map((secao, indice) => (
                         <div
-                        key={indice}
-                        className={`cartao-menor-acessoti ${secao.nome === 'Suporte' ? 'suporte-special' : ''}`}
-                        onClick={() => aoClicarHelper(secao)}
-                        style={secao.nome === 'Suporte' ? { backgroundColor: '#1C293E', color: 'white' } : {}}
-           
+                            key={indice}
+                            className={`cartao-menor-acessoti ${secao.nome === 'Suporte' ? 'suporte-special' : ''}`}
+                            onClick={() => aoClicarHelper(secao)}
+                            style={secao.nome === 'Suporte' ? { backgroundColor: '#1C293E', color: 'white' } : {}}
                         >
-                           <FontAwesomeIcon 
-                            icon={secao.icone} 
-                            className="icone-acessoti-menor" 
-                            style={secao.nome === 'Suporte' ? { color: 'white' } : {}}
-                        />
-                           <div 
+                            <FontAwesomeIcon 
+                                icon={secao.icone} 
+                                className="icone-acessoti-menor" 
+                                style={secao.nome === 'Suporte' ? { color: 'white' } : {}}
+                            />
+                            <div 
                                 className="nome-acessoti-menor" 
                                 style={secao.nome === 'Suporte' ? { color: 'white' } : {}}
                             >
@@ -128,6 +127,16 @@ function AcessoTI() {
                         </div>
                     ))}
                 </div>
+
+                
+                <div className="icon-bottom-right" onClick={() => window.open('https://www.appsheet.com/start/3dbf5f58-b6b1-4ee8-bd4d-a14699c5dc31#view=Meus%20Tickets', '_blank')}>
+                    <div className="tooltip">Minhas Solicitações</div>
+                    <img src="https://i.ibb.co/GVgKvfw/image.png" alt="Icon" className="pulsating-image"/>
+                </div>
+
+
+
+
             </div>
         </div>
     );

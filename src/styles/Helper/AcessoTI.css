@@ -292,3 +292,52 @@ body, html {
     background-color: #153C53 !important;
     color: #ffff !important;
 }
+.icon-bottom-right {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.icon-bottom-right img {
+    width: 100px; 
+    height: 100px;
+    margin-top: 5px;
+    transition: transform 0.4s ease-in-out;
+}
+
+.pulsating-image {
+    transition: transform 0.4s ease-in-out; 
+}
+
+.pulsating-image:hover {
+    transform: scale(1.2); 
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    background-color: #4a4a4a;
+    color: white;
+    max-width: 120px;
+    font-size: 18px;
+    padding: 6px 14px;
+    border-radius: 5px;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.tooltip::after {
+    content: "";
+    position: absolute;
+    bottom: -9px; /* Seta abaixo do tooltip */
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #4a4a4a transparent transparent transparent; /* Seta com cor na parte superior */
+}
