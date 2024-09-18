@@ -78,7 +78,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
 
     const statusOptions = {
         "Em Andamento": "#20C997",
-        "Em Atendimento": "#43A825",
+        "Em Atendimento": "#20C997",
         "Aguardando Retorno Fornecedor": "#E87C86",
         "Aguardando Retorno": "#F50057",
         "Em Aberto": "#3B7DDD",

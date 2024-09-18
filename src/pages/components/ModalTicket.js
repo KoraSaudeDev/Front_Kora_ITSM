@@ -11,6 +11,8 @@ const Modal = ({ data, onClose }) => {
     const [fim, setFim] = useState('');
     const [erro, setErro] = useState('');
     const [selectedFiles, setSelectedFiles] = useState([]);
+    const [adicionandoAtividades, setAdicionandoAtividades] = useState(false);
+    const [adicionandoAnexos, setAdicionandoAnexos] = useState(false);
     const [showAtividadesModal, setShowAtividadesModal] = useState(false);
     const [showAnexosModal, setShowAnexosModal] = useState(false);
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -30,6 +32,8 @@ const Modal = ({ data, onClose }) => {
     const [selectedSubcategoria, setSelectedSubcategoria] = useState(data.subcategoria || '');
     const [selectedAssunto, setSelectedAssunto] = useState(data.assunto || '');
     const [selectedDestinatario, setSelectedDestinatario] = useState(data.executor || '');
+    const [destinatarioDefault, setDestinatarioDefault] = useState(data.executor || '');
+    const [selectedStatus, setSelectedStatus] = useState(data.status || '');
     const [dataLimite, setDataLimite] = useState(data.data_limite);
     const [sla, setSla] = useState('');
     const [emailDomains, setEmailDomains] = useState([]);
@@ -166,7 +170,7 @@ const Modal = ({ data, onClose }) => {
     };
     const statusOptions = {
         "Em Andamento": "#20C997",
-        "Em Atendimento": "#43A825",
+        "Em Atendimento": "#20C997",
         "Aguardando Retorno Fornecedor": "#E87C86",
         "Aguardando Retorno": "#F50057",
         "Em Aberto": "#3B7DDD",
@@ -341,7 +345,271 @@ const Modal = ({ data, onClose }) => {
         }
     }, [data]);
 
+    useEffect(() => {
+        const updateAtividades = async () => {
+            if (adicionandoAtividades) {
+                showLoadingOverlay();
+
+                const filteredFiles = selectedFiles.filter(file => file.uploadType === 2);
+
+                const update_tasks = atividades
+                    .filter(task => task.alterar === 1 && task.cod_task !== undefined)
+                    .map(task => ({
+                        cod_task: task.cod_task,
+                        ds_concluido_por: task.ds_concluido_por,
+                        dt_fim: formatDate(task.dt_fim, 2),
+                    }));
+
+                const insert_tasks = atividades.filter(task => task.alterar === 1 && task.cod_task === undefined);
+
+                const ultimoItem = atividades[atividades.length - 1];
+
+                const update_tickets = {
+                    status: toTitleCase(ultimoItem?.status ?? data.status),
+                    executor: (ultimoItem?.id_executor ?? data.executor),
+                    grupo: (ultimoItem?.executor ?? data.grupo)
+                };
+
+                if (update_tickets.status === "Finalizado") {
+                    update_tickets.finalizado_por = ultimoItem?.aberto_por ?? data.finalizado_por;
+                    update_tickets.data_fim = ultimoItem?.aberto_em ?? formatDate(data.data_fim, 2);
+                    update_tickets.bl_reabertura = 1;
+                }
+
+                setSelectedDestinatario(`${ultimoItem?.id_executor ?? data.executor} - ${ultimoItem?.executor ?? data.grupo}`);
+                setDestinatarioDefault(ultimoItem?.id_executor ?? data.executor);
+                setSelectedStatus(toTitleCase(ultimoItem?.status ?? data.status));
+
+                try {
+                    for (let i = 0; i < filteredFiles.length; i++) {
+                        const formData = new FormData();
+                        formData.append('file', filteredFiles[i].file);
+                        formData.append('uploadType', filteredFiles[i].uploadType);
+
+                        try {
+                            const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/tickets/file/upload`, formData, {
+                                headers: {
+                                    'Content-Type': 'multipart/form-data',
+                                },
+                            });
+
+                            if (response.status === 202) {
+                                const matchedAtividade = insert_tasks.find(task => task.ds_anexo === filteredFiles[i].file.name);
+                                if (matchedAtividade) {
+                                    matchedAtividade.ds_anexo = response?.data?.filename;
+                                }
+                            } else {
+                                console.error(`Erro ao enviar o arquivo ${filteredFiles[i].file.name}:`, response);
+                            }
+                        } catch (error) {
+                            console.error(`Erro ao enviar o arquivo ${filteredFiles[i].file.name}:`, error);
+                        }
+                    }
+
+                    setSelectedFiles(prevFiles => prevFiles.filter(file => file.uploadType !== 2));
+
+                    const ticketConfig = {
+                        method: 'patch',
+                        url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/${data.cod_fluxo}`,
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        data: JSON.stringify(update_tickets)
+                    };
+
+                    await sendRequest(ticketConfig);
+
+                    for (const task of update_tasks) {
+                        const taskConfig = {
+                            method: 'patch',
+                            url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/task/${task.cod_task}`,
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            data: JSON.stringify(task),
+                        };
+
+                        await sendRequest(taskConfig);
+                    }
+
+                    for (let i = 0; i < insert_tasks.length; i++) {
+                        const taskCopy = { ...insert_tasks[i] };
+                        delete taskCopy.id_executor;
+                        delete taskCopy.alterar;
+
+                        const taskConfig = {
+                            method: 'post',
+                            url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/task`,
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            data: JSON.stringify(taskCopy),
+                        };
+
+                        let retorno = await sendRequest(taskConfig);
+
+                        setAtividades(prevAtividades => {
+                            const updatedAtividades = [...prevAtividades];
+                            const index = updatedAtividades.findIndex(a => a === insert_tasks[i]);
+                            if (index !== -1) {
+                                updatedAtividades[index] = { ...updatedAtividades[index], cod_task: retorno.task_id };
+                            }
+                            return updatedAtividades;
+                        });
+                    }
+
+                    setAtividades(prevAtividades =>
+                        prevAtividades.map(task => {
+                            const { alterar, ...rest } = task;
+                            return rest;
+                        })
+                    );
+
+                    axios.post(`${process.env.REACT_APP_API_BASE_URL}/tickets/update/sla?cod_fluxo=${data.cod_fluxo}`);
+
+                    const logConfig = {
+                        method: 'post',
+                        url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/log`,
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        data: JSON.stringify({
+                            "nome": user.name,
+                            "email": user.email,
+                            "cod_fluxo": data.cod_fluxo,
+                            "log": JSON.stringify({
+                                "updated_ticket": update_tickets,
+                                "inserted_task": insert_tasks,
+                                "updated_task": update_tasks
+                            })
+                        })
+                    }
+                    axios.request(logConfig);
+
+                    hideLoadingOverlay();
+                    setSuccessMessage('Atividade salva com sucesso!');
+                    setShowSuccessMessage(true);
+                    setTimeout(() => {
+                        setShowSuccessMessage(false);
+                    }, 1800);
+                } catch (error) {
+                    hideLoadingOverlay();
+                    console.error("Error saving tasks:", error);
+                }
+
+                setAdicionandoAtividades(false);
+            }
+        };
+        updateAtividades();
+    }, [adicionandoAtividades]);
+
+    useEffect(() => {
+        const updateAnexos = async () => {
+            if (adicionandoAnexos) {
+                showLoadingOverlay();
+
+                const filteredFiles = selectedFiles.filter(file => file.uploadType === 3);
+
+                const insert_anexos = anexos.filter(file => file.alterar === 1 && file.cod_anexo === undefined);
+
+                try {
+                    for (let i = 0; i < filteredFiles.length; i++) {
+                        const formData = new FormData();
+                        formData.append('file', filteredFiles[i].file);
+                        formData.append('uploadType', filteredFiles[i].uploadType);
+
+                        try {
+                            const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/tickets/file/upload`, formData, {
+                                headers: {
+                                    'Content-Type': 'multipart/form-data',
+                                },
+                            });
+
+                            if (response.status === 202) {
+                                const matchedAnexos = insert_anexos.find(line => line.ds_anexo === filteredFiles[i].file.name);
+                                if (matchedAnexos) {
+                                    matchedAnexos.ds_anexo = response?.data?.filename;
+                                }
+                            } else {
+                                console.error(`Erro ao enviar o arquivo ${filteredFiles[i].file.name}:`, response);
+                            }
+                        } catch (error) {
+                            console.error(`Erro ao enviar o arquivo ${filteredFiles[i].file.name}:`, error);
+                        }
+                    }
+
+                    setSelectedFiles(prevFiles => prevFiles.filter(file => file.uploadType !== 3));
+
+                    for (let i = 0; i < insert_anexos.length; i++) {
+                        const fileCopy = { ...insert_anexos[i] };
+                        delete fileCopy.alterar;
+
+                        const fileConfig = {
+                            method: 'post',
+                            url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/file`,
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            data: JSON.stringify(fileCopy),
+                        };
+
+                        let retorno = await sendRequest(fileConfig);
+
+                        setAnexos(prevAnexos => {
+                            const updatedAnexos = [...prevAnexos];
+                            const index = updatedAnexos.findIndex(a => a === insert_anexos[i]);
+                            if (index !== -1) {
+                                updatedAnexos[index] = { ...updatedAnexos[index], cod_anexo: retorno.anexo_id };
+                            }
+                            return updatedAnexos;
+                        });
+                    }
+
+                    const logConfig = {
+                        method: 'post',
+                        url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/log`,
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        data: JSON.stringify({
+                            "nome": user.name,
+                            "email": user.email,
+                            "cod_fluxo": data.cod_fluxo,
+                            "log": JSON.stringify({
+                                "insert_anexos": insert_anexos
+                            })
+                        })
+                    }
+                    axios.request(logConfig);
+
+                    hideLoadingOverlay();
+                    setSuccessMessage('Anexo(s) salvo(s) com sucesso!');
+                    setShowSuccessMessage(true);
+                    setTimeout(() => {
+                        setShowSuccessMessage(false);
+                    }, 1800);
+                } catch (error) {
+                    hideLoadingOverlay();
+                    console.error("Error saving anexos:", error);
+                }
+
+                setAdicionandoAnexos(false);
+            }
+        };
+        updateAnexos();
+    }, [adicionandoAnexos]);
+
     if (!data) return null;
+
+    const sendRequest = async (config) => {
+        try {
+            const response = await axios.request(config);
+            console.log(JSON.stringify(response.data));
+            return response.data;
+        } catch (error) {
+            console.error('Request Error:', error);
+        }
+    };
 
     function formatDate(dateString, type = 1) {
         if (!dateString) {
@@ -360,6 +628,16 @@ const Modal = ({ data, onClose }) => {
         else if (type === 2) return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
         else if (type === 3) return date.toISOString().slice(0, 19);
         else return '';
+    };
+
+    function toTitleCase(str) {
+        if (str === "EM ATENDIMENTO") return "Em Andamento";
+        if (str === "CANCELADA") return "Cancelado";
+        return str
+            .toLowerCase()
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
     };
 
     const showLoadingOverlay = () => {
@@ -402,6 +680,8 @@ const Modal = ({ data, onClose }) => {
             }));
 
             setAnexos((prevAnexos) => [...prevAnexos, ...newAnexos]);
+
+            setAdicionandoAnexos(true);
         }
     };
 
@@ -418,7 +698,7 @@ const Modal = ({ data, onClose }) => {
             setErro('');
         }
     };
-    
+
     const handleFimChange = (e) => {
         const newFim = e.target.value;
         if (inicio && new Date(newFim) < new Date(inicio)) {
@@ -526,6 +806,7 @@ const Modal = ({ data, onClose }) => {
         }
 
         setAtividades([...atividades, novaAtividade]);
+        setAdicionandoAtividades(true);
         handleFecharAtividadesModal();
     };
 
@@ -552,13 +833,13 @@ const Modal = ({ data, onClose }) => {
                 break;
             case 'assunto':
                 setSelectedAssunto(value);
-                const selectedAssuntoObj = options.assunto.find(option => option.assunto === value);
-                if (selectedAssuntoObj) {
-                    const destinatario = options.destinatarios.find(dest => dest.value.startsWith(selectedAssuntoObj.grupo_atendimento));
-                    if (destinatario) {
-                        setSelectedDestinatario(destinatario.value);
-                    }
-                }
+                // const selectedAssuntoObj = options.assunto.find(option => option.assunto === value);
+                // if (selectedAssuntoObj) {
+                //     const destinatario = options.destinatarios.find(dest => dest.value.startsWith(selectedAssuntoObj.grupo_atendimento));
+                //     if (destinatario) {
+                //         setSelectedDestinatario(destinatario.value);
+                //     }
+                // }
                 break;
             case 'unidade':
                 setSelectedUnidade(value);
@@ -613,58 +894,32 @@ const Modal = ({ data, onClose }) => {
             return;
         }
 
-        function toTitleCase(str) {
-            if (str === "EM ATENDIMENTO") return "Em Andamento";
-            if (str === "CANCELADA") return "Cancelado";
-            return str
-                .toLowerCase()
-                .split(' ')
-                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(' ');
-        }
-
         showLoadingOverlay();
 
-        const insert_anexos = anexos.filter(task => task.alterar === 1 && task.id === undefined);
-
-        const update_tasks = atividades
-            .filter(task => task.alterar === 1 && task.id !== undefined)
-            .map(task => ({
-                cod_task: task.cod_task,
-                ds_concluido_por: task.ds_concluido_por,
-                dt_fim: formatDate(task.dt_fim, 2),
-            }));
-
-        const insert_tasks = atividades.filter(task => task.alterar === 1 && task.id === undefined);
+        const insert_tasks = [];
 
         const ultimoItem = atividades[atividades.length - 1];
 
         var id_executor = null;
         var executor = null;
 
-        if (insert_tasks.length < 1) {
-            const destinatarioParts = selectedDestinatario.split(" - ");
+        const destinatarioParts = selectedDestinatario.split(" - ");
 
-            if (selectedAssunto !== data.assunto ||
-                selectedSubcategoria !== data.subcategoria ||
-                selectedCategoria !== data.categoria ||
-                String(destinatarioParts[0]) !== String(data.executor)) {
+        if (String(destinatarioParts[0]) !== String(destinatarioDefault)) {
+            id_executor = destinatarioParts[0];
+            executor = selectedDestinatario.substring(id_executor.length + 3);
+            statusParam = "Em Andamento";
 
-                id_executor = destinatarioParts[0];
-                executor = selectedDestinatario.substring(id_executor.length + 3);
-                statusParam = "Em Andamento";
-
-                insert_tasks.push({
-                    "cod_fluxo": data.id,
-                    "aberto_em": formatDate(new Date().toISOString(), 2),
-                    "aberto_por": user.name,
-                    "status": "EM ATENDIMENTO",
-                    "descricao": "Solicitação encaminhada...",
-                    "id_executor": id_executor,
-                    "executor": executor,
-                    "tipo_atividade": "Privada"
-                });
-            }
+            insert_tasks.push({
+                "cod_fluxo": data.id,
+                "aberto_em": formatDate(new Date().toISOString(), 2),
+                "aberto_por": user.name,
+                "status": "EM ATENDIMENTO",
+                "descricao": "Solicitação encaminhada...",
+                "id_executor": id_executor,
+                "executor": executor,
+                "tipo_atividade": "Privada"
+            });
         }
 
         //const resposta_chamado = document.querySelector("#resp-chamado").value;
@@ -688,52 +943,7 @@ const Modal = ({ data, onClose }) => {
         if (organizacaoDomains) update_tickets.organizacao_dominio = organizacaoDomains;
         if (senha) update_tickets.senha_usuario = senha;
 
-        if (update_tickets.status === "Finalizado") {
-            update_tickets.finalizado_por = ultimoItem?.aberto_por ?? data.finalizado_por;
-            update_tickets.data_fim = ultimoItem?.aberto_em ?? formatDate(data.data_fim, 2);
-            update_tickets.bl_reabertura = 1;
-        }
-
-        const sendRequest = async (config) => {
-            try {
-                const response = await axios.request(config);
-                console.log(JSON.stringify(response.data));
-            } catch (error) {
-                console.error('Request Error:', error);
-            }
-        };
-
         try {
-            for (let i = 0; i < selectedFiles.length; i++) {
-                const formData = new FormData();
-                formData.append('file', selectedFiles[i].file);
-                formData.append('uploadType', selectedFiles[i].uploadType);
-
-                const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/tickets/file/upload`, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
-
-                if (response.status === 202) {
-                    if (selectedFiles[i].uploadType === 1) {
-                        update_tickets.anexo_resposta = response?.data?.filename;
-                    } else if (selectedFiles[i].uploadType === 2) {
-                        const matchedAtividade = insert_tasks.find(task => task.ds_anexo === selectedFiles[i].file.name);
-                        if (matchedAtividade) {
-                            matchedAtividade.ds_anexo = response?.data?.filename;
-                        }
-                    } else if (selectedFiles[i].uploadType === 3) {
-                        const matchedFile = insert_anexos.find(task => task.ds_anexo === selectedFiles[i].file.name);
-                        if (matchedFile) {
-                            matchedFile.ds_anexo = response?.data?.filename;
-                        }
-                    }
-                } else {
-                    console.error(`Erro ao enviar o arquivo ${selectedFiles[i].name}:`, response);
-                }
-            }
-
             const ticketConfig = {
                 method: 'patch',
                 url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/${data.cod_fluxo}`,
@@ -744,19 +954,6 @@ const Modal = ({ data, onClose }) => {
             };
 
             await sendRequest(ticketConfig);
-
-            for (const task of update_tasks) {
-                const taskConfig = {
-                    method: 'patch',
-                    url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/task/${task.cod_task}`,
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    data: JSON.stringify(task)
-                };
-
-                await sendRequest(taskConfig);
-            }
 
             for (const task of insert_tasks) {
                 delete task.id_executor;
@@ -774,21 +971,6 @@ const Modal = ({ data, onClose }) => {
                 await sendRequest(taskConfig);
             }
 
-            for (const file of insert_anexos) {
-                delete file.alterar;
-
-                const fileConfig = {
-                    method: 'post',
-                    url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/file`,
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    data: JSON.stringify(file)
-                };
-
-                await sendRequest(fileConfig);
-            }
-
             axios.post(`${process.env.REACT_APP_API_BASE_URL}/tickets/update/sla?cod_fluxo=${data.cod_fluxo}`);
 
             const logConfig = {
@@ -803,9 +985,7 @@ const Modal = ({ data, onClose }) => {
                     "cod_fluxo": data.cod_fluxo,
                     "log": JSON.stringify({
                         "updated_ticket": update_tickets,
-                        "inserted_task": insert_tasks,
-                        "updated_task": update_tasks,
-                        "inserted_file": insert_anexos
+                        "inserted_task": insert_tasks
                     })
                 })
             }
@@ -1191,10 +1371,10 @@ const Modal = ({ data, onClose }) => {
                                 <span
                                     className="status-rect"
                                     style={{
-                                        backgroundColor: statusOptions[data.status] || '#ffffff',
+                                        backgroundColor: statusOptions[selectedStatus] || '#ffffff',
                                     }}
                                 >
-                                    {data.status}
+                                    {selectedStatus}
                                 </span>
                             </div>
                             <div className="sla-container">
