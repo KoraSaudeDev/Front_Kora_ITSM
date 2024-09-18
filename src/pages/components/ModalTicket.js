@@ -1338,6 +1338,7 @@ const Modal = ({ data, onClose }) => {
                                 <div className="card-anexo" key={index} onClick={anexo.id ? () => handleAnexoClick(anexo.ds_anexo) : null}>
                                     <p><strong>Nome:</strong> {anexo.ds_adicionado_por}</p>
                                     <p><strong>Data de Abertura:</strong> {formatDate(anexo.abertura)}</p>
+                                    {anexo.ds_texto && <p><strong>Descrição:</strong> {anexo.ds_texto}</p>}
                                     <p><strong>Arquivo:</strong>
                                         <a>
                                             {anexo.ds_anexo.split('/').pop()}

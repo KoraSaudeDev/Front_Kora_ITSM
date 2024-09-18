@@ -36,7 +36,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
 
     const columnOptions = [
         'abertura', 'status', 'st_sla', 'categoria', 'ds_nivel',
-        'data_limite', 'grupo', 'area_negocio', 'hub', 'unidade'
+        'data_limite', 'executor', 'area_negocio', 'hub', 'unidade'
     ];
     const columnDescriptions = {
         abertura: 'Abertura',
@@ -45,7 +45,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
         categoria: 'Categoria',
         ds_nivel: 'Prioridade',
         data_limite: 'Data limite',
-        grupo: 'Analista Atual',
+        executor: 'Analista Atual',
         area_negocio: 'Área de negócio',
         hub: 'HUB',
         unidade: 'Unidade de negócio'
@@ -177,11 +177,18 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
             setShowNoDataMessage(true);
         }, 10000);
 
+        const interval = setInterval(() => {
+            fetchAtendimentos();
+        }, 30000);
+
         prevPageRef.current = currentPage;
         prevItemsPerPageRef.current = itemsPerPage;
         prevSavedFilters.current = savedFilters;
 
-        return () => clearTimeout(timer);
+        return () => {
+            clearTimeout(timer);
+            clearInterval(interval);
+        };
     }, [currentPage, itemsPerPage, savedFilters, sortOrders]);
 
     useEffect(() => {
@@ -212,7 +219,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
                         value: status,
                         label: status
                     })),
-                    grupo: usuariosExecutoresResponse.data.map(user => ({
+                    executor: usuariosExecutoresResponse.data.map(user => ({
                         value: user.id,
                         label: user.fila
                     })),
@@ -288,23 +295,23 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
 
     useEffect(() => {
         const cod_fluxo = localStorage.getItem('cod_fluxo');
-        
+
         if (cod_fluxo) {
             const fetchTicketData = async () => {
                 try {
                     const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/ticket?cod_fluxo=${cod_fluxo}`);
                     setModalData(response.data);
                     setShowModal(true);
-                    
+
                     localStorage.removeItem('cod_fluxo');
                 } catch (error) {
                     console.error('Erro ao buscar dados do atendimento:', error);
                 }
             };
-    
+
             fetchTicketData();
         }
-    }, []);    
+    }, []);
 
     useEffect(() => {
         if (showMenu) {
@@ -314,7 +321,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
             window.removeEventListener('click', handleClickOutside);
             window.removeEventListener('scroll', handleClickOutside);
         }
-    
+
         return () => {
             window.removeEventListener('click', handleClickOutside);
             window.removeEventListener('scroll', handleClickOutside);
@@ -341,16 +348,16 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
 
     const handleRightClick = (e, atendimento) => {
         e.preventDefault();
-    
+
         const zoomFactor = 0.87;
-        
+
         const clickX = (e.clientX / zoomFactor) + ((e.clientX / zoomFactor) * 0.15);
         const clickY = (e.clientY / zoomFactor) + ((e.clientY / zoomFactor) * 0.17);
-    
+
         setMenuPosition({ x: clickX, y: clickY });
         setSelectedAtendimento(atendimento);
         setShowMenu(true);
-    };    
+    };
 
     const handleClickOutside = () => {
         setShowMenu(false);
@@ -369,10 +376,10 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
 
     const handleOpenInNewPage = (atendimento) => {
         localStorage.setItem('cod_fluxo', atendimento.cod_fluxo);
-        
+
         const url = `${window.location.origin}${window.location.pathname}`;
         window.open(url, '_blank');
-        
+
         setShowMenu(false);
     };
 
@@ -721,27 +728,27 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
                                 <div key={col} className="filter-option">
                                     <h5>{columnDescriptions[col] || col.charAt(0).toUpperCase() + col.slice(1)}</h5>
                                     <div className="filter-select-container">
-    {col === 'abertura' || col === 'data_limite' ? (
-        <>
-            {dateFilters[col] ? (
-                <div className="date-inputs">
-                    <input
-                        type="date"
-                        placeholder="Data Início"
-                        value={dateFilters[col].startDate || ''}
-                        onChange={(e) => handleDateChange(col, 'startDate', e.target.value)}
-                    />
-                    <input
-                        type="date"
-                        placeholder="Data Fim"
-                        value={dateFilters[col].endDate || ''}
-                        onChange={(e) => handleDateChange(col, 'endDate', e.target.value)}
-                    />
-                </div>
-            ) : (
-                <p>Selecione uma data</p>
-            )}
-            {dateErrors[col] && <p className="error-message">{dateErrors[col]}</p>}
+                                        {col === 'abertura' || col === 'data_limite' ? (
+                                            <>
+                                                {dateFilters[col] ? (
+                                                    <div className="date-inputs">
+                                                        <input
+                                                            type="date"
+                                                            placeholder="Data Início"
+                                                            value={dateFilters[col].startDate || ''}
+                                                            onChange={(e) => handleDateChange(col, 'startDate', e.target.value)}
+                                                        />
+                                                        <input
+                                                            type="date"
+                                                            placeholder="Data Fim"
+                                                            value={dateFilters[col].endDate || ''}
+                                                            onChange={(e) => handleDateChange(col, 'endDate', e.target.value)}
+                                                        />
+                                                    </div>
+                                                ) : (
+                                                    <p>Selecione uma data</p>
+                                                )}
+                                                {dateErrors[col] && <p className="error-message">{dateErrors[col]}</p>}
                                             </>
                                         ) : (
                                             <Select
