@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Autosuggest from 'react-autosuggest';
 import axios from 'axios';
 import Modal from '../pages/components/ModalTicket'; 
-import { FaSearch } from 'react-icons/fa'; // Ícone de busca
+import { FaSearch } from 'react-icons/fa'; 
 import '../styles/SearchBar.css';
 
 const statusOptions = {
@@ -45,7 +45,7 @@ const SearchBar = () => {
     }
 
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/tickets-preview?p=${inputValue}`);
+      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/tickets-preview?p=${inputValue}&page=1&per_page=50`);
       return response.data.tickets.map((ticket) => ({
         name: `${ticket.cod_fluxo} - ${ticket.nome}`,
         status: ticket.status, 
@@ -104,10 +104,9 @@ const SearchBar = () => {
   };
 
   return (
-    <div className="react-autosuggest__container">
-      
+    <div className="search-container">
       <Autosuggest
-        suggestions={suggestions}
+        suggestions={suggestions.slice(0, 50)} 
         onSuggestionsFetchRequested={onSuggestionsFetchRequested}
         onSuggestionsClearRequested={onSuggestionsClearRequested}
         getSuggestionValue={getSuggestionValue}

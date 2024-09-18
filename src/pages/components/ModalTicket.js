@@ -1471,7 +1471,7 @@ const Modal = ({ data, onClose }) => {
                                         <label htmlFor="anexoAtividade" className="label-anexo">Anexar Arquivo:</label>
                                         <input type="file" id="anexoAtividade" className="input-anexo" />
                                     </div>
-                                    <button className="botao-salvar-atividade" onClick={handleSalvarAtividade}>Salvar</button>
+                                    <button className="botao-salvar-atividade" onClick={handleSalvarAtividade}>Adicionar</button>
                                 </div>
                             </>
                         )}
