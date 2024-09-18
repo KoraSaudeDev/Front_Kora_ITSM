@@ -177,9 +177,9 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
             setShowNoDataMessage(true);
         }, 10000);
 
-        const interval = setInterval(() => {
-            fetchAtendimentos();
-        }, 30000);
+        // const interval = setInterval(() => {
+        //     fetchAtendimentos();
+        // }, 30000);
 
         prevPageRef.current = currentPage;
         prevItemsPerPageRef.current = itemsPerPage;
@@ -187,7 +187,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
 
         return () => {
             clearTimeout(timer);
-            clearInterval(interval);
+            //clearInterval(interval);
         };
     }, [currentPage, itemsPerPage, savedFilters, sortOrders]);
 
