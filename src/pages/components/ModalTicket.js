@@ -1179,9 +1179,15 @@ const Modal = ({ data, onClose }) => {
     };
 
     const handleOverlayClick = (event) => {
-        if (event.target.classList.contains('modal-overlay')) {
-            handleCloseModal();
+        if (event.target.classList.contains('modal-overlay')) { 
+            if(showAtividadesModal){
+                handleFecharAtividadesModal();
+            }
+            else{
+                handleCloseModal();
+            }
         }
+        
     };
 
     const categoriaOptions = options.categoria.map(option => ({ value: option, label: option }));
