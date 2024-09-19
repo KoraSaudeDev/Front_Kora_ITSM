@@ -1179,15 +1179,15 @@ const Modal = ({ data, onClose }) => {
     };
 
     const handleOverlayClick = (event) => {
-        if (event.target.classList.contains('modal-overlay')) { 
-            if(showAtividadesModal){
+        if (event.target.classList.contains('modal-overlay')) {
+            if (showAtividadesModal) {
                 handleFecharAtividadesModal();
             }
-            else{
+            else {
                 handleCloseModal();
             }
         }
-        
+
     };
 
     const categoriaOptions = options.categoria.map(option => ({ value: option, label: option }));
@@ -1219,6 +1219,14 @@ const Modal = ({ data, onClose }) => {
         }
         return prioridade.prioridade !== 'P6' && prioridade.prioridade !== 'P7';
     });
+    const unidadeOptions = selectedHub
+        ? [
+            ...options.unidade.map(option => ({ value: option, label: option })),
+            ...(options.unidade.includes(selectedUnidade)
+                ? []
+                : [{ value: selectedUnidade, label: selectedUnidade }])
+        ]
+        : [];
 
     return (
         <div className="modal-overlay" onClick={handleOverlayClick}>
@@ -1443,9 +1451,9 @@ const Modal = ({ data, onClose }) => {
                             <strong>Unidade de Negócio: <span className="campo-obrigatorio">*</span></strong>
                             <Select
                                 className="select-destinatario"
-                                value={options.unidade.map(option => ({ value: option, label: option })).find(option => option.value === selectedUnidade) || null}
+                                value={unidadeOptions.find(option => option.value === selectedUnidade) || null}
                                 onChange={(selectedOption) => handleFieldChange('unidade', selectedOption ? selectedOption.value : '')}
-                                options={options.unidade.map(option => ({ value: option, label: option }))}
+                                options={unidadeOptions}
                                 isClearable
                                 placeholder=""
                                 isDisabled={!selectedHub}
