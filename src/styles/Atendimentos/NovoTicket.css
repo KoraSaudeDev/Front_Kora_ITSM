@@ -280,7 +280,7 @@ body {
     word-wrap: break-word;
 }
 
-
+/* 
 input[type="file"] {
     position: relative;
     
@@ -337,7 +337,7 @@ input[type="file"]:active {
     font-weight: 400;
     text-align: center;
 
-}
+} */
 
 
 
