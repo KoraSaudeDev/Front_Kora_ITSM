@@ -7,7 +7,7 @@ body, html {
 .background-branco-home {
     background: white url('../../assets/images/fundo_site.png') no-repeat center top;
     background-size: cover;
-    min-height: 123.5vh;
+    min-height: 132.1vh;
     zoom: 1;
     display: flex;
     justify-content: center;
