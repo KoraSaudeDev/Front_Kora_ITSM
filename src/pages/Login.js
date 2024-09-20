@@ -50,8 +50,11 @@ const Login = () => {
 
       const response = await axios.request(config);
       
-      if (response.data.filas_id > 0) user.bl_analista = true;
-      else user.bl_analista = false;
+      if (Array.isArray(response.data.filas_id) && response.data.filas_id.length > 0) {
+        user.bl_analista = true;
+      } else {
+        user.bl_analista = false;
+      }
 
       if (response.data.gestor) {
         const uniqueIds = new Set();
@@ -135,7 +138,7 @@ const Login = () => {
             </label>
           </div>
           <div className="sidebar-footer">
-            <p>Version 1.016</p>
+            <p>Version 1.017</p>
           </div>
         </div>
       </div>
