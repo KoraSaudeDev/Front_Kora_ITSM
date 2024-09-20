@@ -45,7 +45,7 @@ const SearchBar = () => {
     }
 
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/tickets-preview?p=${inputValue}&page=1&per_page=50`);
+      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/tickets-preview?p=${inputValue}&page=1&per_page=100`);
       return response.data.tickets.map((ticket) => ({
         name: `${ticket.cod_fluxo} - ${ticket.nome}`,
         status: ticket.status, 
