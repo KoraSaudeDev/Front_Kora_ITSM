@@ -360,7 +360,7 @@ const Modal = ({ data, onClose }) => {
                         dt_fim: formatDate(task.dt_fim, 2),
                     }));
 
-                const insert_tasks = atividades.filter(task => task.alterar === 1 && task.cod_task === undefined);
+                var insert_tasks = atividades.filter(task => task.alterar === 1 && task.cod_task === undefined);
 
                 const ultimoItem = atividades[atividades.length - 1];
 
@@ -769,6 +769,8 @@ const Modal = ({ data, onClose }) => {
             tipo_atividade,
             ds_anexo: null
         };
+
+        if (novaAtividade.status == "FINALIZADO") novaAtividade.dt_fim = novaAtividade.aberto_em;
 
         if (fim) novaAtividade.dt_fim = formatDate(fim, 2);
 
@@ -1406,7 +1408,7 @@ const Modal = ({ data, onClose }) => {
 
                         <p><strong className="data">Abertura:</strong> {formatDate(data.abertura)}</p>
                         <p><strong className="data">Data Limite:</strong> {formatDate(dataLimite)}</p>
-                        <p><strong className="data">Tipo da SLA:</strong> {options.prioridades.find(p => p.prioridade === prioridadeSelecionada)?.tipo_tempo.toUpperCase() || ''}</p>
+                        <p><strong className="data">Tipo do SLA:</strong> {options.prioridades.find(p => p.prioridade === prioridadeSelecionada)?.tipo_tempo.toUpperCase() || ''}</p>
 
                         <div className="campo-editavel">
                             <strong>Analista Atual: <span className="campo-obrigatorio">*</span></strong>
@@ -1432,8 +1434,6 @@ const Modal = ({ data, onClose }) => {
                                 styles={customStyles}
                             />
                         </div>
-
-
                         <div className="campo-editavel">
                             <strong>Hub: <span className="campo-obrigatorio">*</span></strong>
                             <Select
@@ -1446,7 +1446,6 @@ const Modal = ({ data, onClose }) => {
                                 styles={customStyles}
                             />
                         </div>
-
                         <div className="campo-editavel">
                             <strong>Unidade de Negócio: <span className="campo-obrigatorio">*</span></strong>
                             <Select
@@ -1570,8 +1569,12 @@ const Modal = ({ data, onClose }) => {
                                     <p><label>Destinatário:</label> {atividadeSelecionada.executor}</p>
                                     <p><label>Descrição:</label> {atividadeSelecionada.descricao}</p>
                                     <p><label>Visibilidade:</label> {atividadeSelecionada.tipo_atividade}</p>
-                                    <p><label>Duração (Útil):</label> {atividadeSelecionada.tempo}</p>
-                                    <p><label>Duração (Corrida):</label> {atividadeSelecionada.tempo_corrido}</p>
+                                    <p>
+                                        <label>Duração:</label>
+                                        {options.prioridades.find(p => p.prioridade === prioridadeSelecionada)?.tipo_tempo.toUpperCase() === 'ÚTIL'
+                                            ? (atividadeSelecionada.tempo ? ` ${atividadeSelecionada.tempo} - ÚTIL` : '')
+                                            : (atividadeSelecionada.tempo_corrido ? ` ${atividadeSelecionada.tempo_corrido} - CORRIDO` : '')}
+                                    </p>
                                     <p><label>Observações:</label> {atividadeSelecionada.ds_obs}</p>
                                     <p style={{ display: 'flex', alignItems: 'center' }}>
                                         <label>Anexo:</label>
@@ -1634,7 +1637,7 @@ const Modal = ({ data, onClose }) => {
                                         <input type="text" id="aberto-por-task" value={user.name} readOnly />
                                     </div>
                                     <textarea className="textarea-atividade" placeholder="Descrição" id="descricao-task" rows="3"></textarea>
-                                    <p>
+                                    <div>
                                         <label>Status:</label><br></br>
                                         <select id="status-task" >
                                             <option></option>
@@ -1642,9 +1645,8 @@ const Modal = ({ data, onClose }) => {
                                                 <option key={index} value={status}>{status}</option>
                                             ))}
                                         </select>
-                                    </p>
-
-                                    <p>
+                                    </div>
+                                    <div>
                                         <label>Destinatário:</label>
                                         <Select
                                             className="select-destinatario"
@@ -1654,7 +1656,7 @@ const Modal = ({ data, onClose }) => {
                                             placeholder=""
                                             onChange={selectedOption => setExecutor(selectedOption)}
                                         />
-                                    </p>
+                                    </div>
                                     <div className="switch-container">
                                         <label htmlFor="tipo-atividade">Pública:</label>
                                         <label className="switch">

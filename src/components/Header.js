@@ -3,8 +3,10 @@ import SearchBar from './SearchBar';
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/Header.css';
 import { FaBell } from 'react-icons/fa';
+import { useAuth } from '../context/AuthContext';
 
 const Header = ({ pendentes = [] }) => {
+  const { user } = useAuth();
   const [showNotifications, setShowNotifications] = useState(false);
   const [isSwinging, setIsSwinging] = useState(false);
   const navigate = useNavigate();
@@ -51,9 +53,11 @@ const Header = ({ pendentes = [] }) => {
         <div className="toggle-menu" onClick={alternarMenu} data-tooltip="Menu">
           &#9776;
         </div>
-        <div className="barra-busca">
-          <SearchBar />
-        </div>
+        {user && user.bl_analista && (
+          <div className="barra-busca">
+            <SearchBar />
+          </div>
+        )}
         <div className="cabecalho2">
           <div className="conteudo-cabecalho2">
             <div

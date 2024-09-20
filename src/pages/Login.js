@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/Login.css';
 import axios from 'axios';
+import { faL } from '../../node_modules/@fortawesome/free-solid-svg-icons/index';
 
 const logoKoraUrl = "https://i.postimg.cc/8k9pdsZV/unnamed.png";
 
@@ -49,6 +50,8 @@ const Login = () => {
 
       const response = await axios.request(config);
       
+      if (response.data.filas_id > 0) user.bl_analista = true;
+      else user.bl_analista = false;
 
       if (response.data.gestor) {
         const uniqueIds = new Set();
@@ -71,6 +74,7 @@ const Login = () => {
       else {
         if (response.data.filas) user.filas = response.data.filas;
         if (response.data.filas_id) user.filas_id = response.data.filas_id;
+        if (response.data.id_user) user.id_user = response.data.id_user;
         if (response.data.id_user) user.id_user = response.data.id_user;
       }
 
@@ -131,7 +135,7 @@ const Login = () => {
             </label>
           </div>
           <div className="sidebar-footer">
-            <p>Version 1.015</p>
+            <p>Version 1.016</p>
           </div>
         </div>
       </div>
