@@ -481,7 +481,7 @@ const NovoTicket = () => {
     return (
         <div className="container-novo-ticket">
             <div className="info-basicas-duas-colunas">
-                <div className="coluna-esquerda">
+                {/* <div className="coluna-esquerda">
                     <h2>Informações Básicas</h2>
                     <form className="formulario" onSubmit={handleSubmit}>
                         <div className="campo">
@@ -530,11 +530,15 @@ const NovoTicket = () => {
                             />
                         </div>
                     </form>
-                </div>
+                </div> */}
 
                 <div className="coluna-direita">
-                    <h2>Detalhes do Ticket</h2>
+                    <h2>Abertura de Ticket</h2>
                     <form className="formulario" onSubmit={handleSubmit}>
+                    <div className="campo">
+                            <label htmlFor="abertura">Abertura <span className="campo-obrigatorio">*</span></label>
+                            <input type="text" id="abertura" name="abertura" value={obterDataAtual()} readOnly className="campo-leitura" />
+                        </div>
                         <div className="campo">
                             <label htmlFor="categoria">Categoria <span className="campo-obrigatorio">*</span></label>
                             <Select

@@ -17,12 +17,11 @@ body {
 .info-basicas-duas-colunas {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: center;
     width: 100%;
 }
-
-.coluna-esquerda, .coluna-direita {
-    width: 48%;
+.coluna-direita {
+    width: 60%;
     background-color: #fff;
     margin-right: 5px;
     border-radius: 4px;
@@ -193,7 +192,7 @@ body {
     100% { opacity: 0; }
 }
 
-#abertura,
+
 #nome-completo,
 #email,
 #matriculaa,
@@ -257,6 +256,7 @@ body {
 #centroCusto,
 #termoAceitacao,
 #motivoAjuste,
+
 #tipoUsuario,
 #dataNascimento{
     height: 40px;
