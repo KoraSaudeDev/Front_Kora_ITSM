@@ -9,6 +9,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Main from './components/Main';
 import Home from './pages/Home';
 import Login from './pages/Login';
+import NotFound from './pages/NotFound';
 
 import HomeHelper from './components/Helper/HomeHelper';
 import AcessoTI from './components/Helper/AcessoTI';
@@ -40,28 +41,14 @@ const App = () => {
           <Route path="/suporte/login" element={<Login />} />
           <Route path="/" element={<Navigate to="/helper" />} /> 
           <Route
-            path="/*"
+            path="/suporte/*"
             element={
               <div className={`app-container ${isSidebarOpen ? 'sidebar-open' : ''}`}>
-                <Header
-                  onToggleSidebar={toggleSidebar}
-                />
+                <Header onToggleSidebar={toggleSidebar} />
                 <Sidebar isOpen={isSidebarOpen} />
                 <Routes>
                   <Route
-                    path="/suporte"
-                    element={
-                      <ProtectedRoute
-                        element={
-                          <Main title="Meus Atendimentos" description="Atendimentos / Meus Atendimentos">
-                            <MeusAtendimentos />
-                          </Main>
-                        }
-                      />
-                    }
-                  />
-                  <Route
-                    path="/suporte/meus-atendimentos"
+                    path="meus-atendimentos"
                     element={
                       <ProtectedRoute
                         element={
@@ -73,7 +60,7 @@ const App = () => {
                     }
                   />
                   <Route
-                    path="/suporte/minha-equipe"
+                    path="minha-equipe"
                     element={
                       <ProtectedRoute
                         element={
@@ -85,7 +72,7 @@ const App = () => {
                     }
                   />
                   <Route
-                    path="/suporte/all-tickets"
+                    path="all-tickets"
                     element={
                       <ProtectedRoute
                         element={
@@ -97,7 +84,7 @@ const App = () => {
                     }
                   />
                   <Route
-                    path="/suporte/novo-ticket-futuro"
+                    path="novo-ticket-futuro"
                     element={
                       <ProtectedRoute
                         element={
@@ -108,14 +95,18 @@ const App = () => {
                       />
                     }
                   />
+  
+                  <Route path="*" element={<Navigate to="/not-found" />} />
                 </Routes>
               </div>
             }
           />
+          <Route path="/not-found" element={<NotFound />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
     </AuthProvider>
-  );
+  );  
 };
 
 export default App;
