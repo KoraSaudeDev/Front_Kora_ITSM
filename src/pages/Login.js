@@ -13,7 +13,8 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || '/suporte/meus-atendimentos'; 
+  // const from = location.state?.from?.pathname || '/suporte/meus-atendimentos';
+  const from = location.state?.from?.pathname || '/suportePRD/meus-atendimentos'; 
   const [userData, setUserData] = useState(null);
   const [stayLoggedIn, setStayLoggedIn] = useState(false);
 

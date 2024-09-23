@@ -132,45 +132,45 @@ const Sidebar = () => {
           
           <li className={`item-navegacao ${activeDropdown === 'dropdownAtendimentos' ? 'active' : ''}`}>
             
-            <a href="#" className={`link-navegacao ${location.pathname.includes('/suporte') ? 'active' : ''}`} onClick={() => alternarDropdown('dropdownAtendimentos')}>
+            <a href="#" className={`link-navegacao ${location.pathname.includes('/suportePRD') ? 'active' : ''}`} onClick={() => alternarDropdown('dropdownAtendimentos')}>
               <FaHeadset className="icon" />
               <span>ITSM</span>
               <FaChevronDown className={`seta ${activeDropdown === 'dropdownAtendimentos' ? 'rotacionar' : ''}`} />
             </a>
             <ul id="dropdownAtendimentos" className={`conteudo-dropdown ${activeDropdown === 'dropdownAtendimentos' ? 'mostrar' : ''}`}>
-              <li className={location.pathname === '/suporte/novo-ticket' ? 'active' : ''}>
+              <li className={location.pathname === '/suportePRD/novo-ticket' ? 'active' : ''}>
                 <a
                   href="https://www.appsheet.com/start/3dbf5f58-b6b1-4ee8-bd4d-a14699c5dc31#view=Novo%20Ticket
 "
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={location.pathname === '/suporte/novo-ticket' ? 'active' : ''}
+                  className={location.pathname === '/suportePRD/novo-ticket' ? 'active' : ''}
                 >
                   Novo Ticket
                 </a>
               </li>
-               {/* <li className={location.pathname === '/suporte/novo-ticket-futuro' ? 'active' : ''}>
-                <Link to="/suporte/novo-ticket-futuro" className={location.pathname === '/suporte/novo-ticket-futuro' ? 'active' : ''}>
+               {/* <li className={location.pathname === '/suportePRD/novo-ticket-futuro' ? 'active' : ''}>
+                <Link to="/suportePRD/novo-ticket-futuro" className={location.pathname === '/suportePRD/novo-ticket-futuro' ? 'active' : ''}>
                   Novo Ticket Futuro
                 </Link>
               </li>  */}
-              <li className={location.pathname === '/suporte/meus-atendimentos' ? 'active' : ''}>
-                <Link to="/suporte/meus-atendimentos" className={location.pathname === '/suporte/meus-atendimentos' ? 'active' : ''}>
+              <li className={location.pathname === '/suportePRD/meus-atendimentos' ? 'active' : ''}>
+                <Link to="/suportePRD/meus-atendimentos" className={location.pathname === '/suportePRD/meus-atendimentos' ? 'active' : ''}>
                   Meus Atendimentos
                   {meusAtendimentosCount > 0 && (
                     <span className="badge">{meusAtendimentosCount}</span>
                   )}
                 </Link>
               </li>
-              <li className={location.pathname === '/suporte/minha-equipe' ? 'active' : ''}>
-                <Link to="/suporte/minha-equipe" className={location.pathname === '/suporte/minha-equipe' ? 'active' : ''}>
+              <li className={location.pathname === '/suportePRD/minha-equipe' ? 'active' : ''}>
+                <Link to="/suportePRD/minha-equipe" className={location.pathname === '/suportePRD/minha-equipe' ? 'active' : ''}>
                   Minha Equipe
                   {minhaEquipeCount > 0 && (
                     <span className="badge">{minhaEquipeCount}</span>
                   )}
                 </Link>
               </li>
-              <li className={location.pathname === '/suporte/dashboard' ? 'active' : ''}>
+              <li className={location.pathname === '/suportePRD/dashboard' ? 'active' : ''}>
                 <a href="http://10.27.254.161:8088/superset/dashboard/p/pV5rmOZ7zgW/" target="_blank" rel="noopener noreferrer" className={location.pathname === '/atendimentos/dashboard' ? 'active' : ''}>
                   Dashboard
                 </a>

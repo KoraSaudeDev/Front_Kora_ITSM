@@ -7,7 +7,8 @@ function HeaderHelper() {
     const navigate = useNavigate();
 
     const aoClicarLogo = () => {
-        navigate('/helper');
+        // navigate('/helper');
+        navigate('/helperPRD');
     };
 
     return (

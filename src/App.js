@@ -33,15 +33,23 @@ const App = () => {
     <AuthProvider>
       <Router>
         <Routes>
-          <Route path="/helper" element={<HomeHelper />} />
+          {/* <Route path="/helper" element={<HomeHelper />} />
           <Route path="/helper/AcessoTI" element={<AcessoTI />} />
           <Route path="/helper/AcessoRH" element={<AcessoRH />} />
           <Route path="/helper/AcessoSuprimentos" element={<AcessoSuprimentos />} />
           <Route path="/helper/AcessoMarketing" element={<AcessoMarketing />} />
           <Route path="/suporte/login" element={<Login />} />
-          <Route path="/" element={<Navigate to="/helper" />} /> 
+          <Route path="/" element={<Navigate to="/helper" />} />  */}
+          <Route path="/helperPRD" element={<HomeHelper />} />
+          <Route path="/helperPRD/AcessoTI" element={<AcessoTI />} />
+          <Route path="/helperPRD/AcessoRH" element={<AcessoRH />} />
+          <Route path="/helperPRD/AcessoSuprimentos" element={<AcessoSuprimentos />} />
+          <Route path="/helperPRD/AcessoMarketing" element={<AcessoMarketing />} />
+          <Route path="/suportePRD/login" element={<Login />} />
+          <Route path="/" element={<Navigate to="/not-found" />} /> 
           <Route
-            path="/suporte/*"
+            // path="/suporte/*"
+            path="/suportePRD/*"
             element={
               <div className={`app-container ${isSidebarOpen ? 'sidebar-open' : ''}`}>
                 <Header onToggleSidebar={toggleSidebar} />

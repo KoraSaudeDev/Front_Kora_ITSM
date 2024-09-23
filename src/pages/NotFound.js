@@ -9,7 +9,7 @@ const NotFound = () => {
                 alt="Page Not Found"
                 className="not-found-image"
             />
-            <h1 className="not-found-title">Oops! Página não encontrada.</h1>
+            <h1 className="not-found-title">Oops! Página desativada no momento.</h1>
             <p className="not-found-text">
                 A página que você está procurando está temporariamente indisponível.
             </p>

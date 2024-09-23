@@ -9,7 +9,8 @@ const ProtectedRoute = ({ element, ...rest }) => {
   return user ? (
     element
   ) : (
-    <Navigate to="/suporte/login" state={{ from: location }} />
+    // <Navigate to="/suporte/login" state={{ from: location }} />
+    <Navigate to="/suportePRD/login" state={{ from: location }} />
   );
 };
 
