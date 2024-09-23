@@ -1491,7 +1491,7 @@ const Modal = ({ data, onClose }) => {
                                     <p
                                         id='status-bolinha'
                                         style={{
-                                            backgroundColor: statusOptions[convertStatusToTitleCase(atividade.status)] || '#ffffff',
+                                            backgroundColor: statusOptions[convertStatusToTitleCase(atividade.status)] || '#000',
                                             color: 'white',
                                             padding: '4px 8px 4px 8px',
                                             borderRadius: '4px',
