@@ -456,6 +456,45 @@ const Modal = ({ data, onClose }) => {
                             }
                             return updatedAtividades;
                         });
+                        console.log(insert_tasks[i].status)
+
+                        let emailSubject, emailBody, toEmails, emails;
+
+                        switch (insert_tasks[i].status) {
+                            case "AGUARDANDO RETORNO":
+                                emailSubject = "Tickets - Aguardando Retorno";
+                                emailBody = `<h1 style='color:blue'>Chamado aguardando retorno</h1><p>Email que era para ter recebido: ${data.email_solicitante}</p>`;
+                                await sendEmail("pedro.magalhaes@korasaude.com.br", emailSubject, emailBody);
+                                break;
+
+                            case "EM ABERTO":
+                            case "EM ATENDIMENTO":
+                                emails = await getEmailsForQueue(ultimoItem?.id_executor ?? data.executor, data.unidade);
+                                if (emails.length < 1) break;
+
+                                emailSubject = "Tickets - Chamado Encaminhado";
+                                emailBody = `<h1 style='color:blue'>Chamado encaminhado</h1><p>Emails: ${emails.join(', ')}</p>`;
+                                await sendEmail("pedro.magalhaes@korasaude.com.br", emailSubject, emailBody);
+                                break;
+
+                            case "AGENDADA":
+                                emails = await getEmailsForQueue(ultimoItem?.id_executor ?? data.executor, data.unidade);
+                                emails.push(data.email_solicitante);
+
+                                emailSubject = "Tickets - Chamado Agendado";
+                                emailBody = `<h1 style='color:blue'>Chamado agendado</h1><p>Emails: ${emails.join(', ')}</p>`;
+                                await sendEmail("pedro.magalhaes@korasaude.com.br", emailSubject, emailBody);
+                                break;
+
+                            case "FINALIZADO":
+                                emailSubject = "Tickets - Finalizado";
+                                emailBody = `<h1 style='color:blue'>Chamado finalizado</h1><p>Email que era para ter recebido: ${data.email_solicitante}</p>`;
+                                await sendEmail("pedro.magalhaes@korasaude.com.br", emailSubject, emailBody);
+                                break;
+
+                            default:
+                                break;
+                        }
                     }
 
                     setAtividades(prevAtividades =>
@@ -638,6 +677,29 @@ const Modal = ({ data, onClose }) => {
             .split(' ')
             .map(word => word.charAt(0).toUpperCase() + word.slice(1))
             .join(' ');
+    };
+
+    const sendEmail = async (to, subject, body, cc = [], bcc = []) => {
+        const emailConfig = {
+            method: 'post',
+            url: `${process.env.REACT_APP_API_BASE_URL}/email/send`,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: JSON.stringify({
+                to,
+                subject,
+                body,
+                cc,
+                bcc
+            })
+        };
+        await sendRequest(emailConfig);
+    };
+
+    const getEmailsForQueue = async (executor, unidade) => {
+        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/email-fila?id_fila=${executor}&unidade=${unidade}`);
+        return response.data;
     };
 
     const showLoadingOverlay = () => {
@@ -971,6 +1033,14 @@ const Modal = ({ data, onClose }) => {
                 };
 
                 await sendRequest(taskConfig);
+                
+                let emailSubject, emailBody, emails;
+                emails = await getEmailsForQueue(ultimoItem?.id_executor ?? data.executor, data.unidade);
+                if (emails.length > 0) {
+                    emailSubject = "Tickets - Chamado Encaminhado";
+                    emailBody = `<h1 style='color:blue'>Chamado encaminhado</h1><p>Emails: ${emails.join(', ')}</p>`;
+                    await sendEmail("pedro.magalhaes@korasaude.com.br", emailSubject, emailBody);
+                }
             }
 
             axios.post(`${process.env.REACT_APP_API_BASE_URL}/tickets/update/sla?cod_fluxo=${data.cod_fluxo}`);
