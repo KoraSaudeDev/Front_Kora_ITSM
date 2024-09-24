@@ -149,11 +149,11 @@ const Sidebar = () => {
                   Novo Ticket
                 </a>
               </li>
-               <li className={location.pathname === '/suportePRD/novo-ticket-futuro' ? 'active' : ''}>
+               {/* <li className={location.pathname === '/suportePRD/novo-ticket-futuro' ? 'active' : ''}>
                 <Link to="/suportePRD/novo-ticket-futuro" className={location.pathname === '/suportePRD/novo-ticket-futuro' ? 'active' : ''}>
                   Novo Ticket Futuro
                 </Link>
-              </li>
+              </li> */}
               <li className={location.pathname === '/suportePRD/meus-atendimentos' ? 'active' : ''}>
                 <Link to="/suportePRD/meus-atendimentos" className={location.pathname === '/suportePRD/meus-atendimentos' ? 'active' : ''}>
                   Meus Atendimentos
