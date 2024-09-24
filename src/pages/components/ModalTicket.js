@@ -58,21 +58,21 @@ const Modal = ({ data, onClose }) => {
     const customStyles = {
         option: (provided, state) => ({
             ...provided,
-            backgroundColor: state.isSelected ? '#007aff' : state.isFocused ? '#e0f7fa' : 'white', // Cor de fundo
+            backgroundColor: state.isSelected ? '#007aff' : state.isFocused ? '#e0f7fa' : 'white', 
             color: state.isSelected ? 'white' : '#3E4676', // Cor do texto
             padding: 10,
         }),
         control: (provided) => ({
             ...provided,
-            borderColor: '#007aff', // Cor da borda do select
-            boxShadow: 'none', // Remover sombra
+            borderColor: '#007aff', 
+            boxShadow: 'none', 
             '&:hover': {
-                borderColor: '#007aff', // Cor da borda ao passar o mouse
+                borderColor: '#007aff',
             },
         }),
         singleValue: (provided) => ({
             ...provided,
-            color: '#3E4676', // Cor do valor selecionado
+            color: '#3E4676', 
         }),
     };
 

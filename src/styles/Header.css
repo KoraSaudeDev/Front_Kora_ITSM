@@ -7,7 +7,7 @@ header {
   left: 0;
   z-index: 10;
   transition: margin-left 0.3s ease-in-out;
-  height: 60px;
+  height: 80px;
 }
 
 .cabecalho2 {
@@ -17,7 +17,7 @@ header {
   top: 0;
   left: 65%;
   z-index: 5;
-  height: 60px;
+  height: 80px;
   display: flex;
   align-items: center;
   padding: 0 20px;
@@ -102,6 +102,7 @@ header {
   align-items: center;
   height: 100%;
   padding: 0 20px;
+
 }
 
 .toggle-menu {
@@ -228,4 +229,153 @@ header {
 .swinging {
   animation: swing 1s ease-in-out;
   transform-origin: top center; 
+}
+
+.cabecalho-helper {
+  background-color: #153C53;
+  width: 100%;
+  color: white;
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease;
+}
+
+#usuario{
+  margin-top: 10px;
+}
+
+.logo-helper {
+  width: 200px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  cursor: pointer;
+}
+
+.logo-helper:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+
+
+.perfil-usuario {
+  display: flex;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  margin-right: -15px;
+  margin-left: 100px;
+}
+
+.foto-perfil {
+  margin-top: 7px;
+  width: 40px; 
+  height: 40px;
+  border-radius: 50%;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.perfil-usuario:hover .foto-perfil {
+  border-color: #007aff; 
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); 
+  transform: scale(1.1); 
+}
+
+.nome-usuario {
+  display: none; 
+}
+
+
+.dropdown-perfil {
+  position: absolute;
+  top: 70px;
+  right: 0;
+  background-color: white;
+  color: #333;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  min-width: 250px;
+  z-index: 1000;
+  pointer-events: none; 
+}
+
+.perfil-usuario.dropdown-open .dropdown-perfil {
+  opacity: 1;
+  transform: translateY(0); 
+  pointer-events: auto; 
+}
+
+
+.dropdown-perfil p {
+  padding: 15px 20px;
+  margin: 0;
+  font-size: 16px; 
+  font-weight: 500;
+  color: #333;
+  cursor: default;
+}
+
+.dropdown-perfil p:hover {
+  background-color: #f9f9f9;
+}
+
+
+.dropdown-separador {
+  height: 1px;
+  background-color: #e0e0e0;
+  margin: 8px 0;
+}
+
+
+.dropdown-logout {
+  padding: 15px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #d9534f;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dropdown-logout:hover {
+  background-color: #ffefef;
+  color: #c9302c;
+}
+
+
+.dropdown-perfil {
+  animation: dropdownFade 0.4s ease-out;
+}
+
+@keyframes dropdownFade {
+  0% {
+      opacity: 0;
+      transform: translateY(-20px);
+  }
+  100% {
+      opacity: 1;
+      transform: translateY(0);
+  }
+}
+
+#fotooPerfil{
+  margin-left: -10px;
+}
+#logo{
+  width: 175px;
+  cursor: pointer;
+  transition: ease-in-out 0.3s;
+}
+
+#logo:hover{
+  scale: 1.1;
 }

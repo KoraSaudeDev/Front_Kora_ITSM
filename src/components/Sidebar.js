@@ -38,7 +38,7 @@ const Sidebar = () => {
         try {
           const response = await axios.post(
             `${process.env.REACT_APP_API_BASE_URL}/tickets/meus-atendimentos?user_id=${user.id_user}&page=1&per_page=1`,
-            { filtros: {}},
+            { filtros: {} },
             {
               headers: {
                 'Content-Type': 'application/json',
@@ -99,7 +99,7 @@ const Sidebar = () => {
   return (
     <nav className="menu-lateral">
       <div className="cabecalho-menu-lateral">
-        <div className="logo" onClick={alternarMenu}>
+        <div className="logo" onClick={() => navigate('/helperPRD')}>
           <img id="logo" src={logokora} width="120px" alt="Logo" />
         </div>
       </div>
@@ -116,7 +116,7 @@ const Sidebar = () => {
             </div>
           </div>
           <div className="informacoes-usuario">
-            <p id="usuario">{user?.name || 'Nome do Usuário'}</p>
+            <p id="usuarioo">{user?.name || 'Nome do Usuário'}</p>
             {user?.filas?.length > 0 ? (
               user.filas.map((item, index) => (
                 <p key={index} id="cargo">
@@ -124,34 +124,21 @@ const Sidebar = () => {
                 </p>
               ))
             ) : (
-              <p id="cargo">Sem fila de atendimento</p>
+              <p id="cargoo">Cargo não informado</p>
             )}
           </div>
         </div>
         <ul className="botoes-navegacao">
-          
           <li className={`item-navegacao ${activeDropdown === 'dropdownAtendimentos' ? 'active' : ''}`}>
-            
             <a href="#" className={`link-navegacao ${location.pathname.includes('/suportePRD') ? 'active' : ''}`} onClick={() => alternarDropdown('dropdownAtendimentos')}>
               <FaHeadset className="icon" />
               <span>ITSM</span>
               <FaChevronDown className={`seta ${activeDropdown === 'dropdownAtendimentos' ? 'rotacionar' : ''}`} />
             </a>
             <ul id="dropdownAtendimentos" className={`conteudo-dropdown ${activeDropdown === 'dropdownAtendimentos' ? 'mostrar' : ''}`}>
-              <li className={location.pathname === '/suportePRD/novo-ticket' ? 'active' : ''}>
-                <a
-                  href="https://www.appsheet.com/start/3dbf5f58-b6b1-4ee8-bd4d-a14699c5dc31#view=Novo%20Ticket
-"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={location.pathname === '/suportePRD/novo-ticket' ? 'active' : ''}
-                >
-                  Novo Ticket
-                </a>
-              </li>
-               <li className={location.pathname === '/suportePRD/novo-ticket-futuro' ? 'active' : ''}>
+              <li className={location.pathname === '/suportePRD/novo-ticket-futuro' ? 'active' : ''}>
                 <Link to="/suportePRD/novo-ticket-futuro" className={location.pathname === '/suportePRD/novo-ticket-futuro' ? 'active' : ''}>
-                  Novo Ticket Futuro
+                  Novo Ticket
                 </Link>
               </li>
               <li className={location.pathname === '/suportePRD/meus-atendimentos' ? 'active' : ''}>
@@ -176,12 +163,6 @@ const Sidebar = () => {
                 </a>
               </li>
             </ul>
-          </li>
-          <li className="item-navegacao logout">
-            <a href="#" className="link-navegacao" onClick={handleLogout}>
-              <FaSignOutAlt className="icon" />
-              <span>Logout</span>
-            </a>
           </li>
         </ul>
       </div>

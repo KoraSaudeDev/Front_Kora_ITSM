@@ -28,33 +28,9 @@ body, html {
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    zoom: 0.8;
+    zoom: 1;
 }
 
-.cabecalho-acessoti {
-    background-color: #0b3554;
-    width: 100%;
-    color: white;
-    padding: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1000;
-}
-
-.logo-acessoti {
-    width: 150px;
-    transition: transform 0.5s ease, opacity 0.5s ease;
-    cursor: pointer;
-}
-
-.logo-acessoti:hover {
-    transform: scale(1.1);
-    opacity: 0.8;
-}
 
 .container-acessoti {
     display: flex;

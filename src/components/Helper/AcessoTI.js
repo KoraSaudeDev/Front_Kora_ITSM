@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../styles/Helper/AcessoTI.css';
-import HeaderHelper from './Header-Helper';
+import HeaderHelper from '../Header';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faEnvelope,
@@ -64,8 +64,7 @@ function AcessoTI() {
         { nome: 'Aplicativos', icone: faMobile, link: 'https://www.appsheet.com/start/2b5f0d42-fa81-4e5c-b998-688347035abd#view=Novo%20Ticket' },
         { nome: 'VPN/ZTNA', icone: faShieldAlt, link: 'https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#=TicketsGeral-448944302&view=Novo%20Ticket&defaults={"categoria":"Cybersecutiry", "subcategoria": "ZTNA - Conectividade"}' },
         { nome: 'Micro Informática', icone: faLaptop, link: 'https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#appName=TicketsGeral-448944302&view=Novo%20Ticket&defaults={"categoria":"Infraestrutura"}' },
-        // { nome: 'Suporte', icone: faHeadset, link: '/suporte/login' }
-        { nome: 'Suporte', icone: faHeadset, link: '/suportePRD/login' }
+        { nome: 'Suporte', icone: faHeadset, link: '/suportePRD/meus-atendimentos' }
     ];
 
     useEffect(() => {

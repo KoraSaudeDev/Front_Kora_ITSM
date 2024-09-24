@@ -4,13 +4,19 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/Header.css';
 import { FaBell } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
+import logoKora from '../assets/images/logokora.png'; 
+import SemFoto from '../assets/images/Sem_foto.png';
 
 const Header = ({ pendentes = [] }) => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [showNotifications, setShowNotifications] = useState(false);
   const [isSwinging, setIsSwinging] = useState(false);
+  const [isDropdownVisible, setDropdownVisible] = useState(false); 
   const navigate = useNavigate();
-  const location = useLocation();
+  const location = useLocation(); 
+
+
+  const isSuportePage = location.pathname.includes('/suportePRD');
 
   const alternarMenu = () => {
     const menu = document.querySelector('.menu-lateral');
@@ -33,7 +39,6 @@ const Header = ({ pendentes = [] }) => {
 
   const handleNotificationClick = (ticket) => {
     setShowNotifications(false);
-    // navigate('/suporte/meus-atendimentos', { state: { ticket } });
     navigate('/suportePRD/meus-atendimentos', { state: { ticket } });
   };
 
@@ -48,17 +53,39 @@ const Header = ({ pendentes = [] }) => {
     }
   }, [pendentes.length]);
 
+  const toggleDropdown = () => {
+    setDropdownVisible(!isDropdownVisible);
+  };
+
+  const handleLogout = () => {
+    logout(); 
+    navigate('/loginRPD'); 
+  };
+
   return (
     <header>
       <div className="conteudo-cabecalho">
-        <div className="toggle-menu" onClick={alternarMenu} data-tooltip="Menu">
-          &#9776;
-        </div>
-        {user && user.bl_analista && (
+
+        {isSuportePage ? (
+          <div className="toggle-menu" onClick={alternarMenu} data-tooltip="Menu">
+            &#9776;
+          </div>
+        ) : (
+          <img 
+            src={logoKora} 
+            alt="Kora Helper" 
+            className="logo-helper" 
+            onClick={() => navigate('/helperPRD')} 
+          />
+        )}
+
+   
+        {isSuportePage && user && user.bl_analista && (
           <div className="barra-busca">
             <SearchBar />
           </div>
         )}
+        
         <div className="cabecalho2">
           <div className="conteudo-cabecalho2">
             <div
@@ -92,6 +119,33 @@ const Header = ({ pendentes = [] }) => {
                 )}
               </div>
             )}
+            <div 
+              className={`perfil-usuario ${isDropdownVisible ? 'dropdown-open' : ''}`} 
+              onClick={toggleDropdown}
+            >
+              <img 
+                src={user?.picture || SemFoto} 
+                alt="Foto de Perfil" 
+                className="foto-perfil" 
+              />
+
+              {isDropdownVisible && (
+                <div className="dropdown-perfil">
+                  <p>{user?.name || 'Nome do Usuário'}</p>
+                  {user?.filas?.length > 0 ? (
+                    user.filas.map((fila, index) => (
+                      <p key={index}>{fila}</p>
+                    ))
+                  ) : (
+                    <p>Cargo não informado</p>
+                  )}
+                  <div className="dropdown-separador"></div>
+                  <div className="dropdown-logout" onClick={handleLogout}>
+                    Logout
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

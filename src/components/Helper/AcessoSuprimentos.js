@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../styles/Helper/AcessoSuprimentos.css';
-import HeaderHelper from './Header-Helper';
+import HeaderHelper from '../Header';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileAlt, faTruckLoading, faClipboardList, faBoxes, faTasks, faFileContract } from '@fortawesome/free-solid-svg-icons';
 
