@@ -37,14 +37,10 @@ function HomeHelper() {
         } else {
             setAlertas((prevAlertas) => ({ ...prevAlertas, [indice]: null }));
             switch (secao.nome) {
-                // case 'TI': navigate('/helper/acessoTI'); break;
-                // case 'RH': navigate('/helper/AcessoRH'); break;
-                // case 'Suprimentos': navigate('/helper/AcessoSuprimentos'); break;
-                // case 'Marketing': navigate('/helper/AcessoMarketing'); break;
-                case 'TI': navigate('/helperPRD/acessoTI'); break;
-                case 'RH': navigate('/helperPRD/AcessoRH'); break;
-                case 'Suprimentos': navigate('/helperPRD/AcessoSuprimentos'); break;
-                case 'Marketing': navigate('/helperPRD/AcessoMarketing'); break;
+                case 'TI': navigate('/helper/acessoTI'); break;
+                case 'RH': navigate('/helper/AcessoRH'); break;
+                case 'Suprimentos': navigate('/helper/AcessoSuprimentos'); break;
+                case 'Marketing': navigate('/helper/AcessoMarketing'); break;
                 default: break;
             }
         }

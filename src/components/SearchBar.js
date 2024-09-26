@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Autosuggest from 'react-autosuggest';
 import axios from 'axios';
-import Modal from '../pages/components/ModalTicket'; 
+import Modal from '../components/ITSM/ModalTicket'; 
 import { FaSearch } from 'react-icons/fa'; 
 import '../styles/SearchBar.css';
 

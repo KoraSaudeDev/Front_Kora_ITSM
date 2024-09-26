@@ -16,7 +16,7 @@ const Header = ({ pendentes = [] }) => {
   const location = useLocation(); 
 
 
-  const isSuportePage = location.pathname.includes('/suportePRD');
+  const isSuportePage = location.pathname.includes('/suporte');
 
   const alternarMenu = () => {
     const menu = document.querySelector('.menu-lateral');
@@ -39,7 +39,7 @@ const Header = ({ pendentes = [] }) => {
 
   const handleNotificationClick = (ticket) => {
     setShowNotifications(false);
-    navigate('/suportePRD/meus-atendimentos', { state: { ticket } });
+    navigate('/suporte/meus-atendimentos', { state: { ticket } });
   };
 
   useEffect(() => {
@@ -59,7 +59,7 @@ const Header = ({ pendentes = [] }) => {
 
   const handleLogout = () => {
     logout(); 
-    navigate('/loginRPD'); 
+    navigate('/login'); 
   };
 
   return (
@@ -75,7 +75,7 @@ const Header = ({ pendentes = [] }) => {
             src={logoKora} 
             alt="Kora Helper" 
             className="logo-helper" 
-            onClick={() => navigate('/helperPRD')} 
+            onClick={() => navigate('/helper')} 
           />
         )}
 

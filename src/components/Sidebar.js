@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import '../styles/Sidebar.css';
-import { FaHeadset, FaChevronDown, FaSignOutAlt } from 'react-icons/fa';
+import * as Icons from 'react-icons/fa';
 import logokora from '../assets/images/logokora.png';
 import SemFoto from '../assets/images/Sem_foto.png';
 import { useAuth } from '../context/AuthContext';
@@ -10,51 +10,76 @@ import axios from 'axios';
 const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [activeDropdown, setActiveDropdown] = useState('dropdownAtendimentos');
+  const [activeDropdown, setActiveDropdown] = useState(null);
   const { user, logout } = useAuth();
-  const [meusAtendimentosCount, setMeusAtendimentosCount] = useState(0);
-  const [minhaEquipeCount, setMinhaEquipeCount] = useState(0);
+  const [menuCounts, setMenuCounts] = useState({});
+  const [menus, setMenus] = useState([]);
 
   useEffect(() => {
-    if (user && user.filas && user.id_user) {
-      const fetchMinhaEquipeCount = async () => {
+    const fetchMenus = () => {
+      const storedMenu = localStorage.getItem(process.env.REACT_APP_CACHE_MENU);
+      if (storedMenu) {
+        const menus = JSON.parse(storedMenu);
+        setMenus(menus);
+
+        const firstParent = menus.find(menu => menu.parent_id === null);
+        if (firstParent) {
+          setActiveDropdown(`dropdown${firstParent.id}`);
+        }
+      } else {
+        setMenus([]);
+      }
+    };
+    fetchMenus();
+  }, []);
+
+  useEffect(() => {
+    const fetchMenuCounts = async () => {
+      const counts = {};
+      const fetchCount = async (menu) => {
         try {
-          const response = await axios.post(
-            `${process.env.REACT_APP_API_BASE_URL}/tickets/minha-equipe?page=1&per_page=1`,
-            { filas: user.filas_id },
-            {
-              headers: {
-                'Content-Type': 'application/json',
-              },
+          const menuConfigString = menu.apiCounterConfig.replace(/<<(\w+)>>/g, (match, key) => {
+            const value = user[key];
+
+            if (Array.isArray(value)) {
+              return JSON.stringify(value);
             }
-          );
-          setMinhaEquipeCount(response.data.total_items);
+
+            return value !== undefined ? value : match;
+          });
+
+          const menuConfig = JSON.parse(menuConfigString);
+
+          const axiosConfig = {
+            method: menuConfig.method,
+            url: `${process.env.REACT_APP_API_BASE_URL}${menuConfig.url}`,
+            ...(menuConfig.headers && { headers: menuConfig.headers }),
+            ...(menuConfig.data && { data: menuConfig.data }),
+            ...(menuConfig.maxBodyLength && { maxBodyLength: menuConfig.maxBodyLength }),
+          };
+
+          const response = await axios(axiosConfig);
+          
+          counts[menu.id] = response.data.total_items || 0;
         } catch (error) {
-          console.error("Erro ao buscar contagem de Minha Equipe", error);
+          console.error(`Erro ao buscar contagem de ${menu.label}`, error);
+          counts[menu.id] = 0;
         }
       };
 
-      const fetchMeusAtendimentosCount = async () => {
-        try {
-          const response = await axios.post(
-            `${process.env.REACT_APP_API_BASE_URL}/tickets/meus-atendimentos?user_id=${user.id_user}&page=1&per_page=1`,
-            { filtros: {} },
-            {
-              headers: {
-                'Content-Type': 'application/json',
-              },
-            }
-          );
-          setMeusAtendimentosCount(response.data.total_items);
-        } catch (error) {
-          console.error("Erro ao buscar contagem de Meus Atendimentos", error);
-        }
-      };
+      const menusWithCounter = menus.filter(menu => menu.apiCounterConfig);
+      await Promise.all(menusWithCounter.map(fetchCount));
 
-      fetchMeusAtendimentosCount();
-      fetchMinhaEquipeCount();
+      setMenuCounts(prevCounts => ({
+        ...prevCounts,
+        ...counts,
+      }));
+    };
+
+    if (menus.length > 0) {
+      fetchMenuCounts();
     }
-  }, [user]);
+  }, [menus]);
 
   useEffect(() => {
     const menu = document.querySelector('.menu-lateral');
@@ -72,34 +97,55 @@ const Sidebar = () => {
     }
   }, [location.pathname]);
 
-  const alternarMenu = () => {
-    const menuLateral = document.querySelector('.menu-lateral');
-    const conteudoPrincipal = document.querySelector('main');
-    const cabecalho = document.querySelector('header');
-
-    if (menuLateral && conteudoPrincipal && cabecalho) {
-      menuLateral.classList.toggle('visible');
-      conteudoPrincipal.classList.toggle('mover');
-      if (menuLateral.classList.contains('visible')) {
-        cabecalho.style.marginLeft = '250px';
-      } else {
-        cabecalho.style.marginLeft = '0';
-      }
-    }
+  const alternarDropdown = (dropdownId) => {
+    setActiveDropdown(activeDropdown === dropdownId ? null : dropdownId);
   };
 
-  const alternarDropdown = (id) => {
-    setActiveDropdown((prevState) => (prevState === id ? '' : id));
+  const isMenuActive = (menu) => {
+    return location.pathname.includes(menu.route) || menus.some(sub => sub.parent_id === menu.id && location.pathname.includes(sub.route));
   };
 
-  const handleLogout = () => {
-    logout();
+  const getIcon = (iconName) => {
+    const IconComponent = Icons[iconName];
+    return IconComponent ? <IconComponent className="icon" /> : null;
+  };
+
+  const renderMenuItems = (menus, parentId = null) => {
+    return menus
+      .filter(menu => menu.parent_id === parentId)
+      .map(menu => {
+        const hasSubMenu = menus.some(sub => sub.parent_id === menu.id);
+        const count = menuCounts[menu.id] || null;
+
+        return (
+          <li key={menu.id} className={`item-navegacao ${isMenuActive(menu) ? 'active' : ''}`}>
+            <Link to={menu.route || '#'}
+              className={`link-navegacao ${isMenuActive(menu) ? 'active' : ''}`}
+              onClick={() => hasSubMenu && alternarDropdown(`dropdown${menu.id}`)}
+            >
+              {getIcon(menu.icon)}
+              <span>{menu.label}</span>
+              {count > 0 && <span className="badge">{count}</span>}
+              {hasSubMenu && <Icons.FaChevronDown className={`seta ${activeDropdown === `dropdown${menu.id}` ? 'rotacionar' : ''}`} />}
+            </Link>
+
+            {hasSubMenu && (
+              <ul
+                id={`dropdown${menu.id}`}
+                className={`conteudo-dropdown ${activeDropdown === `dropdown${menu.id}` ? 'mostrar' : ''}`}
+              >
+                {renderMenuItems(menus, menu.id)}
+              </ul>
+            )}
+          </li>
+        );
+      });
   };
 
   return (
     <nav className="menu-lateral">
       <div className="cabecalho-menu-lateral">
-        <div className="logo" onClick={() => navigate('/helperPRD')}>
+        <div className="logo" onClick={() => navigate('/helper')}>
           <img id="logo" src={logokora} width="120px" alt="Logo" />
         </div>
       </div>
@@ -129,41 +175,7 @@ const Sidebar = () => {
           </div>
         </div>
         <ul className="botoes-navegacao">
-          <li className={`item-navegacao ${activeDropdown === 'dropdownAtendimentos' ? 'active' : ''}`}>
-            <a href="#" className={`link-navegacao ${location.pathname.includes('/suportePRD') ? 'active' : ''}`} onClick={() => alternarDropdown('dropdownAtendimentos')}>
-              <FaHeadset className="icon" />
-              <span>ITSM</span>
-              <FaChevronDown className={`seta ${activeDropdown === 'dropdownAtendimentos' ? 'rotacionar' : ''}`} />
-            </a>
-            <ul id="dropdownAtendimentos" className={`conteudo-dropdown ${activeDropdown === 'dropdownAtendimentos' ? 'mostrar' : ''}`}>
-              <li className={location.pathname === '/suportePRD/novo-ticket-futuro' ? 'active' : ''}>
-                <Link to="/suportePRD/novo-ticket-futuro" className={location.pathname === '/suportePRD/novo-ticket-futuro' ? 'active' : ''}>
-                  Novo Ticket
-                </Link>
-              </li>
-              <li className={location.pathname === '/suportePRD/meus-atendimentos' ? 'active' : ''}>
-                <Link to="/suportePRD/meus-atendimentos" className={location.pathname === '/suportePRD/meus-atendimentos' ? 'active' : ''}>
-                  Meus Atendimentos
-                  {meusAtendimentosCount > 0 && (
-                    <span className="badge">{meusAtendimentosCount}</span>
-                  )}
-                </Link>
-              </li>
-              <li className={location.pathname === '/suportePRD/minha-equipe' ? 'active' : ''}>
-                <Link to="/suportePRD/minha-equipe" className={location.pathname === '/suportePRD/minha-equipe' ? 'active' : ''}>
-                  Minha Equipe
-                  {minhaEquipeCount > 0 && (
-                    <span className="badge">{minhaEquipeCount}</span>
-                  )}
-                </Link>
-              </li>
-              <li className={location.pathname === '/suportePRD/dashboard' ? 'active' : ''}>
-                <a href="http://10.27.254.161:8088/superset/dashboard/p/pV5rmOZ7zgW/" target="_blank" rel="noopener noreferrer" className={location.pathname === '/atendimentos/dashboard' ? 'active' : ''}>
-                  Dashboard
-                </a>
-              </li>
-            </ul>
-          </li>
+          {renderMenuItems(menus)}
         </ul>
       </div>
       <div className="sidebar-footer">

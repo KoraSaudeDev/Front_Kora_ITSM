@@ -12,16 +12,18 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || '/helperPRD'; 
+  const from = location.state?.from?.pathname || '/helper'; 
   const [userData, setUserData] = useState(null);
   const [stayLoggedIn, setStayLoggedIn] = useState(false);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
+    const storedUser = localStorage.getItem(process.env.REACT_APP_CACHE_USER);
+    const storedMenu = localStorage.getItem(process.env.REACT_APP_CACHE_MENU);
+    if (storedUser && storedMenu) {
       const user = JSON.parse(storedUser);
+      const menu = JSON.parse(storedMenu);
       setUserData(user);
-      login(user);
+      login(user, menu);
       navigate(from);
     }
   }, [login, navigate]);
@@ -79,8 +81,10 @@ const Login = () => {
         if (response.data.id_user) user.id_user = response.data.id_user;
       }
 
+      const menus = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/menu/`);
+
       setUserData(user);
-      login(user);
+      login(user, menus.data);
       hideLoadingOverlay();
       navigate(from);
       

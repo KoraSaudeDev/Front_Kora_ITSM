@@ -5,7 +5,7 @@ const Main = ({ title, description, children }) => {
   const formattedDescription = `ITSM / ${description}`;
 
   return (
-    <main>
+    <main className='mover'>
       <div className="header-section">
         <div className="main-title">{title}</div>
         <div className="breadcrumb">
