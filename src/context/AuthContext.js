@@ -6,7 +6,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
+    const storedUser = localStorage.getItem(process.env.REACT_APP_CACHE_USER);
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
@@ -14,11 +14,11 @@ export const AuthProvider = ({ children }) => {
 
   const login = (userData) => {
     setUser(userData);
-    localStorage.setItem('user', JSON.stringify(userData)); 
+    localStorage.setItem(process.env.REACT_APP_CACHE_USER, JSON.stringify(userData)); 
   };
 
   const logout = () => {
-    localStorage.removeItem('user');
+    localStorage.removeItem(process.env.REACT_APP_CACHE_USER);
     setUser(null);
   };
 

@@ -35,6 +35,7 @@ const Modal = ({ data, onClose }) => {
     const [destinatarioDefault, setDestinatarioDefault] = useState(data.executor || '');
     const [selectedStatus, setSelectedStatus] = useState(data.status || '');
     const [dataLimite, setDataLimite] = useState(data.data_limite);
+    const [isTaskPublic, setIsTaskPublic] = useState(false);
     const [sla, setSla] = useState('');
     const [emailDomains, setEmailDomains] = useState([]);
     const [isEmailDomainEditable, setIsEmailDomainEditable] = useState(false);
@@ -782,6 +783,7 @@ const Modal = ({ data, onClose }) => {
 
     const handleFecharAtividadesModal = () => {
         setIsClosingAtividadesModal(true);
+        setIsTaskPublic(false);
         setTimeout(() => {
             setShowAtividadesModal(false);
             setIsClosingAtividadesModal(false);
@@ -800,10 +802,9 @@ const Modal = ({ data, onClose }) => {
         const aberto_por = document.querySelector('#aberto-por-task').value;
         const descricao = document.querySelector('#descricao-task').value.trim();
         const status = document.querySelector('#status-task').value;
-        var tipo_atividade_checkbox = document.querySelector('input#tipo-atividade');
 
         var tipo_atividade = 'Privada';
-        if (tipo_atividade_checkbox && tipo_atividade_checkbox.checked) {
+        if (isTaskPublic) {
             tipo_atividade = 'Pública';
         }
 
@@ -952,6 +953,16 @@ const Modal = ({ data, onClose }) => {
         setDataLimite(data_atualizada);
     };
 
+    const handleStatusTaskChange = (event) => {
+        const status = event.target.value;
+
+        if (status === "AGUARDANDO RETORNO" || status === "FINALIZADO") {
+            setIsTaskPublic(true);
+        } else {
+            setIsTaskPublic(false);
+        }
+    }
+
     const handleSalvarTicket = async (statusParam = null, senha = null) => {
         if (!selectedHub || !selectedUnidade || !selectedCategoria || !selectedSubcategoria || !selectedAssunto || !prioridadeSelecionada || !selectedDestinatario) {
             alert('Por favor, preencha todos os campos obrigatórios.');
@@ -1033,7 +1044,7 @@ const Modal = ({ data, onClose }) => {
                 };
 
                 await sendRequest(taskConfig);
-                
+
                 let emailSubject, emailBody, emails;
                 emails = await getEmailsForQueue(ultimoItem?.id_executor ?? data.executor, data.unidade);
                 if (emails.length > 0) {
@@ -1709,7 +1720,7 @@ const Modal = ({ data, onClose }) => {
                                     <textarea className="textarea-atividade" placeholder="Descrição" id="descricao-task" rows="3"></textarea>
                                     <div>
                                         <label>Status:</label><br></br>
-                                        <select id="status-task" >
+                                        <select id="status-task" onChange={handleStatusTaskChange}>
                                             <option></option>
                                             {options.status.map((status, index) => (
                                                 <option key={index} value={status}>{status}</option>
@@ -1730,7 +1741,12 @@ const Modal = ({ data, onClose }) => {
                                     <div className="switch-container">
                                         <label htmlFor="tipo-atividade">Pública:</label>
                                         <label className="switch">
-                                            <input type="checkbox" id="tipo-atividade" />
+                                            <input
+                                                type="checkbox"
+                                                id="tipo-atividade"
+                                                checked={isTaskPublic}
+                                                onChange={(e) => setIsTaskPublic(e.target.checked)}
+                                            />
                                             <span className="slider round"></span>
                                         </label>
                                     </div>

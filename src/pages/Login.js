@@ -19,7 +19,7 @@ const Login = () => {
   const [stayLoggedIn, setStayLoggedIn] = useState(false);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
+    const storedUser = localStorage.getItem(process.env.REACT_APP_CACHE_USER);
     if (storedUser) {
       const user = JSON.parse(storedUser);
       setUserData(user);
