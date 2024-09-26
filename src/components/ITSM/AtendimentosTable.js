@@ -145,28 +145,18 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
 
                 const totalItems = response.data.total_items;
 
-                const slaData = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/sla`);
-
-                const atendimentosWithSla = fetchedAtendimentos.map(atendimento => {
-                    const slaInfo = slaData?.data.find(sla => sla.prioridade === atendimento.ds_nivel);
-                    return {
-                        ...atendimento,
-                        slaDescricao: slaInfo ? `${slaInfo.prioridade} - ${slaInfo.descricao}` : atendimento.ds_nivel
-                    };
-                });
-
                 hideLoadingOverlay();
 
-                setAtendimentos(atendimentosWithSla);
+                setAtendimentos(fetchedAtendimentos);
                 setTotalPages(Math.ceil(totalItems / itemsPerPage));
                 localStorage.setItem(
                     cacheKey,
-                    JSON.stringify({ tickets: atendimentosWithSla, totalItems })
+                    JSON.stringify({ tickets: fetchedAtendimentos, totalItems })
                 );
 
                 setLoading(false);
             } catch (error) {
-                console.error('Erro ao buscar atendimentos:', error);
+                console.error('Erro ao buscar dados da tabela:', error);
                 setLoading(false);
             }
         };
@@ -401,24 +391,6 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
         setTotalPages(Math.ceil(response.data.total_items / itemsPerPage));
     };
 
-    // const handleSortOrderToggle = (column) => {
-    //     setSortOrders((prev) => {
-    //         const currentOrder = prev[column];
-    //         let newOrder = 'asc';
-
-    //         if (currentOrder === 'asc') {
-    //             newOrder = 'desc';
-    //         } else if (currentOrder === 'desc') {
-    //             newOrder = null;
-    //         }
-
-    //         return {
-    //             ...prev,
-    //             [column]: newOrder
-    //         };
-    //     });
-    // };
-
     const handleDateChange = useCallback((column, type, value) => {
         const newDateFilters = {
             ...dateFilters,
@@ -496,13 +468,6 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
     const handleSaveFilters = async () => {
         const cleanFilters = (filters) => {
             return {
-                // sortOrders: Object.keys(filters.sortOrders).reduce((acc, key) => {
-                //     const value = filters.sortOrders[key];
-                //     if (value !== null) {
-                //         acc[key] = value;
-                //     }
-                //     return acc;
-                // }, {}),
                 filterOptions: Object.keys(filters.filterOptions).reduce((acc, key) => {
                     const values = filters.filterOptions[key].filter(option => option !== "");
                     if (values.length > 0) {
@@ -959,7 +924,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
                                                 fontWeight: '500'
                                             }}
                                         >
-                                            {atendimento.slaDescricao}
+                                            {atendimento.prioridadeDescricao}
                                         </span>
                                     </td>
                                     <td id='cont-tabela'>{atendimento.categoria}</td>
