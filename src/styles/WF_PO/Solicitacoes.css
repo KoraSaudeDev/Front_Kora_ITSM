@@ -1,0 +1,274 @@
+/* Contêiner principal da tabela */
+.container-solicitacoes {
+    margin: 20px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+}
+
+/* Estilo da tabela */
+.tabela-tickets {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-family: 'Arial', sans-serif;
+    font-size: 14px;
+    min-width: 1200px; /* Garante que as colunas não fiquem comprimidas */
+}
+
+.tabela-tickets th,
+.tabela-tickets td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+/* Cabeçalho da tabela */
+.tabela-tickets th {
+    background-color: #f7f7f7;
+    color: #333;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+}
+
+.tabela-tickets th:hover {
+    background-color: #e0e0e0;
+}
+
+/* Linhas pares com cor alternada */
+.tabela-tickets tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Linhas ao passar o mouse */
+.tabela-tickets tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Estilo do Status com cores */
+.tabela-tickets .status {
+    background-color: #3b7ddd;
+    color: white;
+    text-align: center;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.tabela-tickets .status-aguardando {
+    background-color: #e87c86;
+    color: white;
+}
+
+.tabela-tickets .status-aberto {
+    background-color: #3b7ddd;
+    color: white;
+}
+
+/* Estilo do SLA */
+.tabela-tickets .sla {
+    background-color: #dc3545;
+    color: white;
+    text-align: center;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.tabela-tickets .sla-no-prazo {
+    background-color: #28a745;
+}
+
+/* Estilo da Prioridade */
+.tabela-tickets .prioridade {
+    background-color: #e5c200;
+    color: white;
+    text-align: center;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.tabela-tickets .prioridade-alta {
+    background-color: #ff0000;
+}
+
+.tabela-tickets .prioridade-media {
+    background-color: #ff8c00;
+}
+
+.tabela-tickets .prioridade-baixa {
+    background-color: #28a745;
+}
+
+/* Estilos gerais para o conteúdo da tabela */
+.tabela-tickets td {
+    text-align: center;
+    vertical-align: middle;
+    font-size: 14px;
+    color: #333;
+}
+
+
+.tabela-tickets th,
+.tabela-tickets td {
+    text-align: center;
+}
+
+/* Paginação */
+.pagination {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.pagination button {
+    background-color: #007aff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    margin: 0 5px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.pagination button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.pagination button:hover:not(:disabled) {
+    background-color: #005bb5;
+}
+
+.pagination span {
+    margin: 0 10px;
+    font-size: 16px;
+    color: #333;
+}
+
+
+.container-solicitacoes {
+    overflow-x: auto;
+}
+
+/* Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Modal Container */
+
+/* Modal Header */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-header h3 {
+    font-size: 1.5rem;
+    color: #3e4676; /* Adjust to match your design */
+}
+
+.modal-header .close {
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #999;
+}
+
+/* Modal Content */
+.modal-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.modal-content .form-row {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.campo {
+    flex-basis: 48%; /* Adjust to control the size of the fields */
+    margin-bottom: 20px;
+}
+
+.campo label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #3e4676;
+}
+
+.campo input, 
+.campo textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Modal Footer */
+.modal-footer {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.modal-footer button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.modal-footer button:hover {
+    background-color: #0056b3;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Modal */
+@media (max-width: 768px) {
+    .modal {
+        width: 90%;
+    }
+
+    .modal-content .form-row {
+        flex-direction: column;
+    }
+
+    .campo {
+        flex-basis: 100%;
+    }
+}

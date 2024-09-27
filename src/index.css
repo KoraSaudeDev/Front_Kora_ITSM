@@ -19,9 +19,11 @@
 }
 
 body {
-  overflow: hidden; 
+  overflow-x: hidden; /* Impede a rolagem horizontal */
+  overflow-y: auto;   /* Permite a rolagem vertical */
   background-color: #F2F5FA;
 }
+
 
 body.loaded #overlay {
   animation: slideUpReverse 1s ease-in-out forwards;
@@ -36,6 +38,3 @@ body.loaded #overlay {
   }
 }
 
-body.loaded {
-  overflow: auto;
-}

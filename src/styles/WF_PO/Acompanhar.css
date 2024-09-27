@@ -1,0 +1,525 @@
+.container-solicitacoes {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.table-wrapper {
+    margin-top: 10px;
+    overflow-x: auto;
+}
+
+.form-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    flex-basis: 48%;
+}
+
+.campo label {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.campo input[type="text"],
+.campo input[type="email"],
+.campo input[type="number"],
+.campo textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+textarea {
+    resize: vertical;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #333;
+}
+
+.modal-content {
+    padding: 15px;
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tabela-tickets {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.tabela-tickets th, .tabela-tickets td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.tabela-tickets th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+}
+
+.tabela-tickets tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.tabela-tickets tr:hover {
+    background-color: #f1f1f1;
+}
+
+.tabela-tickets input[type="checkbox"] {
+    margin-left: 5px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.pagination button {
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    background-color: #f8f8f8;
+    cursor: pointer;
+}
+
+.pagination button:disabled {
+    cursor: not-allowed;
+    background-color: #e0e0e0;
+}
+
+.pagination span {
+    margin: 0 10px;
+}
+
+.approve-btn, .reject-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin-right: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.reject-btn {
+    background-color: #dc3545;
+}
+
+.approve-btn:hover, .reject-btn:hover {
+    opacity: 0.9;
+}
+
+.modal-footer {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.modal-footer button {
+    padding: 10px 20px;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.modal-footer .close {
+    background-color: #ddd;
+    color: #555;
+}
+
+.tabela-detalhes-modal {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.tabela-detalhes-modal th, .tabela-detalhes-modal td {
+    padding: 8px;
+    border: 1px solid #ddd;
+}
+
+.tabela-detalhes-modal th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+    text-align: center;
+}
+
+.tabela-detalhes-modal td {
+    text-align: center;
+}
+
+/* Botões Aprovar/Reprovar mais destacados */
+.botoes-acoes {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 10px;
+}
+
+.botoes-acoes button {
+    padding: 10px 20px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.botoes-acoes .aprovar {
+    background-color: #28a745;
+    color: white;
+}
+
+.botoes-acoes .reprovar {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Campos e formulários do cabeçalho da requisição */
+.cabecalho-requisicao {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+
+.cabecalho-requisicao .campo {
+    flex-basis: 24%;
+    margin-bottom: 10px;
+}
+
+.cabecalho-requisicao .campo label {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.cabecalho-requisicao .campo input, .cabecalho-requisicao .campo textarea {
+    padding: 8px;
+    width: 100%;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+/* Campos de histórico */
+.historico-aprovacoes, .atividades {
+    margin-top: 20px;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+}
+
+.historico-aprovacoes h4, .atividades h4 {
+    margin: 0;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+/* Botão de enviar cotação */
+.botao-enviar-cotacao {
+    margin-top: 15px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.botao-enviar-cotacao button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.botao-enviar-cotacao button:hover {
+    background-color: #0056b3;
+}
+.container-solicitacoes {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.table-wrapper {
+    margin-top: 10px;
+    overflow-x: auto;
+}
+
+.form-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    flex-basis: 48%;
+}
+
+.campo label {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.campo input[type="text"],
+.campo input[type="email"],
+.campo input[type="number"],
+.campo textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+textarea {
+    resize: vertical;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #333;
+}
+
+.modal-content {
+    padding: 15px;
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tabela-tickets {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.tabela-tickets th, .tabela-tickets td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.tabela-tickets th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+}
+
+.tabela-tickets tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.tabela-tickets tr:hover {
+    background-color: #f1f1f1;
+}
+
+.tabela-tickets input[type="checkbox"] {
+    margin-left: 5px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.pagination button {
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    background-color: #f8f8f8;
+    cursor: pointer;
+}
+
+.pagination button:disabled {
+    cursor: not-allowed;
+    background-color: #e0e0e0;
+}
+
+.pagination span {
+    margin: 0 10px;
+}
+
+.approve-btn, .reject-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin-right: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.reject-btn {
+    background-color: #dc3545;
+}
+
+.approve-btn:hover, .reject-btn:hover {
+    opacity: 0.9;
+}
+
+.modal-footer {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.modal-footer button {
+    padding: 10px 20px;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.modal-footer .close {
+    background-color: #ddd;
+    color: #555;
+}
+
+.tabela-detalhes-modal {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.tabela-detalhes-modal th, .tabela-detalhes-modal td {
+    padding: 8px;
+    border: 1px solid #ddd;
+}
+
+.tabela-detalhes-modal th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+    text-align: center;
+}
+
+.tabela-detalhes-modal td {
+    text-align: center;
+}
+
+/* Botões Aprovar/Reprovar mais destacados */
+.botoes-acoes {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 10px;
+}
+
+.botoes-acoes button {
+    padding: 10px 20px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.botoes-acoes .aprovar {
+    background-color: #28a745;
+    color: white;
+}
+
+.botoes-acoes .reprovar {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Campos e formulários do cabeçalho da requisição */
+.cabecalho-requisicao {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+
+.cabecalho-requisicao .campo {
+    flex-basis: 24%;
+    margin-bottom: 10px;
+}
+
+.cabecalho-requisicao .campo label {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.cabecalho-requisicao .campo input, .cabecalho-requisicao .campo textarea {
+    padding: 8px;
+    width: 100%;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+/* Campos de histórico */
+.historico-aprovacoes, .atividades {
+    margin-top: 20px;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+}
+
+.historico-aprovacoes h4, .atividades h4 {
+    margin: 0;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+/* Botão de enviar cotação */
+.botao-enviar-cotacao {
+    margin-top: 15px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.botao-enviar-cotacao button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.botao-enviar-cotacao button:hover {
+    background-color: #0056b3;
+}
+.approve-btn{
+    background-color: #28a745;
+}
