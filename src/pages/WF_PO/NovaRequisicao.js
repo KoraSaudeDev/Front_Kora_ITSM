@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
+import { debounce } from 'lodash';
 import { FaShoppingCart } from 'react-icons/fa';
 import '../../styles/WF_PO/NovaRequisicao.css';
 import { useAuth } from '../../context/AuthContext';
+import axios from 'axios';
 
 const NovaRequisicao = () => {
     const { user } = useAuth();
@@ -12,19 +14,11 @@ const NovaRequisicao = () => {
         centroCusto: [],
         areaNegocio: [],
         tipoSolicitacao: [
-            { value: 'produto', label: 'Produto' },
-            { value: 'servico', label: 'Serviço' },
+            { value: 'Produto', label: 'Produto' },
+            { value: 'Serviço', label: 'Serviço' },
         ],
-        material: [
-            { value: 'agulha', label: 'Agulha', preco: 1.50 },
-            { value: 'dorflex', label: 'Dorflex', preco: 5.00 },
-            { value: 'ritalina', label: 'Ritalina', preco: 15.00 },
-            { value: 'benegrip', label: 'Benegrip', preco: 7.50 },
-        ],
-        grupoMaterial: [
-            { value: 'grupoa', label: 'Grupo A' },
-            { value: 'grupob', label: 'Grupo B' },
-        ],
+        material: [],
+        grupoMaterial: [],
     });
 
     const [selectedHub, setSelectedHub] = useState(null);
@@ -54,19 +48,137 @@ const NovaRequisicao = () => {
     const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
     useEffect(() => {
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/wf-requisicao/form/hub`)
+            .then(response => {
+                setOptions(prevOptions => ({
+                    ...prevOptions,
+                    hub: response.data.map(hub => ({ value: hub, label: hub }))
+                }));
+            })
+            .catch(error => console.error('Error fetching hubs:', error));
+    }, []);
+
+    useEffect(() => {
+        if (selectedHub) {
+            axios.get(`${process.env.REACT_APP_API_BASE_URL}/wf-requisicao/form/unidade?hub=${selectedHub.value}`)
+                .then(response => {
+                    setOptions(prevOptions => ({
+                        ...prevOptions,
+                        unidade: response.data.map(item => ({ value: item.cod_sap, label: item.unidade }))
+                    }));
+                    setSelectedUnidade(null);
+                    setSelectedCentroCusto(null);
+                })
+                .catch(error => console.error('Error fetching unidades:', error));
+        } else {
+            setOptions(prevOptions => ({
+                ...prevOptions,
+                unidade: [],
+                centroCusto: [],
+            }));
+            setSelectedUnidade(null);
+            setSelectedCentroCusto(null);
+        }
+    }, [selectedHub]);
+
+    useEffect(() => {
+        if (selectedUnidade) {
+            axios.get(`${process.env.REACT_APP_API_BASE_URL}/sap/centro-custo?empresa=${selectedUnidade.value}`)
+                .then(response => {
+                    setOptions(prevOptions => ({
+                        ...prevOptions,
+                        centroCusto: response.data.map(item => ({ value: item.centro_custo, label: item.centro_custo }))
+                    }));
+                    setSelectedCentroCusto(null);
+                })
+                .catch(error => console.error('Error fetching centro de custo:', error));
+        } else {
+            setOptions(prevOptions => ({
+                ...prevOptions,
+                centroCusto: [],
+            }));
+            setSelectedCentroCusto(null);
+        }
+    }, [selectedUnidade]);
+
+    useEffect(() => {
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/sap/grupo-mercadoria`)
+            .then(response => {
+                setOptions(prevOptions => ({
+                    ...prevOptions,
+                    grupoMaterial: response.data.map(item => ({ value: item, label: item }))
+                }));
+            })
+            .catch(error => console.error('Error fetching grupo de mercadoria:', error));
+    }, []);
+
+    useEffect(() => {
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/areas-negocio`)
+            .then(response => {
+                setOptions(prevOptions => ({
+                    ...prevOptions,
+                    areaNegocio: response.data.map(item => ({ value: item, label: item }))
+                }));
+            })
+            .catch(error => console.error('Error fetching areas de negocio:', error));
+    }, []);
+
+    const fetchMaterials = debounce((inputValue) => {
+
+        if (!inputValue || !selectedTipoSolicitacao?.value || !selectedGrupoMaterial?.value) return;
+
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/sap/material`, {
+            params: {
+                material: inputValue,
+                tipo: selectedTipoSolicitacao?.value,
+                grupo: selectedGrupoMaterial?.value,
+            },
+        })
+            .then(response => {
+                setOptions(prevOptions => ({
+                    ...prevOptions,
+                    material: response.data.map(item => ({
+                        value: item.material,
+                        label: item.material,
+                        codigo: item.codigo,
+                        grupo: item.grupo,
+                        unidadeMedida: item.unidadeMedida,
+                        preco: item.preco,
+                    }))
+                }));
+            })
+            .catch(error => {
+                console.error('Erro ao buscar materiais:', error);
+            });
+    }, 10);
+
+    useEffect(() => {
         if (selectedMaterial) {
             setPreco(selectedMaterial.preco);
+            setCodigoMaterial(selectedMaterial.codigo);
+            setUnidadeMedida(selectedMaterial.unidadeMedida);
         }
     }, [selectedMaterial]);
 
+    useEffect(() => {
+        setItems([]);
+        setEditingIndex(null);
+        setCodigoMaterial('');
+        setSelectedMaterial(null);
+        setQuantidade('');
+        setPreco('');
+        setUnidadeMedida('');
+    }, [selectedTipoSolicitacao, selectedGrupoMaterial]);
+
     const handleAddItem = () => {
-        const materialPreco = selectedMaterial ? selectedMaterial.preco : 0;
+        const materialPreco = selectedMaterial ? parseFloat(selectedMaterial.preco) : 0;
+        const quantidadeNumerica = parseFloat(quantidade) || 1;
         const newItem = {
             codigo: codigoMaterial || '0000000' + (items.length + 1),
             material: selectedMaterial?.label || '',
-            quantidade: quantidade || 1,
+            quantidade: quantidadeNumerica,
             preco: materialPreco.toFixed(2),
-            total: (quantidade * materialPreco).toFixed(2),
+            total: (quantidadeNumerica * materialPreco).toFixed(2),
             unidadeMedida: unidadeMedida,
         };
         setItems([...items, newItem]);
@@ -81,7 +193,6 @@ const NovaRequisicao = () => {
         setIsCartOpen(!isCartOpen);
     };
 
-
     const handleEditItem = (index) => {
         const itemToEdit = items[index];
         setEditingIndex(index);
@@ -94,15 +205,18 @@ const NovaRequisicao = () => {
 
     const handleSaveEdit = () => {
         const updatedItems = [...items];
-        const materialPreco = selectedMaterial ? selectedMaterial.preco : 0;
+        const materialPreco = selectedMaterial ? parseFloat(selectedMaterial.preco) : 0;
+        const quantidadeNumerica = parseFloat(quantidade) || 1;
+        
         updatedItems[editingIndex] = {
             codigo: codigoMaterial,
             material: selectedMaterial?.label || '',
-            quantidade: quantidade || 1,
+            quantidade: quantidadeNumerica,
             preco: materialPreco.toFixed(2),
-            total: (quantidade * materialPreco).toFixed(2),
+            total: (quantidadeNumerica * materialPreco).toFixed(2),
             unidadeMedida: unidadeMedida,
         };
+    
         setItems(updatedItems);
         setEditingIndex(null);
         setCodigoMaterial('');
@@ -110,7 +224,7 @@ const NovaRequisicao = () => {
         setQuantidade('');
         setPreco('');
         setUnidadeMedida('');
-    };
+    };    
 
     const handleSendTicket = () => {
         setShowSuccessPopup(true);
@@ -171,7 +285,6 @@ const NovaRequisicao = () => {
                         </div>
                     </div>
 
-
                     <div className="row">
                         <div className="campo">
                             <label htmlFor="areaNegocio">Área de Negócio</label>
@@ -180,7 +293,6 @@ const NovaRequisicao = () => {
                                 onChange={setSelectedAreaNegocio}
                                 options={options.areaNegocio}
                                 isClearable
-                                isDisabled={!selectedGrupoMaterial}
                             />
                         </div>
                         <div className="campo">
@@ -194,7 +306,7 @@ const NovaRequisicao = () => {
                         </div>
                     </div>
 
-                    {selectedTipoSolicitacao?.value === 'produto' && (
+                    {selectedTipoSolicitacao?.value === 'Produto' && (
                         <div className="row">
                             <div className="campo">
                                 <label htmlFor="dataRemessa">Data de Remessa</label>
@@ -208,7 +320,7 @@ const NovaRequisicao = () => {
                         </div>
                     )}
 
-                    {selectedTipoSolicitacao?.value === 'servico' && (
+                    {selectedTipoSolicitacao?.value === 'Serviço' && (
                         <div className="row">
                             <div className="campo">
                                 <label htmlFor="codigoFornecedor">Código do Fornecedor</label>
@@ -248,6 +360,7 @@ const NovaRequisicao = () => {
                             </div>
                         </div>
                     )}
+
                     <div className="row">
                         <div className="campo">
                             <label htmlFor="grupoMaterial">Grupo de Material</label>
@@ -256,7 +369,6 @@ const NovaRequisicao = () => {
                                 onChange={setSelectedGrupoMaterial}
                                 options={options.grupoMaterial}
                                 isClearable
-                                isDisabled={!selectedCentroCusto}
                             />
                         </div>
                     </div>
@@ -281,7 +393,6 @@ const NovaRequisicao = () => {
                             />
                         </div>
                     </div>
-
 
                     <div className="cadastro-material">
                         <div className="cadastro-material-header">
@@ -313,6 +424,9 @@ const NovaRequisicao = () => {
                                 options={options.material}
                                 placeholder="Digite para pesquisar"
                                 className="select-field"
+                                onInputChange={(inputValue) => fetchMaterials(inputValue)}
+                                isDisabled={!selectedTipoSolicitacao || !selectedGrupoMaterial}
+                                isClearable
                             />
                         </div>
                         <div className="campo" style={{ width: '100%' }}>
@@ -340,6 +454,8 @@ const NovaRequisicao = () => {
                                 id="unidadeMedida"
                                 value={unidadeMedida}
                                 onChange={(e) => setUnidadeMedida(e.target.value)}
+                                className="campo-leitura"
+                                readOnly
                             />
                         </div>
 
