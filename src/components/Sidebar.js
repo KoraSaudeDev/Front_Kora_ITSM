@@ -186,7 +186,7 @@ const Sidebar = () => {
         </ul>
       </div>
       <div className="sidebar-footer">
-        <p>Version 1.018</p>
+        <p>Version 1.019</p>
       </div>
     </nav>
   );
