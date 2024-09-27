@@ -457,15 +457,35 @@ const Modal = ({ data, onClose }) => {
                             }
                             return updatedAtividades;
                         });
-                        console.log(insert_tasks[i].status)
 
-                        let emailSubject, emailBody, toEmails, emails;
+                        let emailSubject, emailBody, emails;
 
                         switch (insert_tasks[i].status) {
                             case "AGUARDANDO RETORNO":
                                 emailSubject = "Tickets - Aguardando Retorno";
-                                emailBody = `<h1 style='color:blue'>Chamado aguardando retorno</h1><p>Email que era para ter recebido: ${data.email_solicitante}</p>`;
-                                await sendEmail("pedro.magalhaes@korasaude.com.br", emailSubject, emailBody);
+                                emailBody = `
+                                <p><img alt='' src='https://uploaddeimagens.com.br/images/004/756/786/thumb/Logo_Kora.png?1710514563' /></p>
+                                <p> 
+                                    Olá prezado(a)!<br>Um ticket foi encaminhado para você aguardando retorno, para acessar 
+                                    <strong><a href='https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#view=Aguardando%20Retorno'>clique aqui.</a></strong>
+                                </p>
+                                <p>Dados do Chamado:</p>
+                                <ul>
+                                    <li>N° Ticket: ${data.cod_fluxo}</li>
+                                    <li>Aberto Por: ${data.nome}</li>
+                                    <li>Status: ${toTitleCase(ultimoItem?.status ?? data.status)}</li>
+                                    <li>HUB: ${data.hub}</li>
+                                    <li>Unidade: ${data.unidade}</li>
+                                    <li>Categoria: ${data.categoria}</li>
+                                    <li>Subcategoria: ${data.subcategoria}</li>
+                                    <li>Assunto: ${data.assunto}</li>
+                                    <li>Descrição Ticket: ${data.descricao}</li>
+                                    <li>Encaminhado Por: ${taskCopy.executor}</li>
+                                    <li>Descrição Encaminhamento: ${taskCopy.descricao}</li>
+                                </ul>
+                                <p><i>Mensagem enviada de forma automática, favor não responder.</i></p>
+                                `;
+                                await sendEmail(data.email_solicitante, emailSubject, emailBody);
                                 break;
 
                             case "EM ABERTO":
@@ -474,23 +494,132 @@ const Modal = ({ data, onClose }) => {
                                 if (emails.length < 1) break;
 
                                 emailSubject = "Tickets - Chamado Encaminhado";
-                                emailBody = `<h1 style='color:blue'>Chamado encaminhado</h1><p>Emails: ${emails.join(', ')}</p>`;
-                                await sendEmail("pedro.magalhaes@korasaude.com.br", emailSubject, emailBody);
+                                emailBody = `
+                                <p><img alt='' src='https://uploaddeimagens.com.br/images/004/756/786/thumb/Logo_Kora.png?1710514563' /></p>
+                                <p> 
+                                    Olá prezado(a)!<br>Um ticket foi encaminhado para sua área, para acessar 
+                                    <strong><a href='https://qashelper.korasaude.com.br/suporte/minha-equipe'>clique aqui.</a></strong>
+                                </p>
+                                <p>Dados do Chamado:</p>
+                                <ul>
+                                    <li>N° Ticket: ${data.cod_fluxo}</li>
+                                    <li>Aberto Por: ${data.nome}</li>
+                                    <li>Status: ${toTitleCase(ultimoItem?.status ?? data.status)}</li>
+                                    <li>HUB: ${data.hub}</li>
+                                    <li>Unidade: ${data.unidade}</li>
+                                    <li>Categoria: ${data.categoria}</li>
+                                    <li>Subcategoria: ${data.subcategoria}</li>
+                                    <li>Assunto: ${data.assunto}</li>
+                                    <li>Descrição Ticket: ${data.descricao}</li>
+                                    <li>Encaminhado Por: ${taskCopy.executor}</li>
+                                    <li>Descrição Encaminhamento: ${taskCopy.descricao}</li>
+                                </ul>
+                                <p><i>Mensagem enviada de forma automática, favor não responder.</i></p>
+                                `;
+                                await sendEmail(emails.join(';'), emailSubject, emailBody);
+
+                                if (taskCopy.tipo_atividade !== "Pública") break;
+
+                                emailSubject = "Tickets - Chamado Movimentado";
+                                emailBody = `
+                                <p><img alt='' src='https://uploaddeimagens.com.br/images/004/756/786/thumb/Logo_Kora.png?1710514563' /></p>
+                                <p> 
+                                    Olá prezado(a)!<br>Seu chamado foi encaminhado, para acessar 
+                                    <strong><a href='https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#view=Meus%20Tickets'>clique aqui.</a></strong>
+                                </p>
+                                <p>Dados do Chamado:</p>
+                                <ul>
+                                    <li>N° Ticket: ${data.cod_fluxo}</li>
+                                    <li>Aberto Por: ${data.nome}</li>
+                                    <li>Status: ${toTitleCase(ultimoItem?.status ?? data.status)}</li>
+                                    <li>HUB: ${data.hub}</li>
+                                    <li>Unidade: ${data.unidade}</li>
+                                    <li>Categoria: ${data.categoria}</li>
+                                    <li>Subcategoria: ${data.subcategoria}</li>
+                                    <li>Assunto: ${data.assunto}</li>
+                                    <li>Descrição Ticket: ${data.descricao}</li>
+                                    <li>Encaminhado Por: ${taskCopy.executor}</li>
+                                    <li>Descrição Encaminhamento: ${taskCopy.descricao}</li>
+                                </ul>
+                                <p><i>Mensagem enviada de forma automática, favor não responder.</i></p>
+                                `;
+                                await sendEmail(data.email_solicitante, emailSubject, emailBody);
+
                                 break;
 
                             case "AGENDADA":
-                                emails = await getEmailsForQueue(ultimoItem?.id_executor ?? data.executor, data.unidade);
-                                emails.push(data.email_solicitante);
-
                                 emailSubject = "Tickets - Chamado Agendado";
-                                emailBody = `<h1 style='color:blue'>Chamado agendado</h1><p>Emails: ${emails.join(', ')}</p>`;
-                                await sendEmail("pedro.magalhaes@korasaude.com.br", emailSubject, emailBody);
+                                emailBody = `
+                                <p><img alt='' src='https://uploaddeimagens.com.br/images/004/756/786/thumb/Logo_Kora.png?1710514563' /></p>
+                                <p> 
+                                    Olá prezado(a)!<br>Um ticket aberto por você foi agendado, para acessar 
+                                    <strong><a href='https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#view=Meus%20Tickets'>clique aqui.</a></strong>
+                                </p>
+                                <p>Dados do Chamado:</p>
+                                <ul>
+                                    <li>N° Ticket: ${data.cod_fluxo}</li>
+                                    <li>Aberto Por: ${data.nome}</li>
+                                    <li>Status: ${toTitleCase(ultimoItem?.status ?? data.status)}</li>
+                                    <li>HUB: ${data.hub}</li>
+                                    <li>Unidade: ${data.unidade}</li>
+                                    <li>Categoria: ${data.categoria}</li>
+                                    <li>Subcategoria: ${data.subcategoria}</li>
+                                    <li>Assunto: ${data.assunto}</li>
+                                    <li>Descrição Ticket: ${data.descricao}</li>
+                                    <li>Agendado Por: ${taskCopy.executor}</li>
+                                    <li>Descrição Agendamento: ${taskCopy.descricao}</li>
+                                </ul>
+                                <p><i>Mensagem enviada de forma automática, favor não responder.</i></p>
+                                `;
+                                await sendEmail(data.email_solicitante, emailSubject, emailBody);
                                 break;
 
                             case "FINALIZADO":
                                 emailSubject = "Tickets - Finalizado";
-                                emailBody = `<h1 style='color:blue'>Chamado finalizado</h1><p>Email que era para ter recebido: ${data.email_solicitante}</p>`;
-                                await sendEmail("pedro.magalhaes@korasaude.com.br", emailSubject, emailBody);
+                                emailBody = `
+                                <p><img alt='' src='https://uploaddeimagens.com.br/images/004/756/786/thumb/Logo_Kora.png?1710514563' /></p>
+                                <p> 
+                                    Olá prezado(a)!<br>Seu chamado foi finalizado, para acessar 
+                                    <strong><a href='https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#view=Meus%20Tickets'>clique aqui.</a></strong>
+                                </p>
+                                <p>Dados do Chamado:</p>
+                                <ul>
+                                    <li>N° Ticket: ${data.cod_fluxo}</li>
+                                    <li>Aberto Por: ${data.nome}</li>
+                                    <li>Status: ${toTitleCase(ultimoItem?.status ?? data.status)}</li>
+                                    <li>HUB: ${data.hub}</li>
+                                    <li>Unidade: ${data.unidade}</li>
+                                    <li>Categoria: ${data.categoria}</li>
+                                    <li>Subcategoria: ${data.subcategoria}</li>
+                                    <li>Assunto: ${data.assunto}</li>
+                                    <li>Descrição Ticket: ${data.descricao}</li>
+                                    <li>Finalizado Por: ${taskCopy.executor}</li>
+                                    <li>Descrição Finalizado: ${taskCopy.descricao}</li>
+                                </ul>
+                                <p><i>Mensagem enviada de forma automática, favor não responder.</i></p>
+                                `;
+                                await sendEmail(data.email_solicitante, emailSubject, emailBody);
+                                
+                                emailSubject = "Tickets - Avalie a sua Experiência";
+                                emailBody = `
+                                <p><img alt="" src="https://uploaddeimagens.com.br/images/004/756/786/thumb/Logo_Kora.png?1710514563" /></p>
+                                <p> 
+                                    Olá ${data.nome}!<br>Avalie a sua experiência com o nosso atendimento, para avaliar
+                                    <strong><a href='https://www.appsheet.com/start/b914109c-dee9-49d1-82f9-17abaa287982#appName=TicketsPesquisadeSatifação-448944302&page=form&row=&table=tb_tickets_form_user&view=Pesquisa+de+Satisfação&defaults={"cod_fluxo":"${data.cod_fluxo}"}'> clique aqui.</a></strong>
+                                </p>
+                                <p>Dados do Chamado:<p/>
+                                <ul>
+                                    <li>N° Ticket: ${data.cod_fluxo}</li>
+                                    <li>Status: ${toTitleCase(ultimoItem?.status ?? data.status)}</li>
+                                    <li>HUB: ${data.hub}</li>
+                                    <li>Unidade: ${data.unidade}</li>
+                                    <li>Categoria: ${data.categoria}</li>
+                                    <li>Subcategoria: ${data.subcategoria}</li>
+                                    <li>Assunto: ${data.assunto}</li>
+                                </ul>
+                                <p><i>Mensagem enviada de forma automática, favor não responder.</i></p>
+                                `;
+                                await sendEmail(data.email_solicitante, emailSubject, emailBody);
                                 break;
 
                             default:
@@ -1044,13 +1173,34 @@ const Modal = ({ data, onClose }) => {
                 };
 
                 await sendRequest(taskConfig);
-
+                
                 let emailSubject, emailBody, emails;
-                emails = await getEmailsForQueue(ultimoItem?.id_executor ?? data.executor, data.unidade);
+                emails = await getEmailsForQueue(ultimoItem?.id_executor ?? data.executor, selectedUnidade ?? data.unidade);
                 if (emails.length > 0) {
                     emailSubject = "Tickets - Chamado Encaminhado";
-                    emailBody = `<h1 style='color:blue'>Chamado encaminhado</h1><p>Emails: ${emails.join(', ')}</p>`;
-                    await sendEmail("pedro.magalhaes@korasaude.com.br", emailSubject, emailBody);
+                    emailBody = `
+                    <p><img alt='' src='https://uploaddeimagens.com.br/images/004/756/786/thumb/Logo_Kora.png?1710514563' /></p>
+                    <p> 
+                        Olá prezado(a)!<br>Um ticket foi encaminhado para sua área, para acessar 
+                        <strong><a href='https://qashelper.korasaude.com.br/suporte/minha-equipe'>clique aqui.</a></strong>
+                    </p>
+                    <p>Dados do Chamado:</p>
+                    <ul>
+                        <li>N° Ticket: ${data.cod_fluxo}</li>
+                        <li>Aberto Por: ${data.nome}</li>
+                        <li>Status: ${statusParam === null ? toTitleCase(ultimoItem?.status ?? data.status) : statusParam}</li>
+                        <li>HUB: ${selectedHub ?? data.hub}</li>
+                        <li>Unidade: ${selectedUnidade ?? data.unidade}</li>
+                        <li>Categoria: ${selectedCategoria ?? data.categoria}</li>
+                        <li>Subcategoria: ${selectedSubcategoria ?? data.subcategoria}</li>
+                        <li>Assunto: ${selectedAssunto ?? data.assunto}</li>
+                        <li>Descrição Ticket: ${data.descricao}</li>
+                        <li>Encaminhado Por: ${task.executor}</li>
+                        <li>Descrição Encaminhamento: ${task.descricao}</li>
+                    </ul>
+                    <p><i>Mensagem enviada de forma automática, favor não responder.</i></p>
+                    `;
+                    await sendEmail(emails.join(';'), emailSubject, emailBody);
                 }
             }
 
