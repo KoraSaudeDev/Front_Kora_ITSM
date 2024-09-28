@@ -33,8 +33,7 @@ const Header = ({ pendentes = [] }) => {
 
   const handleNotificationClick = (ticket) => {
     setShowNotifications(false);
-    // navigate('/suporte/meus-atendimentos', { state: { ticket } });
-    navigate('/suportePRD/meus-atendimentos', { state: { ticket } });
+    navigate('/suporte/meus-atendimentos', { state: { ticket } });
   };
 
   useEffect(() => {

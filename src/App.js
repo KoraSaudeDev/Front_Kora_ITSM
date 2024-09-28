@@ -16,6 +16,8 @@ import AcessoRH from './components/Helper/AcessoRH';
 import AcessoSuprimentos from './components/Helper/AcessoSuprimentos';
 import AcessoMarketing from './components/Helper/AcessoMarketing';
 import AcessoFinanceiro from './components/Helper/AcessoFinanceiro';
+import AcessoAssistencial from './components/Helper/AcessoAssistencial';
+import AcessoContabilidade from './components/Helper/AcessoContabilidade';
 
 import MeusAtendimentos from './pages/Atendimentos/MeusAtendimentos';
 import MinhaEquipe from './pages/Atendimentos/MinhaEquipe';
@@ -33,25 +35,18 @@ const App = () => {
     <AuthProvider>
       <Router>
         <Routes>
-          {/* <Route path="/helper" element={<HomeHelper />} />
+          <Route path="/helper" element={<HomeHelper />} />
           <Route path="/helper/AcessoTI" element={<AcessoTI />} />
           <Route path="/helper/AcessoRH" element={<AcessoRH />} />
           <Route path="/helper/AcessoSuprimentos" element={<AcessoSuprimentos />} />
           <Route path="/helper/AcessoMarketing" element={<AcessoMarketing />} />
           <Route path="/helper/AcessoFinanceiro" element={<AcessoFinanceiro />} />
+          <Route path="/helper/AcessoAssistencial" element={<AcessoAssistencial />} />
+          <Route path="/helper/AcessoContabilidade" element={<AcessoContabilidade />} />
           <Route path="/suporte/login" element={<Login />} />
-          <Route path="/" element={<Navigate to="/helper" />} />  */}
-          <Route path="/helperPRD" element={<HomeHelper />} />
-          <Route path="/helperPRD/AcessoTI" element={<AcessoTI />} />
-          <Route path="/helperPRD/AcessoRH" element={<AcessoRH />} />
-          <Route path="/helperPRD/AcessoSuprimentos" element={<AcessoSuprimentos />} />
-          <Route path="/helperPRD/AcessoMarketing" element={<AcessoMarketing />} />
-          <Route path="/helperPRD/AcessoFinanceiro" element={<AcessoFinanceiro />} />
-          <Route path="/suportePRD/login" element={<Login />} />
-          <Route path="/" element={<Navigate to="/not-found" />} /> 
+          <Route path="/" element={<Navigate to="/helper" />} />
           <Route
-            // path="/suporte/*"
-            path="/suportePRD/*"
+            path="/suporte/*"
             element={
               <div className={`app-container ${isSidebarOpen ? 'sidebar-open' : ''}`}>
                 <Header onToggleSidebar={toggleSidebar} />

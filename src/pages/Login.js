@@ -13,8 +13,7 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  // const from = location.state?.from?.pathname || '/suporte/meus-atendimentos';
-  const from = location.state?.from?.pathname || '/suportePRD/meus-atendimentos'; 
+  const from = location.state?.from?.pathname || '/suporte/meus-atendimentos';
   const [userData, setUserData] = useState(null);
   const [stayLoggedIn, setStayLoggedIn] = useState(false);
 
@@ -139,7 +138,7 @@ const Login = () => {
             </label>
           </div>
           <div className="sidebar-footer">
-            <p>Version 1.019</p>
+            <p>Version 1.020</p>
           </div>
         </div>
       </div>
