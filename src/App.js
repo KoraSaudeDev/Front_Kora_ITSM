@@ -45,6 +45,8 @@ const App = () => {
           <Route path="/helper/AcessoContabilidade" element={<AcessoContabilidade />} />
           <Route path="/suporte/login" element={<Login />} />
           <Route path="/" element={<Navigate to="/helper" />} />
+          <Route path="/acesso" element={<Navigate to="/helper" />} />
+          <Route path="/acesso/*" element={<Navigate to="/helper" />} />
           <Route
             path="/suporte/*"
             element={
