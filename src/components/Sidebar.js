@@ -140,8 +140,7 @@ const Sidebar = () => {
             <ul id="dropdownAtendimentos" className={`conteudo-dropdown ${activeDropdown === 'dropdownAtendimentos' ? 'mostrar' : ''}`}>
               <li className={location.pathname === '/suporte/novo-ticket' ? 'active' : ''}>
                 <a
-                  href="https://www.appsheet.com/start/3dbf5f58-b6b1-4ee8-bd4d-a14699c5dc31#view=Novo%20Ticket
-"
+                  href="https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#appName=TicketsGeral-448944302&page=form&row=&table=SL_novo_ticket&view=Novo+Ticket"
                   target="_blank"
                   rel="noopener noreferrer"
                   className={location.pathname === '/suporte/novo-ticket' ? 'active' : ''}
