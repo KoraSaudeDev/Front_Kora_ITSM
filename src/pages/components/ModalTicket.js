@@ -78,6 +78,7 @@ const Modal = ({ data, onClose }) => {
     };
 
     const formsEspecificos = {
+        "cp_id_categoria": data.cp_id_categoria,
         "novo_usuario": data.novo_usuario,
         "primeiro_nome_user": data.primeiro_nome_user,
         "sobrenome_user": data.sobrenome_user,
@@ -124,6 +125,7 @@ const Modal = ({ data, onClose }) => {
         "ds_obs": data.ds_obs,
     };
     const formsEspecificosLabels = {
+        "cp_id_categoria": "ID V360",
         "novo_usuario": "Nome Completo Usuário",
         "primeiro_nome_user": "Primeiro Nome do Usuário",
         "sobrenome_user": "Sobrenome do Usuário",
@@ -1423,7 +1425,12 @@ const Modal = ({ data, onClose }) => {
 
     };
 
-    const categoriaOptions = options.categoria.map(option => ({ value: option, label: option }));
+    const categoriaOptions = [
+        ...options.categoria.map(option => ({ value: option, label: option })),
+        ...(options.categoria.includes(selectedCategoria)
+            ? []
+            : [{ value: selectedCategoria, label: selectedCategoria }])
+    ];
     const subcategoriaOptions = selectedCategoria
         ? [
             ...options.subcategoria.map(option => ({ value: option, label: option })),

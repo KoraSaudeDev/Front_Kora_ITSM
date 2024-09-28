@@ -14,7 +14,7 @@ function HomeHelper() {
         { nome: 'TI', icone: faLaptopCode, bgColor: '#F4E1C9', textColor: '#1c1c1e', habilitado: true },
         { nome: 'RH', icone: faUsers, bgColor: '#A2C9E1', textColor: '#1c1c1e', habilitado: true },
         { nome: 'Suprimentos', icone: faShoppingCart, bgColor: '#1C293E', textColor: '#ffffff', habilitado: true },
-        { nome: 'Financeiro', icone: faDollarSign, bgColor: '#A2C9E1', textColor: '#1c1c1e', habilitado: false },
+        { nome: 'Financeiro', icone: faDollarSign, bgColor: '#A2C9E1', textColor: '#1c1c1e', habilitado: true },
         { nome: 'Marketing', icone: faBullseye, bgColor: '#A2C9E1', textColor: '#1c1c1e', habilitado: true },
         { nome: 'Assistencial', icone: faStethoscope, bgColor: '#F4E1C9', textColor: '#1c1c1e', habilitado: false },
         { nome: 'Controladoria & Contabilidade', icone: faChartLine, bgColor: '#A2C9E1', textColor: '#1c1c1e', habilitado: false }
@@ -29,7 +29,7 @@ function HomeHelper() {
     const aoClicarHelper = (indice) => {
         const secao = secoes[indice];
         if (!secao.habilitado) {
-            setAlertas((prevAlertas) => ({ ...prevAlertas, [indice]: 'Esta seção não está habilitada no QAS' }));
+            setAlertas((prevAlertas) => ({ ...prevAlertas, [indice]: 'Esta seção não possui módulos disponíveis no momento.' }));
 
             setTimeout(() => {
                 setAlertas((prevAlertas) => ({ ...prevAlertas, [indice]: null }));
@@ -41,10 +41,12 @@ function HomeHelper() {
                 // case 'RH': navigate('/helper/AcessoRH'); break;
                 // case 'Suprimentos': navigate('/helper/AcessoSuprimentos'); break;
                 // case 'Marketing': navigate('/helper/AcessoMarketing'); break;
+                // case 'Financeiro': navigate('/helper/AcessoFinanceiro'); break;
                 case 'TI': navigate('/helperPRD/acessoTI'); break;
                 case 'RH': navigate('/helperPRD/AcessoRH'); break;
                 case 'Suprimentos': navigate('/helperPRD/AcessoSuprimentos'); break;
                 case 'Marketing': navigate('/helperPRD/AcessoMarketing'); break;
+                case 'Financeiro': navigate('/helperPRD/AcessoFinanceiro'); break;
                 default: break;
             }
         }

@@ -128,15 +128,11 @@ function AcessoTI() {
                         </div>
                     ))}
                 </div>
-
                 
                 <div className="icon-bottom-right" onClick={() => window.open('https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#view=Meus%20Tickets', '_blank')}>
                     <div className="tooltip">Minhas Solicitações</div>
                     <img src="https://i.ibb.co/GVgKvfw/image.png" alt="Icon" className="pulsating-image"/>
                 </div>
-
-
-
 
             </div>
         </div>

@@ -1,0 +1,61 @@
+
+.container-acesso-financeiro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 150px;
+}
+
+.cartoes-financeiro {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.cartao-financeiro {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    padding: 40px;
+    width: 200px;
+    height: 250px;
+    cursor: pointer;
+    text-align: center;
+    color: #2b3a5f;
+    opacity: 0;
+    animation: fadeIn 0.8s ease forwards;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.cartao-financeiro:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 24px rgba(102, 160, 247, 0.1);
+}
+
+.icone-financeiro {
+    font-size: 60px;
+    margin-bottom: 20px;
+    color: #08548a;
+}
+
+.nome-financeiro {
+    font-size: 20px;
+    font-weight: 600;
+    color: #3e4676;
+}
