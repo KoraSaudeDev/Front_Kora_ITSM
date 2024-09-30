@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import ReactDOM from 'react-dom';
-import { FaSearch, FaChevronLeft, FaChevronRight, FaFilter, FaArrowUp, FaArrowDown } from 'react-icons/fa';
+import { FaSearch, FaChevronLeft, FaChevronRight, FaFilter, FaArrowUp, FaArrowDown, FaDownload } from 'react-icons/fa';
 import Select from 'react-select';
 import Modal from './ModalTicket';
 import caixaVazia from '../../assets/images/caixa-vazia.png';
@@ -20,11 +20,19 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
     const [showNoDataMessage, setShowNoDataMessage] = useState(false);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+    const [showExportDropdown, setShowExportDropdown] = useState(false);
     const [filterOptions, setFilterOptions] = useState({});
     const [filterSelectedOptions, setFilterSelectedOptions] = useState({});
+    const [exportSelectedOptions, setExportSelectedOptions] = useState({});
     const [savedFilters, setSavedFilters] = useState(null);
     const [filtersOn, setFiltersOn] = useState(false);
+    const [exportOptions, setExportOptions] = useState({});
     const [selectedHubs, setSelectedHubs] = useState([]);
+    const [selectedCategoria, setSelectedCategoria] = useState('');
+    const [selectedSubcategoria, setSelectedSubcategoria] = useState('');
+    const [selectedExportHubs, setSelectedExportHubs] = useState([]);
+    const [selectedExportCategoria, setSelectedExportCategoria] = useState('');
+    const [selectedExportSubcategoria, setSelectedExportSubcategoria] = useState('');
     const [sortOrders, setSortOrders] = useState({});
     const [dateFilters, setDateFilters] = useState({
         abertura: { startDate: '', endDate: '' },
@@ -36,15 +44,27 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
     });
     const [errorTimeouts, setErrorTimeouts] = useState({});
 
+    const [dateExportFilters, setDateExportFilters] = useState({
+        abertura: { startDate: '', endDate: '' },
+        data_limite: { startDate: '', endDate: '' }
+    });
+    const [dateExportErrors, setDateExportErrors] = useState({
+        abertura: '',
+        data_limite: ''
+    });
+    const [errorExportTimeouts, setErrorExportTimeouts] = useState({});
+
     const columnOptions = [
-        'abertura', 'status', 'st_sla', 'categoria', 'ds_nivel',
-        'data_limite', 'executor', 'area_negocio', 'hub', 'unidade'
+        'abertura', 'status', 'st_sla', 'categoria', 'subcategoria', 'assunto',
+        'ds_nivel', 'data_limite', 'executor', 'area_negocio', 'hub', 'unidade'
     ];
     const columnDescriptions = {
         abertura: 'Abertura',
         status: 'Status',
         st_sla: 'SLA',
         categoria: 'Categoria',
+        subcategoria: 'Subcategoria',
+        assunto: 'Assunto',
         ds_nivel: 'Prioridade',
         data_limite: 'Data limite',
         executor: 'Analista Atual',
@@ -100,7 +120,9 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
         "P2": "#FF8C00",
         "P3": "#E5C200",
         "P4": "#1E90FF",
-        "P5": "#28a745"
+        "P5": "#28a745",
+        "P6": "#36d184",
+        "P7": "#0d5185"
     };
 
     const [menuPosition, setMenuPosition] = React.useState({ x: 0, y: 0 });
@@ -184,7 +206,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
     }, [currentPage, itemsPerPage, savedFilters, sortOrders, refreshKey]);
 
     useEffect(() => {
-        const fetchFilterOptions = async (hubs = []) => {
+        const fetchFilterOptions = async (hubs = [], categoria = [], subcategoria = []) => {
             try {
                 const responses = await Promise.all([
                     axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/hub`),
@@ -193,10 +215,22 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
                     axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/usuarios-executores`),
                     axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/sla`),
                     axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/areas-negocio`),
-                    hubs.length > 0 ? axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/unidade?hub=${hubs.join(',')}`) : Promise.resolve({ data: [] })
+                    hubs.length > 0 ? axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/unidade?hub=${hubs.join(',')}`) : Promise.resolve({ data: [] }),
+                    categoria.length > 0 ? axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/subcategorias?categoria=${categoria[0]}`) : Promise.resolve({ data: [] }),
+                    (categoria.length > 0 && subcategoria.length > 0) ? axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/assuntos?categoria=${categoria[0]}&subcategoria=${subcategoria[0]}`) : Promise.resolve({ data: [] })
                 ]);
 
-                const [hubResponse, categoriasResponse, statusResponse, usuariosExecutoresResponse, slaResponse, areasNegocioResponse, unidadeResponse] = responses;
+                const [
+                    hubResponse,
+                    categoriasResponse,
+                    statusResponse,
+                    usuariosExecutoresResponse,
+                    slaResponse,
+                    areasNegocioResponse,
+                    unidadeResponse,
+                    subcategoriasResponse,
+                    assuntosResponse
+                ] = responses;
 
                 const options = {
                     hub: hubResponse.data.map(hub => ({
@@ -236,8 +270,36 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
                     unidade: unidadeResponse.data.map(unidade => ({
                         value: unidade,
                         label: unidade
+                    })),
+                    subcategoria: subcategoriasResponse.data.map(subcategoria => ({
+                        value: subcategoria,
+                        label: subcategoria
+                    })),
+                    assunto: assuntosResponse.data.map(assunto => ({
+                        value: assunto.assunto,
+                        label: assunto.assunto
                     }))
                 };
+
+                if (filterSelectedOptions.executor && filterSelectedOptions.executor.length > 0) {
+                    const selectedExecutors = [];
+
+                    filterSelectedOptions.executor.forEach(selectedExecutor => {
+                        const matchingOption = options.executor.find(
+                            option => option.value === selectedExecutor.value
+                        );
+                        if (matchingOption) {
+                            selectedExecutors.push(matchingOption);
+                        }
+                    });
+
+                    if (selectedExecutors.length > 0) {
+                        setFilterSelectedOptions(prev => ({
+                            ...prev,
+                            executor: selectedExecutors
+                        }));
+                    }
+                }
 
                 setFilterOptions(options);
             } catch (error) {
@@ -245,8 +307,96 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
             }
         };
 
-        fetchFilterOptions(selectedHubs);
-    }, [selectedHubs]);
+        fetchFilterOptions(selectedHubs, selectedCategoria, selectedSubcategoria);
+    }, [selectedHubs, selectedCategoria, selectedSubcategoria]);
+
+    useEffect(() => {
+        const fetchExportOptions = async (hubs = [], categoria = [], subcategoria = []) => {
+            try {
+                const responses = await Promise.all([
+                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/hub`),
+                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/categorias`),
+                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/status-tickets`),
+                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/usuarios-executores`),
+                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/sla`),
+                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/areas-negocio`),
+                    hubs.length > 0 ? axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/unidade?hub=${hubs.join(',')}`) : Promise.resolve({ data: [] }),
+                    categoria.length > 0 ? axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/subcategorias?categoria=${categoria[0]}`) : Promise.resolve({ data: [] }),
+                    (categoria.length > 0 && subcategoria.length > 0) ? axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/assuntos?categoria=${categoria[0]}&subcategoria=${subcategoria[0]}`) : Promise.resolve({ data: [] })
+                ]);
+
+                const [
+                    hubResponse,
+                    categoriasResponse,
+                    statusResponse,
+                    usuariosExecutoresResponse,
+                    slaResponse,
+                    areasNegocioResponse,
+                    unidadeResponse,
+                    subcategoriasResponse,
+                    assuntosResponse
+                ] = responses;
+
+                const options = {
+                    hub: hubResponse.data.map(hub => ({
+                        value: hub,
+                        label: hub
+                    })),
+                    categoria: categoriasResponse.data.map(categoria => ({
+                        value: categoria,
+                        label: categoria
+                    })),
+                    status: statusResponse.data.map(status => ({
+                        value: status,
+                        label: status
+                    })),
+                    executor: usuariosExecutoresResponse.data.map(user => ({
+                        value: user.id,
+                        label: user.fila
+                    })),
+                    st_sla: [
+                        {
+                            value: "Em Atraso",
+                            label: "Em Atraso"
+                        },
+                        {
+                            value: "No Prazo",
+                            label: "No Prazo"
+                        }
+                    ],
+                    ds_nivel: slaResponse.data.map(sla => ({
+                        value: sla.prioridade,
+                        label: `${sla.prioridade} ${sla.descricao == null ? '' : `- ${sla.descricao}`}`
+                    })),
+                    area_negocio: areasNegocioResponse.data.map(area => ({
+                        value: area,
+                        label: area
+                    })),
+                    unidade: unidadeResponse.data.map(unidade => ({
+                        value: unidade,
+                        label: unidade
+                    })),
+                    subcategoria: subcategoriasResponse.data.map(subcategoria => ({
+                        value: subcategoria,
+                        label: subcategoria
+                    })),
+                    assunto: assuntosResponse.data.map(assunto => ({
+                        value: assunto.assunto,
+                        label: assunto.assunto
+                    }))
+                };
+
+                options.status.push({value: "Finalizado", label: "Finalizado"})
+                options.status.push({value: "Cancelado", label: "Cancelado"})
+
+                setExportOptions(options);
+            } catch (error) {
+                console.error('Error fetching filter options:', error);
+            }
+        };
+
+        fetchExportOptions(selectedExportHubs, selectedExportCategoria, selectedExportSubcategoria);
+    }, [selectedExportHubs, selectedExportCategoria, selectedExportSubcategoria]);
 
     useEffect(() => {
         const fetchSavedFilters = async () => {
@@ -265,15 +415,29 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
                 const updatedFilterSelectedOptions = {};
                 for (const key in filterOptions) {
                     if (filterOptions[key].length) {
-                        updatedFilterSelectedOptions[key] = filterOptions[key].map(option => ({
-                            value: option,
-                            label: option
-                        }));
+                        if (key === 'executor') {
+                            updatedFilterSelectedOptions[key] = filterOptions[key].map(id => {
+                                const executorOption = filterOptions.executor.find(exec => exec.value === id);
+                                return {
+                                    value: executorOption?.value || id,
+                                    label: executorOption?.label || id
+                                };
+                            });
+                        } else {
+                            updatedFilterSelectedOptions[key] = filterOptions[key].map(option => ({
+                                value: option,
+                                label: option
+                            }));
+                        }
                     } else {
                         updatedFilterSelectedOptions[key] = [];
                     }
                 }
                 setFilterSelectedOptions(updatedFilterSelectedOptions);
+
+                if (filterOptions.categoria) setSelectedCategoria(filterOptions.categoria);
+                if (filterOptions.subcategoria) setSelectedSubcategoria(filterOptions.subcategoria);
+                if (filterOptions.hub) setSelectedHubs(filterOptions.hub);
 
                 setSavedFilters(response.data);
                 setFiltersOn(true);
@@ -464,20 +628,148 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
 
     const handleSelectChange = (col, selectedOptions) => {
         setFilterSelectedOptions(prevOptions => {
+            const isMultiSelect = col !== 'categoria' && col !== 'subcategoria';
+
             const updatedOptions = {
                 ...prevOptions,
-                [col]: selectedOptions
+                [col]: isMultiSelect
+                    ? Array.isArray(selectedOptions) ? selectedOptions : [selectedOptions]
+                    : [selectedOptions]
             };
 
             if (col === 'hub') {
-                const newSelectedHubs = selectedOptions.map(option => option.value);
+                const newSelectedHubs = updatedOptions.hub.map(option => option.value);
                 setSelectedHubs(newSelectedHubs);
-
                 updatedOptions.unidade = [];
 
                 setFilterSelectedOptions(prev => ({
                     ...prev,
                     unidade: []
+                }));
+            }
+
+            if (col === 'categoria') {
+                const newSelectedCategoria = [updatedOptions.categoria[0]?.value];
+                setSelectedCategoria(newSelectedCategoria);
+                updatedOptions.subcategoria = [];
+                updatedOptions.assunto = [];
+
+                setFilterSelectedOptions(prev => ({
+                    ...prev,
+                    subcategoria: [],
+                    assunto: []
+                }));
+            }
+
+            if (col === 'subcategoria') {
+                const newSelectedSubcategoria = [updatedOptions.subcategoria[0]?.value];
+                setSelectedSubcategoria(newSelectedSubcategoria);
+                updatedOptions.assunto = [];
+
+                setFilterSelectedOptions(prev => ({
+                    ...prev,
+                    assunto: []
+                }));
+            }
+
+            return updatedOptions;
+        });
+    };
+
+    const handleDateExportChange = useCallback((column, type, value) => {
+        const newDateFilters = {
+            ...dateFilters,
+            [column]: {
+                ...dateFilters[column],
+                [type]: value
+            }
+        };
+
+        if (newDateFilters[column].startDate && newDateFilters[column].endDate) {
+            const startDate = new Date(newDateFilters[column].startDate);
+            const endDate = new Date(newDateFilters[column].endDate);
+
+            if (startDate > endDate) {
+                setDateExportErrors(prev => ({
+                    ...prev,
+                    [column]: 'A data de início não pode ser posterior à data de fim.'
+                }));
+
+                if (errorTimeouts[column]) {
+                    clearTimeout(errorTimeouts[column]);
+                }
+
+                const timeoutId = setTimeout(() => {
+                    setDateExportErrors(prev => ({
+                        ...prev,
+                        [column]: ''
+                    }));
+                }, 3000);
+
+                setErrorExportTimeouts(prev => ({
+                    ...prev,
+                    [column]: timeoutId
+                }));
+
+                return;
+            } else {
+                setDateExportErrors(prev => ({
+                    ...prev,
+                    [column]: ''
+                }));
+
+                if (errorTimeouts[column]) {
+                    clearTimeout(errorTimeouts[column]);
+                }
+            }
+        }
+
+        setDateExportFilters(newDateFilters);
+    }, [dateExportFilters, errorExportTimeouts]);
+
+    const handleSelectExportChange = (col, selectedOptions) => {
+        setExportSelectedOptions(prevOptions => {
+            const isMultiSelect = col !== 'categoria' && col !== 'subcategoria';
+
+            const updatedOptions = {
+                ...prevOptions,
+                [col]: isMultiSelect
+                    ? Array.isArray(selectedOptions) ? selectedOptions : [selectedOptions]
+                    : [selectedOptions]
+            };
+
+            if (col === 'hub') {
+                const newSelectedHubs = updatedOptions.hub.map(option => option.value);
+                setSelectedExportHubs(newSelectedHubs);
+                updatedOptions.unidade = [];
+
+                setExportSelectedOptions(prev => ({
+                    ...prev,
+                    unidade: []
+                }));
+            }
+
+            if (col === 'categoria') {
+                const newSelectedCategoria = [updatedOptions.categoria[0]?.value];
+                setSelectedExportCategoria(newSelectedCategoria);
+                updatedOptions.subcategoria = [];
+                updatedOptions.assunto = [];
+
+                setExportSelectedOptions(prev => ({
+                    ...prev,
+                    subcategoria: [],
+                    assunto: []
+                }));
+            }
+
+            if (col === 'subcategoria') {
+                const newSelectedSubcategoria = [updatedOptions.subcategoria[0]?.value];
+                setSelectedExportSubcategoria(newSelectedSubcategoria);
+                updatedOptions.assunto = [];
+
+                setExportSelectedOptions(prev => ({
+                    ...prev,
+                    assunto: []
                 }));
             }
 
@@ -496,7 +788,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
                 //     return acc;
                 // }, {}),
                 filterOptions: Object.keys(filters.filterOptions).reduce((acc, key) => {
-                    const values = filters.filterOptions[key].filter(option => option !== "");
+                    const values = filters.filterOptions[key].filter(option => option !== "" && option !== null && option !== undefined);
                     if (values.length > 0) {
                         acc[key] = values;
                     }
@@ -526,7 +818,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
         const savedFiltersLocal = {
             sortOrders,
             filterOptions: Object.keys(filterSelectedOptions).reduce((acc, key) => {
-                acc[key] = filterSelectedOptions[key].map(option => option.value);
+                acc[key] = filterSelectedOptions[key].map(option => option?.value);
                 return acc;
             }, {}),
             dateFilters
@@ -587,6 +879,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
         }
 
         setShowFilterDropdown(false);
+        setCurrentPage(1);
     };
 
     const handleDeleteFilters = async () => {
@@ -611,6 +904,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
         }
 
         setShowFilterDropdown(false);
+        setCurrentPage(1);
     };
 
     const clearFilters = () => {
@@ -621,6 +915,83 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
             abertura: { startDate: '', endDate: '' },
             data_limite: { startDate: '', endDate: '' }
         });
+    };
+
+    const handleExportTickets = async () => {
+        const cleanFilters = (filters) => {
+            return {
+                filterOptions: Object.keys(filters.filterOptions).reduce((acc, key) => {
+                    const values = filters.filterOptions[key].filter(option => option !== "" && option !== null && option !== undefined);
+                    if (values.length > 0) {
+                        acc[key] = values;
+                    }
+                    return acc;
+                }, {}),
+                dateFilters: Object.keys(filters.dateFilters).reduce((acc, key) => {
+                    const { startDate, endDate } = filters.dateFilters[key];
+                    if (startDate || endDate) {
+                        acc[key] = { startDate, endDate };
+                    }
+                    return acc;
+                }, {})
+            };
+        };
+
+        const validateDateFilters = (filters) => {
+            for (const key in filters.dateFilters) {
+                const { startDate, endDate } = filters.dateFilters[key];
+                if ((startDate && !endDate) || (!startDate && endDate)) {
+                    alert(`Para o filtro "${key}", por favor, preencha tanto a data de início quanto a data de término.`);
+                    return false;
+                }
+            }
+            return true;
+        };
+
+        const savedFiltersLocal = {
+            filterOptions: Object.keys(exportSelectedOptions).reduce((acc, key) => {
+                acc[key] = exportSelectedOptions[key].map(option => option?.value);
+                return acc;
+            }, {}),
+            dateFilters
+        };
+
+        if (!validateDateFilters(savedFiltersLocal)) return;
+
+        const cleanedFilters = cleanFilters(savedFiltersLocal);
+
+        try {
+            showLoadingOverlay();
+            const filterConfig = {
+                method: 'post',
+                url: `${process.env.REACT_APP_API_BASE_URL}/tickets/export`,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                data: JSON.stringify(cleanedFilters),
+                responseType: 'blob'
+            };
+
+            const response = await axios(filterConfig);
+
+            const now = new Date();
+            const timestamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
+
+            const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `export_${timestamp}.xlsx`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            hideLoadingOverlay();
+        } catch (error) {
+            console.error('Error exporting tickets:', error);
+            hideLoadingOverlay();
+        }
+
+        setShowExportDropdown(false);
     };
 
     const handlePageClick = (pageNumber) => {
@@ -745,13 +1116,15 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
                                         ) : (
                                             <Select
                                                 className="filter-column-select"
-                                                isMulti
+                                                isMulti={col !== 'categoria' && col !== 'subcategoria'}
                                                 options={filterOptions[col] || []}
                                                 value={filterSelectedOptions[col] || []}
                                                 placeholder=""
                                                 onChange={(selectedOptions) => handleSelectChange(col, selectedOptions)}
                                                 styles={customStyles}
+                                                isClearable
                                             />
+
                                         )}
 
                                         {/* <div
@@ -774,6 +1147,66 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
                                 </button>
                                 <button className="save-filter-button" onClick={handleDeleteFilters}>
                                     Limpar
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                <div className="export-icon-container">
+                    <FaDownload
+                        className={`export-icon ${filtersOn ? 'export-icon-active' : ''}`}
+                        onClick={() => setShowExportDropdown(!showExportDropdown)}
+                    />
+                    {showExportDropdown && (
+                        <div className="export-dropdown">
+                            <h4>Filtros do Export</h4>
+
+                            {columnOptions.map((col) => (
+                                <div key={col} className="export-option">
+                                    <h5>{columnDescriptions[col] || col.charAt(0).toUpperCase() + col.slice(1)}</h5>
+                                    <div className="export-select-container">
+                                        {col === 'abertura' || col === 'data_limite' ? (
+                                            <>
+                                                {dateExportFilters[col] ? (
+                                                    <div className="date-inputs">
+                                                        <input
+                                                            type="date"
+                                                            placeholder="Data Início"
+                                                            value={dateExportFilters[col].startDate || ''}
+                                                            onChange={(e) => handleDateExportChange(col, 'startDate', e.target.value)}
+                                                        />
+                                                        <input
+                                                            type="date"
+                                                            placeholder="Data Fim"
+                                                            value={dateExportFilters[col].endDate || ''}
+                                                            onChange={(e) => handleDateExportChange(col, 'endDate', e.target.value)}
+                                                        />
+                                                    </div>
+                                                ) : (
+                                                    <p>Selecione uma data</p>
+                                                )}
+                                                {dateExportErrors[col] && <p className="error-message">{dateExportErrors[col]}</p>}
+                                            </>
+                                        ) : (
+                                            <Select
+                                                className="export-column-select"
+                                                isMulti={col !== 'categoria' && col !== 'subcategoria'}
+                                                options={exportOptions[col] || []}
+                                                value={exportSelectedOptions[col] || []}
+                                                placeholder=""
+                                                onChange={(selectedOptions) => handleSelectExportChange(col, selectedOptions)}
+                                                styles={customStyles}
+                                                isClearable
+                                            />
+
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                            <div style={{ display: 'flex' }}>
+                                <button className="save-export-button" onClick={handleExportTickets}>
+                                    Exportar
                                 </button>
                             </div>
                         </div>
@@ -1002,7 +1435,8 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
                         </ul>
                     </div>,
                     document.body
-                )}
+                )
+            }
         </div>
     );
 };

@@ -11,14 +11,16 @@ html {
     height: 100%;
 }
 
-.filter-icon-container {
+.filter-icon-container,
+.export-icon-container {
     position: relative;
     margin-right: 15px;
     display: flex;
     align-items: center;
 }
 
-.filter-icon {
+.filter-icon,
+.export-icon {
     font-size: 20px;
     cursor: pointer;
     color: #a0abb6;
@@ -26,7 +28,8 @@ html {
     transition: color 0.3s ease;
 }
 
-.filter-icon:hover {
+.filter-icon:hover,
+.export-icon:hover {
     color: #005bb5;
 }
 
@@ -34,7 +37,8 @@ html {
     color: blue;
 }
 
-.filter-dropdown {
+.filter-dropdown,
+.export-dropdown {
     position: absolute;
     top: 40px;
     width: 350px;
@@ -48,25 +52,29 @@ html {
     overflow-x: auto;
 }
 
-.filter-dropdown h4 {
+.filter-dropdown h4,
+.export-dropdown h4  {
     font-size: 18px;
     color: #3E4676;
     font-weight: 500;
     margin-bottom: 15px;
 }
 
-.filter-option {
+.filter-option,
+.export-option {
     margin-bottom: 20px;
 }
 
-.filter-option h5 {
+.filter-option h5,
+.export-option h5 {
     font-size: 15px;
     font-weight: 400;
     color: #3E4676;
     margin-bottom: 8px;
 }
 
-.filter-select-container input[type="date"] {
+.filter-select-container input[type="date"],
+.export-select-container input[type="date"] {
     width: 45%;
     padding: 8px 10px;
     font-size: 14px;
@@ -78,7 +86,9 @@ html {
 }
 
 .filter-select-container input[type="date"]:hover,
-.filter-select-container input[type="date"]:focus {
+.filter-select-container input[type="date"]:focus,
+.export-select-container input[type="date"]:hover,
+.export-select-container input[type="date"]:focus {
     border-color: #007aff;
     outline: none;
 }
@@ -89,7 +99,8 @@ html {
     margin-top: 5px;
 }
 
-.save-filter-button {
+.save-filter-button,
+.save-export-button {
     background-color: #007aff;
     color: white;
     font-size: 15px;
@@ -101,7 +112,8 @@ html {
     margin-right: 10px;
 }
 
-.save-filter-button:hover {
+.save-filter-button:hover,
+.save-export-button:hover {
     background-color: #005bb5;
 }
 
@@ -116,13 +128,15 @@ html {
     margin-bottom: 20px;
 }
 
-.filter-dropdown h4 {
+.filter-dropdown h4,
+.export-dropdown h4 {
     margin: 0 0 10px 0;
     font-size: 16px;
     font-weight: bold;
 }
 
-.filter-select-container {
+.filter-select-container,
+.export-select-container {
     display: flex;
     align-items: center;
 }
@@ -174,12 +188,12 @@ html {
 .option-p5 {
     background-color: #046704;
     /* Verde */
-    ;
     color: white;
     font-weight: bold;
 }
 
-.save-filter-button {
+.save-filter-button,
+.save-export-button {
     background-color: #043972;
     color: white;
     padding: 8px 12px;
@@ -190,7 +204,8 @@ html {
     text-align: center;
 }
 
-.save-filter-button:hover {
+.save-filter-button:hover,
+.save-export-button:hover {
     background-color: #218838;
 }
 
@@ -2057,7 +2072,8 @@ th.sorted-desc::before {
 
 
 
-.filter-select-container {
+.filter-select-container,
+.export-select-container {
     display: flex;
     flex-direction: column; 
     gap: 5px; 

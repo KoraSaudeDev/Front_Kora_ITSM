@@ -276,6 +276,7 @@ const Modal = ({ data, onClose }) => {
             setInicioCheck(formattedDate);
             setInicio(formattedDate);
             setFim('');
+            setExecutor({ value: `${user.id_user} - ${user.name}`, label: user.name });
         }
     }, [showAtividadesModal, showAnexosModal]);
 
@@ -502,7 +503,7 @@ const Modal = ({ data, onClose }) => {
                                 <p><img alt='' src='https://uploaddeimagens.com.br/images/004/756/786/thumb/Logo_Kora.png?1710514563' /></p>
                                 <p> 
                                     Olá prezado(a)!<br>Um ticket foi encaminhado para sua área, para acessar 
-                                    <strong><a href='https://qashelper.korasaude.com.br/suporte/minha-equipe'>clique aqui.</a></strong>
+                                    <strong><a href='${window.location.protocol}//${window.location.host}/suporte/minha-equipe'>clique aqui.</a></strong>
                                 </p>
                                 <p>Dados do Chamado:</p>
                                 <ul>
@@ -603,7 +604,7 @@ const Modal = ({ data, onClose }) => {
                                 <p><i>Mensagem enviada de forma automática, favor não responder.</i></p>
                                 `;
                                 await sendEmail(data.email_solicitante, emailSubject, emailBody);
-                                
+
                                 emailSubject = "Tickets - Avalie a sua Experiência";
                                 emailBody = `
                                 <p><img alt="" src="https://uploaddeimagens.com.br/images/004/756/786/thumb/Logo_Kora.png?1710514563" /></p>
@@ -917,6 +918,7 @@ const Modal = ({ data, onClose }) => {
     const handleFecharAtividadesModal = () => {
         setIsClosingAtividadesModal(true);
         setIsTaskPublic(false);
+        setExecutor(null);
         setTimeout(() => {
             setShowAtividadesModal(false);
             setIsClosingAtividadesModal(false);
@@ -1177,7 +1179,7 @@ const Modal = ({ data, onClose }) => {
                 };
 
                 await sendRequest(taskConfig);
-                
+
                 let emailSubject, emailBody, emails;
                 emails = await getEmailsForQueue(ultimoItem?.id_executor ?? data.executor, selectedUnidade ?? data.unidade);
                 if (emails.length > 0) {
@@ -1186,7 +1188,7 @@ const Modal = ({ data, onClose }) => {
                     <p><img alt='' src='https://uploaddeimagens.com.br/images/004/756/786/thumb/Logo_Kora.png?1710514563' /></p>
                     <p> 
                         Olá prezado(a)!<br>Um ticket foi encaminhado para sua área, para acessar 
-                        <strong><a href='https://qashelper.korasaude.com.br/suporte/minha-equipe'>clique aqui.</a></strong>
+                        <strong><a href='${window.location.protocol}//${window.location.host}/suporte/minha-equipe'>clique aqui.</a></strong>
                     </p>
                     <p>Dados do Chamado:</p>
                     <ul>
@@ -1601,8 +1603,22 @@ const Modal = ({ data, onClose }) => {
                                 );
                             } else if (key === "organizacao_dominio" && isEmailDomainEditable) {
                                 return;
-                            }
-                            else {
+                            } else if (key === "material_referencia") {
+                                return (
+                                    value !== null && value !== undefined && value !== '' && (
+                                        <p key={key} style={{ display: 'flex', alignItems: 'center' }}>
+                                            <strong>{formsEspecificosLabels[key]}:</strong>
+                                            <a onClick={() => handleAnexoClick(value)} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                                {value.split('/').pop()}
+                                                <FaFileAlt
+                                                    className="icone-anexo"
+                                                    style={{ marginLeft: '5px' }}
+                                                />
+                                            </a>
+                                        </p>
+                                    )
+                                );
+                            } else {
                                 return (
                                     value !== null && value !== undefined && value !== '' && value !== 'R$ 0/Mês' && (
                                         <p key={key}>
@@ -1896,6 +1912,7 @@ const Modal = ({ data, onClose }) => {
                                             isClearable
                                             placeholder=""
                                             onChange={selectedOption => setExecutor(selectedOption)}
+                                            value={executor}
                                         />
                                     </div>
                                     <div className="switch-container">
