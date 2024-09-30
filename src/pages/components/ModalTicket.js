@@ -2,10 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import Select from 'react-select';
 import { FaTimes, FaFileAlt, FaPlus, FaUserPlus } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
+import { useRefresh } from '../../context/RefreshContext';
 import axios from 'axios';
 
 const Modal = ({ data, onClose }) => {
     const { user } = useAuth();
+    const { triggerRefresh } = useRefresh();
     const [inicioCheck, setInicioCheck] = useState('');
     const [inicio, setInicio] = useState('');
     const [fim, setFim] = useState('');
@@ -1390,6 +1392,7 @@ const Modal = ({ data, onClose }) => {
         setIsClosingModal(true);
         setTimeout(() => {
             onClose();
+            triggerRefresh();
             setIsClosingModal(false);
         }, 500);
     };

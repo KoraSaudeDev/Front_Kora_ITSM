@@ -5,6 +5,7 @@ import { FaHeadset, FaChevronDown, FaSignOutAlt } from 'react-icons/fa';
 import logokora from '../assets/images/logokora.png';
 import SemFoto from '../assets/images/Sem_foto.png';
 import { useAuth } from '../context/AuthContext';
+import { useRefresh } from '../context/RefreshContext';
 import axios from 'axios';
 
 const Sidebar = () => {
@@ -12,6 +13,7 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const [activeDropdown, setActiveDropdown] = useState('dropdownAtendimentos');
   const { user, logout } = useAuth();
+  const { refreshKey } = useRefresh();
   const [meusAtendimentosCount, setMeusAtendimentosCount] = useState(0);
   const [minhaEquipeCount, setMinhaEquipeCount] = useState(0);
 
@@ -54,7 +56,7 @@ const Sidebar = () => {
       fetchMeusAtendimentosCount();
       fetchMinhaEquipeCount();
     }
-  }, [user]);
+  }, [user, refreshKey]);
 
   useEffect(() => {
     const menu = document.querySelector('.menu-lateral');
@@ -185,7 +187,7 @@ const Sidebar = () => {
         </ul>
       </div>
       <div className="sidebar-footer">
-        <p>Version 1.020</p>
+        <p>Version 1.021</p>
       </div>
     </nav>
   );

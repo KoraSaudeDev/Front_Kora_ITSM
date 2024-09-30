@@ -5,10 +5,12 @@ import Select from 'react-select';
 import Modal from './ModalTicket';
 import caixaVazia from '../../assets/images/caixa-vazia.png';
 import { useAuth } from '../../context/AuthContext';
+import { useRefresh } from '../../context/RefreshContext';
 import axios from 'axios';
 
 const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtro }) => {
     const { user } = useAuth();
+    const { refreshKey } = useRefresh();
     const [atendimentos, setAtendimentos] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [modalData, setModalData] = useState(null);
@@ -179,7 +181,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
             clearTimeout(timer);
             //clearInterval(interval);
         };
-    }, [currentPage, itemsPerPage, savedFilters, sortOrders]);
+    }, [currentPage, itemsPerPage, savedFilters, sortOrders, refreshKey]);
 
     useEffect(() => {
         const fetchFilterOptions = async (hubs = []) => {
