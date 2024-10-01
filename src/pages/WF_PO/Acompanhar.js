@@ -1,66 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import { FaChevronLeft, FaChevronRight, FaShoppingCart } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight, FaShoppingCart, FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import '../../styles/WF_PO/Solicitacoes.css';
+import '../../styles/WF_PO/NovaRequisicao.css';
 
-const Acompanhar = ({ cartItems = [] }) => {
+const Aprovacoes = ({ cartItems = [] }) => {
     const [tickets, setTickets] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [totalPages, setTotalPages] = useState(1);
     const [isCartOpen, setIsCartOpen] = useState(false);
-    const [selectedTicket, setSelectedTicket] = useState(null); // Ticket selecionado para exibição no modal
-    const [selectAll, setSelectAll] = useState(false); // Adicionando a opção de selecionar todos no modal
+    const [selectedTicket, setSelectedTicket] = useState(null);
+
+   
+    const [isHistoricoOpen, setIsHistoricoOpen] = useState(false);
+    const [isAtividadesOpen, setIsAtividadesOpen] = useState(false);
 
     useEffect(() => {
-        let newTickets = [];
-
-        if (cartItems.length > 0) {
-            newTickets = cartItems.map((item, index) => ({
-                abertura: new Date().toLocaleString(),
-                nome: item.nome || `Material ${index + 1}`,  // Preencher nome do ticket
-                email: item.email || 'example@example.com',  // Preencher e-mail do ticket
-                fase: 'Pendente',
-                responsavel: 'Coordenador CC',
-                hub: item.hub || 'Default Hub',  // Preencher hub
-                unidade: item.unidade || 'Default Unidade',  // Preencher unidade
-                codigo: item.codigo || '0000000000',  // Código do item
-                item: item.nome || `Item ${index + 1}`,  // Nome do item
-                quantidade: item.quantidade || 1, // Quantidade do item
-                preco: item.preco || 100, // Preço unitário
-                total: item.quantidade * (item.preco || 100), // Total (quantidade * preço)
-                motivoRecusa: item.motivoRecusa || '',  // Motivo da recusa (vazio por padrão)
-                acao: (
-                    <FaShoppingCart 
-                        className="cart-icon" 
-                        onClick={() => openTicketModal(item)} 
-                    />
-                ),
-            }));
-        }
-
-        if (newTickets.length === 0) {
-            newTickets = [{
-                abertura: new Date().toLocaleString(),
-                nome: 'Produto Exemplo',
-                email: 'example@example.com',
-                fase: 'Pendente',
-                responsavel: 'João Silva',
-                hub: 'HUB Central',
-                unidade: 'Unidade A',
-                codigo: '0000000000',
-                item: 'Produto Exemplo',
-                quantidade: 10,
-                preco: 90,
-                total: 900,
-                motivoRecusa: '',
-                acao: (
-                    <FaShoppingCart 
-                        className="cart-icon" 
-                        onClick={() => openTicketModal({})} 
-                    />
-                ),
-            }];
-        }
+        let newTickets = cartItems.length > 0 ? cartItems : [{
+            abertura: new Date().toLocaleString(),
+            nome: 'Produto Exemplo',
+            email: 'example@example.com',
+            fase: 'Em Aberto',
+            responsavel: 'João Silva',
+            hub: 'HUB Central',
+            unidade: 'Unidade A',
+            acao: (
+                <FaShoppingCart
+                    className="cart-icon"
+                    onClick={() => openTicketModal({})}
+                />
+            ),
+        }];
 
         setTickets(newTickets);
         setTotalPages(Math.ceil(newTickets.length / itemsPerPage));
@@ -70,22 +40,19 @@ const Acompanhar = ({ cartItems = [] }) => {
         setCurrentPage(newPage);
     };
 
-    const handleSelectAll = () => {
-        setSelectAll(!selectAll);
-    };
-
     const renderTickets = () => {
         const startIndex = (currentPage - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
         return tickets.slice(startIndex, endIndex).map((ticket, index) => (
             <tr key={index}>
-                <td>{ticket.codigo}</td>
-                <td>{ticket.item}</td>
-                <td>{ticket.quantidade}</td>
-                <td>{(ticket.preco || 0).toFixed(2)}</td> {/* Verificação aplicada aqui */}
-                <td>{(ticket.total || 0).toFixed(2)}</td> {/* Verificação aplicada aqui */}
+                <td>{index + 1}</td>
+                <td>{ticket.abertura}</td>
+                <td>{ticket.nome}</td>
+                <td>{ticket.email}</td>
                 <td>{ticket.fase}</td>
-                <td>{ticket.motivoRecusa || '-'}</td>
+                <td>{ticket.responsavel}</td>
+                <td>{ticket.hub}</td>
+                <td>{ticket.unidade}</td>
                 <td>{ticket.acao}</td>
             </tr>
         ));
@@ -101,112 +68,123 @@ const Acompanhar = ({ cartItems = [] }) => {
         setSelectedTicket(null);
     };
 
+    
+    const toggleHistorico = () => setIsHistoricoOpen(!isHistoricoOpen);
+    const toggleAtividades = () => setIsAtividadesOpen(!isAtividadesOpen);
+
     return (
         <div className="container-solicitacoes">
-            <h2>Tickets Recebidos</h2>
             <table className="tabela-tickets">
                 <thead>
                     <tr>
-                        <th>Código</th>
-                        <th>Item</th>
-                        <th>Quantidade</th>
-                        <th>Preço</th>
-                        <th>Total</th>
-                        <th>Status</th>
-                        <th>Motivo da Recusa</th>
+                        <th>#</th>
+                        <th>Abertura</th>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Fase</th>
+                        <th>Responsável</th>
+                        <th>HUB</th>
+                        <th>Unidade</th>
                         <th>Ação</th>
                     </tr>
                 </thead>
                 <tbody>
                     {tickets.length > 0 ? renderTickets() : (
                         <tr>
-                            <td colSpan="8">Nenhum registro encontrado</td>
+                            <td colSpan="9">Nenhum registro encontrado</td>
                         </tr>
                     )}
                 </tbody>
             </table>
             <div className="pagination">
-                <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+                <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} id="btn-prev-page">
                     <FaChevronLeft />
                 </button>
-                <span>{currentPage} de {totalPages}</span>
-                <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+                <span id="pagination-info">{currentPage} de {totalPages}</span>
+                <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} id="btn-next-page">
                     <FaChevronRight />
                 </button>
             </div>
 
-            {/* Modal */}
+    
             {isCartOpen && selectedTicket && (
-                <div className="modal-overlay">
-                    <div className="modal">
-                        <div className="modal-header">
-                            <h3>Detalhes do Ticket</h3>
-                            <span className="close" onClick={closeTicketModal}>&times;</span>
+                <div className="modal-overlay" id="modal-cart">
+                    <div className="modal" id="modal-details">
+                        <div className="modal-header" id="modal-header">
+                            <h3>Detalhes da Solicitação</h3>
+                            <span className="close" onClick={closeTicketModal} id="btn-close-modal">&times;</span>
                         </div>
-                        <div className="modal-content">
+                        <div className="modal-content" id="modal-content">
+                         
+                            <div className="requisicao-info" id="requisicao-info">
+                                <p><strong>Requisição:</strong> 109</p>
+                                <p><strong>Abertura:</strong> 13/08/2024 20:45:55</p>
+                                <p><strong>Fase:</strong> Aprovação do(s) Produto(s)</p>
+                                <p><strong>Responsável:</strong> Coordenador CC</p>
+                            </div>
 
-                            {/* Campos adicionais no modal */}
+                        
                             <div className="form-row">
                                 <div className="campo">
-                                    <label>Email:</label>
-                                    <input type="email" value={selectedTicket.email || 'example@example.com'} readOnly />
+                                    <label htmlFor="input-email">Email:</label>
+                                    <input id="input-email" type="email" value="pedro.marchesini@korasaude.com.br" readOnly />
                                 </div>
                                 <div className="campo">
-                                    <label>Nome:</label>
-                                    <input type="text" value={selectedTicket.nome || 'Nome do Solicitante'} readOnly />
+                                    <label htmlFor="input-nome">Nome:</label>
+                                    <input id="input-nome" type="text" value="Pedro" readOnly />
+                                </div>
+                            </div>
+                            <div className="form-row">
+                                <div className="campo">
+                                    <label htmlFor="input-hub">Hub:</label>
+                                    <input id="input-hub" type="text" value="ES" readOnly />
+                                </div>
+                                <div className="campo">
+                                    <label htmlFor="input-unidade">Unidade:</label>
+                                    <input id="input-unidade" type="text" value="ES: HOSPITAL MERIDIONAL S.A (Cariacica)" readOnly />
+                                </div>
+                                <div className="campo">
+                                    <label htmlFor="input-centro-custo">Centro de Custo:</label>
+                                    <input id="input-centro-custo" type="text" value="ACOMODACOES TERREO (1410101001)" readOnly />
+                                </div>
+                            </div>
+                            <div className="form-row">
+                                <div className="campo">
+                                    <label htmlFor="input-area">Área:</label>
+                                    <input id="input-area" type="text" value="AMBULATORIO" readOnly />
+                                </div>
+                                <div className="campo">
+                                    <label htmlFor="input-tipo-solicitacao">Tipo de Solicitação:</label>
+                                    <input id="input-tipo-solicitacao" type="text" value="Produto" readOnly />
+                                </div>
+                                <div className="campo">
+                                    <label htmlFor="input-data-remessa">Data Remessa:</label>
+                                    <input id="input-data-remessa" type="text" value="12/09/2024" readOnly />
+                                </div>
+                                <div className="campo">
+                                    <label htmlFor="input-bloco">Bloco:</label>
+                                    <input id="input-bloco" type="text" value="P/3" readOnly />
+                                </div>
+                            </div>
+                            <div className="form-row">
+                                <div className="campo">
+                                    <label htmlFor="input-descricao">Descrição:</label>
+                                    <textarea id="input-descricao" rows="2" value="teste" readOnly />
+                                </div>
+                                <div className="campo">
+                                    <label htmlFor="input-observacoes">Observações:</label>
+                                    <textarea id="input-observacoes" rows="2" value="" readOnly />
                                 </div>
                             </div>
 
-                            <div className="form-row">
-                                <div className="campo">
-                                    <label>Hub:</label>
-                                    <input type="text" value={selectedTicket.hub || 'Default Hub'} readOnly />
-                                </div>
-                                <div className="campo">
-                                    <label>Unidade:</label>
-                                    <input type="text" value={selectedTicket.unidade || 'Default Unidade'} readOnly />
-                                </div>
-                                <div className="campo">
-                                    <label>Centro de Custo:</label>
-                                    <input type="text" value="Acomodações Térreo" readOnly />
-                                </div>
-                            </div>
+                           
 
-                            <div className="form-row">
-                                <div className="campo">
-                                    <label>Área:</label>
-                                    <input type="text" value="Ambulatório" readOnly />
-                                </div>
-                                <div className="campo">
-                                    <label>Tipo de Solicitação:</label>
-                                    <input type="text" value="Produto" readOnly />
-                                </div>
-                                <div className="campo">
-                                    <label>Data Remessa:</label>
-                                    <input type="text" value="12/09/2024" readOnly />
-                                </div>
-                                <div className="campo">
-                                    <label>Bloco:</label>
-                                    <input type="text" value="P/3" readOnly />
-                                </div>
-                            </div>
-
-                            <div className="form-row">
-                                <div className="campo">
-                                    <label>Descrição:</label>
-                                    <textarea rows="2" value="Verificar problema" readOnly />
-                                </div>
-                                <div className="campo">
-                                    <label>Observações:</label>
-                                    <textarea rows="2" value="" readOnly />
-                                </div>
-                            </div>
-
-                            {/* Tabela no modal */}
-                            <table className="tabela-detalhes-modal">
+                           
+                            
+                            <table className="tabela-tickets">
                                 <thead>
                                     <tr>
-                                        <th><input type="checkbox" onChange={handleSelectAll} checked={selectAll} /> Selecionar Todos</th>
+                                        <th><input type="checkbox" id="checkbox-select" /></th>
                                         <th>Código</th>
                                         <th>Item</th>
                                         <th>Quantidade</th>
@@ -218,23 +196,94 @@ const Acompanhar = ({ cartItems = [] }) => {
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td><input type="checkbox" /></td>
-                                        <td>{selectedTicket.codigo}</td>
-                                        <td>{selectedTicket.item}</td>
-                                        <td>{selectedTicket.quantidade}</td>
-                                        <td>{(selectedTicket.preco || 0).toFixed(2)}</td> {/* Verificação aplicada aqui */}
-                                        <td>{(selectedTicket.total || 0).toFixed(2)}</td> {/* Verificação aplicada aqui */}
-                                        <td>{selectedTicket.fase}</td>
-                                        <td>{selectedTicket.motivoRecusa || '-'}</td>
+                                        <td><input type="checkbox" id="checkbox-item" /></td>
+                                        <td>000000000010008796</td>
+                                        <td>AGULHA DESC. 25 X 12 REF. CF019-001</td>
+                                        <td>10</td>
+                                        <td>90.00</td>
+                                        <td>900.00</td>
+                                        <td>Pendente</td>
+                                        <td>Motivo da Recusa</td>
                                     </tr>
                                 </tbody>
                             </table>
 
-                            {/* Botões Aprovar/Reprovar no modal */}
-                            <div className="modal-footer">
-                                <button className="approve-btn">Aprovar</button>
-                                <button className="reject-btn">Reprovar</button>
-                                <button onClick={closeTicketModal}>Fechar</button>
+                       
+                            <div className="total">
+                                <p id="total-info">Total: R$900.00</p>
+                            </div>
+
+                            <div className="accordion" id="accordion-cotacao">
+                                <h4 onClick={toggleAtividades} className={isAtividadesOpen ? 'active' : ''}>
+                                    Retorno Cotação Bionexo
+                                    {isAtividadesOpen ? <FaChevronUp /> : <FaChevronDown />}
+                                </h4>
+                                {isAtividadesOpen && (
+                                    <div className="accordion-content active">
+                                        <p>Retorno Cotação Bionexo</p>
+                                    </div>
+                                )}
+                            </div>
+
+                        
+                            <div className="accordion" id="accordion-historico">
+                                <h4 onClick={toggleHistorico} className={isHistoricoOpen ? 'active' : ''}>
+                                    Histórico de Aprovações dos Materiais
+                                    {isHistoricoOpen ? <FaChevronUp /> : <FaChevronDown />}
+                                </h4>
+                                {isHistoricoOpen && (
+                                    <div className="accordion-content active">
+                                        <table className="tabela-historico">
+                                            <thead>
+                                                <tr>
+                                                    <th>Código</th>
+                                                    <th>Item</th>
+                                                    <th>Quantidade</th>
+                                                    <th>Preço</th>
+                                                    <th>Total</th>
+                                                    <th>Status</th>
+                                                    <th>Executor</th>
+                                                    <th>Motivo da Recusa</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>000000000010008796</td>
+                                                    <td>AGULHA DESC. 25 X 12 REF. CF019-001</td>
+                                                    <td>10</td>
+                                                    <td>90.00</td>
+                                                    <td>900.00</td>
+                                                    <td>Pendente</td>
+                                                    <td>Solicitante</td>
+                                                    <td></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+                            </div>
+
+                  
+                            <div className="accordion" id="accordion-atividades">
+                                <h4 onClick={toggleAtividades} className={isAtividadesOpen ? 'active' : ''}>
+                                    Atividades
+                                    {isAtividadesOpen ? <FaChevronUp /> : <FaChevronDown />}
+                                </h4>
+                                {isAtividadesOpen && (
+                                    <div className="accordion-content active">
+                                        <p>Aqui vai o histórico de atividades realizadas.</p>
+                                    </div>
+                                )}
+                            </div>
+
+               
+                            <div className="footer-note" id="footer-note">
+                                <p>ATENÇÃO! Você é o último responsável pela aprovação dos materiais, ao enviar, será criado uma cotação no bionexo!</p>
+                            </div>
+
+                            <div className="modal-footer" id="modal-footer">
+                                <button className="btn-voltar" id="btn-voltar" onClick={closeTicketModal}>Voltar</button>
+                                
                             </div>
                         </div>
                     </div>
@@ -244,4 +293,4 @@ const Acompanhar = ({ cartItems = [] }) => {
     );
 };
 
-export default Acompanhar;
+export default Aprovacoes;

@@ -240,7 +240,7 @@ const NovaRequisicao = () => {
     return (
         <div className="container">
             <div className="form-wrapper">
-                <h2>Abertura de Ticket</h2>
+                
                 <form className="formulario">
                     <div className="row">
                         <div className="campo">

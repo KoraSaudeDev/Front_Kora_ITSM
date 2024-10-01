@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaChevronLeft, FaChevronRight, FaShoppingCart } from 'react-icons/fa'; 
+import { FaChevronLeft, FaChevronRight, FaShoppingCart } from 'react-icons/fa';
 import '../../styles/WF_PO/Solicitacoes.css';
 
 const Aprovacoes = ({ cartItems = [] }) => {
@@ -7,8 +7,14 @@ const Aprovacoes = ({ cartItems = [] }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [totalPages, setTotalPages] = useState(1);
-    const [isCartOpen, setIsCartOpen] = useState(false);  
+    const [isCartOpen, setIsCartOpen] = useState(false);
     const [selectedTicket, setSelectedTicket] = useState(null);
+
+
+    const [isHistoricoOpen, setIsHistoricoOpen] = useState(false);
+    const [isAtividadesOpen, setIsAtividadesOpen] = useState(false);
+
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
         let newTickets = cartItems.length > 0 ? cartItems : [{
@@ -20,9 +26,9 @@ const Aprovacoes = ({ cartItems = [] }) => {
             hub: 'HUB Central',
             unidade: 'Unidade A',
             acao: (
-                <FaShoppingCart 
-                    className="cart-icon" 
-                    onClick={() => openTicketModal({})} 
+                <FaShoppingCart
+                    className="cart-icon"
+                    onClick={() => openTicketModal({})}
                 />
             ),
         }];
@@ -32,25 +38,33 @@ const Aprovacoes = ({ cartItems = [] }) => {
     }, [cartItems]);
 
     const handlePageChange = (newPage) => {
-        setCurrentPage(newPage);
+        if (newPage >= 1 && newPage <= totalPages) {
+            setCurrentPage(newPage);
+        }
     };
 
     const renderTickets = () => {
         const startIndex = (currentPage - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
-        return tickets.slice(startIndex, endIndex).map((ticket, index) => (
-            <tr key={index}>
-                <td>{index + 1}</td>
-                <td>{ticket.abertura}</td>
-                <td>{ticket.nome}</td>
-                <td>{ticket.email}</td>
-                <td>{ticket.fase}</td>
-                <td>{ticket.responsavel}</td>
-                <td>{ticket.hub}</td>
-                <td>{ticket.unidade}</td>
-                <td>{ticket.acao}</td>
-            </tr>
-        ));
+        return tickets
+            .filter(ticket => 
+                ticket.nome.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                ticket.email.toLowerCase().includes(searchQuery.toLowerCase())
+            )
+            .slice(startIndex, endIndex)
+            .map((ticket, index) => (
+                <tr key={index}>
+                    <td>{index + 1}</td>
+                    <td>{ticket.abertura}</td>
+                    <td>{ticket.nome}</td>
+                    <td>{ticket.email}</td>
+                    <td>{ticket.fase}</td>
+                    <td>{ticket.responsavel}</td>
+                    <td>{ticket.hub}</td>
+                    <td>{ticket.unidade}</td>
+                    <td>{ticket.acao}</td>
+                </tr>
+            ));
     };
 
     const openTicketModal = (ticket) => {
@@ -63,9 +77,15 @@ const Aprovacoes = ({ cartItems = [] }) => {
         setSelectedTicket(null);
     };
 
+
+    const toggleHistorico = () => setIsHistoricoOpen(!isHistoricoOpen);
+    const toggleAtividades = () => setIsAtividadesOpen(!isAtividadesOpen);
+
     return (
         <div className="container-solicitacoes">
-            <h2>Tickets Recebidos</h2>
+
+           
+
             <table className="tabela-tickets">
                 <thead>
                     <tr>
@@ -88,26 +108,33 @@ const Aprovacoes = ({ cartItems = [] }) => {
                     )}
                 </tbody>
             </table>
+
             <div className="pagination">
-                <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} id="btn-prev-page">
+                <button 
+                    onClick={() => handlePageChange(currentPage - 1)} 
+                    disabled={currentPage === 1} 
+                    id="btn-prev-page">
                     <FaChevronLeft />
                 </button>
                 <span id="pagination-info">{currentPage} de {totalPages}</span>
-                <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} id="btn-next-page">
+                <button 
+                    onClick={() => handlePageChange(currentPage + 1)} 
+                    disabled={currentPage === totalPages} 
+                    id="btn-next-page">
                     <FaChevronRight />
                 </button>
             </div>
 
-            {/* Modal */}
+    
             {isCartOpen && selectedTicket && (
                 <div className="modal-overlay" id="modal-cart">
                     <div className="modal" id="modal-details">
                         <div className="modal-header" id="modal-header">
-                            <h3>Detalhes do Ticket</h3>
+                            <h3>Detalhes da Solicitação</h3>
                             <span className="close" onClick={closeTicketModal} id="btn-close-modal">&times;</span>
                         </div>
                         <div className="modal-content" id="modal-content">
-                            {/* Requisição Info */}
+                      
                             <div className="requisicao-info" id="requisicao-info">
                                 <p><strong>Requisição:</strong> 109</p>
                                 <p><strong>Abertura:</strong> 13/08/2024 20:45:55</p>
@@ -115,7 +142,6 @@ const Aprovacoes = ({ cartItems = [] }) => {
                                 <p><strong>Responsável:</strong> Coordenador CC</p>
                             </div>
 
-                            {/* Form Fields */}
                             <div className="form-row">
                                 <div className="campo">
                                     <label htmlFor="input-email">Email:</label>
@@ -165,17 +191,17 @@ const Aprovacoes = ({ cartItems = [] }) => {
                                 </div>
                                 <div className="campo">
                                     <label htmlFor="input-observacoes">Observações:</label>
-                                    <textarea id="input-observacoes" rows="2" value="" />
+                                    <textarea id="input-observacoes" rows="2" value="" readOnly />
                                 </div>
                             </div>
 
-                            {/* Buttons */}
-                            <div className="form-row">
+                     
+                            <div className="form-actions">
                                 <button className="btn-aprovar" id="btn-aprovarr">Aprovar</button>
                                 <button className="btn-reprovar" id="btn-reprovarr">Reprovar</button>
                             </div>
 
-                            {/* Table */}
+                       
                             <table className="tabela-tickets">
                                 <thead>
                                     <tr>
@@ -203,27 +229,87 @@ const Aprovacoes = ({ cartItems = [] }) => {
                                 </tbody>
                             </table>
 
-                            {/* Total */}
+                           
                             <div className="total">
                                 <p id="total-info">Total: R$900.00</p>
                             </div>
 
-                            {/* Histórico de Aprovações dos Materiais */}
+                        
                             <div className="accordion" id="accordion-historico">
-                                <h4>Histórico de Aprovações dos Materiais</h4>
-                            </div>
-                            
-                            {/* Atividades */}
-                            <div className="accordion" id="accordion-atividades">
-                                <h4>Atividades</h4>
+                                <h4 onClick={toggleHistorico} className={isHistoricoOpen ? 'active' : ''}>
+                                    Histórico de Aprovações dos Materiais
+                                </h4>
+                                {isHistoricoOpen && (
+                                    <div className="accordion-content active">
+                                        <table className="tabela-historico">
+                                            <thead>
+                                                <tr>
+                                                    <th>Código</th>
+                                                    <th>Item</th>
+                                                    <th>Quantidade</th>
+                                                    <th>Preço</th>
+                                                    <th>Total</th>
+                                                    <th>Status</th>
+                                                    <th>Executor</th>
+                                                    <th>Motivo da Recusa</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>000000000010008796</td>
+                                                    <td>AGULHA DESC. 25 X 12 REF. CF019-001</td>
+                                                    <td>10</td>
+                                                    <td>90.00</td>
+                                                    <td>900.00</td>
+                                                    <td>Pendente</td>
+                                                    <td>Solicitante</td>
+                                                    <td></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
                             </div>
 
-                            {/* Footer Note */}
+                   
+                            <div className="accordion" id="accordion-atividades">
+                                <h4 onClick={toggleAtividades} className={isAtividadesOpen ? 'active' : ''}>
+                                    Atividades
+                                </h4>
+                                {isAtividadesOpen && (
+                                    <div className="accordion-content active">
+                                        <table className="tabela-historico">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Fase</th>
+                                                    <th>Executor</th>
+                                                    <th>Início</th>
+                                                    <th>Fim</th>
+                                                    <th>Motivo Reprova</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>276</td>
+                                                    <td>Aprovação do(s) Produto(s)</td>
+                                                    <td>Coordenador CC</td>
+                                                    <td>13/08/2024 20:45:55</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+                            </div>
+
+                        
                             <div className="footer-note" id="footer-note">
                                 <p>ATENÇÃO! Você é o último responsável pela aprovação dos materiais, ao enviar, será criado uma cotação no bionexo!</p>
                             </div>
 
-                            {/* Modal Footer */}
+                        
                             <div className="modal-footer" id="modal-footer">
                                 <button className="btn-voltar" id="btn-voltar" onClick={closeTicketModal}>Voltar</button>
                                 <button className="btn-enviar" id="btn-enviar">Enviar Cotação</button>

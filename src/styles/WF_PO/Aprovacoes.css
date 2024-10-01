@@ -62,7 +62,7 @@ input[readonly] {
     color: #666;
 }
 
-/* Tabela de Itens */
+
 .tabela-tickets {
     width: 100%;
     border-collapse: collapse;
@@ -95,7 +95,7 @@ input[readonly] {
     width: 150px;
 }
 
-/* Botões de Aprovar e Reprovar */
+
 .form-actions {
     display: flex;
     justify-content: flex-end;
@@ -130,7 +130,7 @@ input[readonly] {
     background-color: #c82333;
 }
 
-/* Modal Footer Botões */
+
 .modal-footer {
     display: flex;
     justify-content: space-between;
@@ -164,7 +164,7 @@ input[readonly] {
     background-color: #0069d9;
 }
 
-/* Total Info */
+
 .total-info {
     text-align: right;
     margin-top: 20px;
@@ -176,7 +176,6 @@ input[readonly] {
     margin: 0;
 }
 
-/* Accordion Sections */
 .accordion {
     margin-top: 20px;
 }
@@ -204,7 +203,7 @@ input[readonly] {
     display: block;
 }
 
-/* Rodapé de Aviso */
+
 .footer-note {
     margin-top: 20px;
     padding: 10px;
@@ -215,7 +214,7 @@ input[readonly] {
     font-size: 14px;
 }
 
-/* Modal Styling */
+
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -257,13 +256,13 @@ input[readonly] {
     color: #333;
 }
 
-/* Scrollable Table */
+
 .tabela-tickets {
     max-height: 300px;
     overflow-y: auto;
 }
 
-/* Pagination Styling */
+
 .pagination {
     display: flex;
     justify-content: center;
