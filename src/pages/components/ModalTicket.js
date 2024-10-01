@@ -1075,13 +1075,13 @@ const Modal = ({ data, onClose }) => {
 
         if (prioridade.tipo_tempo === "Corrido") {
             data_atualizada = await adicionaMinutosCorridos(data.abertura, sla);
+            if (!data.tempo_minutos_corridos) return;
             const tempo_minutos_corridos = parseInt(data.tempo_minutos_corridos, 10);
-            console.log(sla, tempo_minutos_corridos, tempo_minutos_corridos <= sla);
             setSla(tempo_minutos_corridos <= sla ? "No Prazo" : "Em Atraso");
         } else {
             data_atualizada = await adicionaMinutosUteis(data.abertura, sla);
+            if (!data.tempo_minutos) return;
             const tempo_minutos = parseInt(data.tempo_minutos, 10);
-            console.log(sla, tempo_minutos, tempo_minutos <= sla);
             setSla(tempo_minutos <= sla ? "No Prazo" : "Em Atraso");
         }
 
