@@ -5,6 +5,7 @@ import Sidebar from './components/Sidebar';
 import './App.css';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import { RefreshProvider } from './context/RefreshContext';
 
 import Main from './components/Main';
 import Login from './pages/Login';
@@ -15,6 +16,9 @@ import AcessoTI from './components/Helper/AcessoTI';
 import AcessoRH from './components/Helper/AcessoRH';
 import AcessoSuprimentos from './components/Helper/AcessoSuprimentos';
 import AcessoMarketing from './components/Helper/AcessoMarketing';
+import AcessoFinanceiro from './components/Helper/AcessoFinanceiro';
+import AcessoAssistencial from './components/Helper/AcessoAssistencial';
+import AcessoContabilidade from './components/Helper/AcessoContabilidade';
 
 const App = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -73,37 +77,44 @@ const App = () => {
 
   return (
     <AuthProvider>
-      <Router>
-        <Routes>
-          <Route path="/helper" element={<ProtectedRoute element={<HomeHelper />} />} />
-          <Route path="/helper/AcessoTI" element={<ProtectedRoute element={<AcessoTI />} />} />
-          <Route path="/helper/AcessoRH" element={<ProtectedRoute element={<AcessoRH />} />} />
-          <Route path="/helper/AcessoSuprimentos" element={<ProtectedRoute element={<AcessoSuprimentos />} />} />
-          <Route path="/helper/AcessoMarketing" element={<ProtectedRoute element={<AcessoMarketing />} />} />
+      <RefreshProvider>
+        <Router>
+          <Routes>
+            <Route path="/helper" element={<ProtectedRoute element={<HomeHelper />} />} />
+            <Route path="/helper/AcessoTI" element={<ProtectedRoute element={<AcessoTI />} />} />
+            <Route path="/helper/AcessoRH" element={<ProtectedRoute element={<AcessoRH />} />} />
+            <Route path="/helper/AcessoSuprimentos" element={<ProtectedRoute element={<AcessoSuprimentos />} />} />
+            <Route path="/helper/AcessoMarketing" element={<ProtectedRoute element={<AcessoMarketing />} />} />
+            <Route path="/helper/AcessoFinanceiro" element={<AcessoFinanceiro />} />
+            <Route path="/helper/AcessoAssistencial" element={<AcessoAssistencial />} />
+            <Route path="/helper/AcessoContabilidade" element={<AcessoContabilidade />} />
+            <Route path="/acesso" element={<Navigate to="/helper" />} />
+            <Route path="/acesso/*" element={<Navigate to="/helper" />} />
 
-          <Route path="/login" element={<Login />} />
+            <Route path="/login" element={<Login />} />
 
-          <Route path="/" element={<Navigate to="/login" />} />
+            <Route path="/" element={<Navigate to="/login" />} />
 
-          <Route
-            path="/suporte/*"
-            element={
-              <div className={`app-container ${isSidebarOpen ? 'sidebar-open' : ''}`}>
-                <Header onToggleSidebar={toggleSidebar} />
-                <Sidebar isOpen={isSidebarOpen} />
-                <Routes>
-                  {renderDynamicRoutes(menus)}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </div>
-            }
-          />
+            <Route
+              path="/suporte/*"
+              element={
+                <div className={`app-container ${isSidebarOpen ? 'sidebar-open' : ''}`}>
+                  <Header onToggleSidebar={toggleSidebar} />
+                  <Sidebar isOpen={isSidebarOpen} />
+                  <Routes>
+                    {renderDynamicRoutes(menus)}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </div>
+              }
+            />
 
-          <Route path="/not-found" element={<NotFound />} />
+            <Route path="/not-found" element={<NotFound />} />
 
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Router>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Router>
+      </RefreshProvider>
     </AuthProvider>
   );
 };

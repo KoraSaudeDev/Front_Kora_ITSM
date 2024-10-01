@@ -5,6 +5,7 @@ import * as Icons from 'react-icons/fa';
 import logokora from '../assets/images/logokora.png';
 import SemFoto from '../assets/images/Sem_foto.png';
 import { useAuth } from '../context/AuthContext';
+import { useRefresh } from '../context/RefreshContext';
 import axios from 'axios';
 
 const Sidebar = () => {
@@ -12,6 +13,7 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const [activeDropdown, setActiveDropdown] = useState(null);
   const { user, logout } = useAuth();
+  const { refreshKey } = useRefresh();
   const [menuCounts, setMenuCounts] = useState({});
   const [menus, setMenus] = useState([]);
 
@@ -79,7 +81,7 @@ const Sidebar = () => {
     if (menus.length > 0) {
       fetchMenuCounts();
     }
-  }, [menus]);
+  }, [menus, refreshKey]);
 
   useEffect(() => {
     const menu = document.querySelector('.menu-lateral');

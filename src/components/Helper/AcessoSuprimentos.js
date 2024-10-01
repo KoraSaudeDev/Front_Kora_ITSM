@@ -13,7 +13,7 @@ function AcessoSuprimentos() {
         { nome: 'GED', icone: faFileAlt, link: 'https://ged.docsolucoes.com.br/kora/home/auth/login' },
         { nome: 'Suprimentos Logística', icone: faTruckLoading, link: 'https://www.appsheet.com/start/e2a5613d-5b3d-4ae4-b467-f0480fd35795' },
         { nome: 'Cadastro de Fornecedor', icone: faClipboardList, link: 'https://www.appsheet.com/start/44e01724-465a-42f5-9680-9884977096ad#view=Nova%20Solicita%C3%A7%C3%A3o' },
-        { nome: 'Tickets Suprimentos', icone: faBoxes, link: 'https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#appName=TicketsGeral-448944302&view=Novo%20Ticket&defaults={"categoria":"Integracao/Suprimentos"}' },
+        { nome: 'Tickets Suprimentos', icone: faBoxes, link: 'https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#appName=TicketsGeral-448944302&view=Novo%20Ticket&defaults={%22Categoria%22:%22Integra%C3%A7%C3%A3o/Suprimentos%22}' },
         { nome: 'Satelitti - Assinatura de Contratos', icone: faFileContract, link: 'https://kora-doc.satelitti.com.br/suite-new/auth/login' },
         { nome: 'Planning', icone: faTasks, link: 'https://planning.korasaude.com.br/' },
     ];
@@ -43,6 +43,12 @@ function AcessoSuprimentos() {
                             <div className="nome-acessoti">{secao.nome}</div>
                         </div>
                     ))}
+
+                    <div className="icon-bottom-right" onClick={() => window.open('https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#view=Meus%20Tickets', '_blank')}>
+                        <div className="tooltip">Minhas Solicitações</div>
+                        <img src="https://i.ibb.co/GVgKvfw/image.png" alt="Icon" className="pulsating-image"/>
+                    </div>
+    
                 </div>
             </div>
         </div>

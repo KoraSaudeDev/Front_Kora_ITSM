@@ -2,10 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import Select from 'react-select';
 import { FaTimes, FaFileAlt, FaPlus, FaUserPlus } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
+import { useRefresh } from '../../context/RefreshContext';
 import axios from 'axios';
 
 const Modal = ({ data, onClose }) => {
     const { user } = useAuth();
+    const { triggerRefresh } = useRefresh();
     const [inicioCheck, setInicioCheck] = useState('');
     const [inicio, setInicio] = useState('');
     const [fim, setFim] = useState('');
@@ -35,6 +37,7 @@ const Modal = ({ data, onClose }) => {
     const [destinatarioDefault, setDestinatarioDefault] = useState(data.executor || '');
     const [selectedStatus, setSelectedStatus] = useState(data.status || '');
     const [dataLimite, setDataLimite] = useState(data.data_limite);
+    const [isTaskPublic, setIsTaskPublic] = useState(false);
     const [sla, setSla] = useState('');
     const [emailDomains, setEmailDomains] = useState([]);
     const [isEmailDomainEditable, setIsEmailDomainEditable] = useState(false);
@@ -58,25 +61,26 @@ const Modal = ({ data, onClose }) => {
     const customStyles = {
         option: (provided, state) => ({
             ...provided,
-            backgroundColor: state.isSelected ? '#007aff' : state.isFocused ? '#e0f7fa' : 'white', 
+            backgroundColor: state.isSelected ? '#007aff' : state.isFocused ? '#e0f7fa' : 'white', // Cor de fundo
             color: state.isSelected ? 'white' : '#3E4676', // Cor do texto
             padding: 10,
         }),
         control: (provided) => ({
             ...provided,
-            borderColor: '#007aff', 
-            boxShadow: 'none', 
+            borderColor: '#007aff', // Cor da borda do select
+            boxShadow: 'none', // Remover sombra
             '&:hover': {
-                borderColor: '#007aff',
+                borderColor: '#007aff', // Cor da borda ao passar o mouse
             },
         }),
         singleValue: (provided) => ({
             ...provided,
-            color: '#3E4676', 
+            color: '#3E4676', // Cor do valor selecionado
         }),
     };
 
     const formsEspecificos = {
+        "cp_id_categoria": data.cp_id_categoria,
         "novo_usuario": data.novo_usuario,
         "primeiro_nome_user": data.primeiro_nome_user,
         "sobrenome_user": data.sobrenome_user,
@@ -123,6 +127,7 @@ const Modal = ({ data, onClose }) => {
         "ds_obs": data.ds_obs,
     };
     const formsEspecificosLabels = {
+        "cp_id_categoria": "ID V360",
         "novo_usuario": "Nome Completo Usuário",
         "primeiro_nome_user": "Primeiro Nome do Usuário",
         "sobrenome_user": "Sobrenome do Usuário",
@@ -271,6 +276,7 @@ const Modal = ({ data, onClose }) => {
             setInicioCheck(formattedDate);
             setInicio(formattedDate);
             setFim('');
+            setExecutor({ value: `${user.id_user} - ${user.name}`, label: user.name });
         }
     }, [showAtividadesModal, showAnexosModal]);
 
@@ -456,6 +462,174 @@ const Modal = ({ data, onClose }) => {
                             }
                             return updatedAtividades;
                         });
+
+                        let emailSubject, emailBody, emails;
+
+                        switch (insert_tasks[i].status) {
+                            case "AGUARDANDO RETORNO":
+                                emailSubject = "Tickets - Aguardando Retorno";
+                                emailBody = `
+                                <p><img alt='' src='https://uploaddeimagens.com.br/images/004/756/786/thumb/Logo_Kora.png?1710514563' /></p>
+                                <p> 
+                                    Olá prezado(a)!<br>Um ticket foi encaminhado para você aguardando retorno, para acessar 
+                                    <strong><a href='https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#view=Aguardando%20Retorno'>clique aqui.</a></strong>
+                                </p>
+                                <p>Dados do Chamado:</p>
+                                <ul>
+                                    <li>N° Ticket: ${data.cod_fluxo}</li>
+                                    <li>Aberto Por: ${data.nome}</li>
+                                    <li>Status: ${toTitleCase(ultimoItem?.status ?? data.status)}</li>
+                                    <li>HUB: ${data.hub}</li>
+                                    <li>Unidade: ${data.unidade}</li>
+                                    <li>Categoria: ${data.categoria}</li>
+                                    <li>Subcategoria: ${data.subcategoria}</li>
+                                    <li>Assunto: ${data.assunto}</li>
+                                    <li>Descrição Ticket: ${data.descricao}</li>
+                                    <li>Encaminhado Por: ${taskCopy.executor}</li>
+                                    <li>Descrição Encaminhamento: ${taskCopy.descricao}</li>
+                                </ul>
+                                <p><i>Mensagem enviada de forma automática, favor não responder.</i></p>
+                                `;
+                                await sendEmail(data.email_solicitante, emailSubject, emailBody);
+                                break;
+
+                            case "EM ABERTO":
+                            case "EM ATENDIMENTO":
+                                emails = await getEmailsForQueue(ultimoItem?.id_executor ?? data.executor, data.unidade);
+                                if (emails.length < 1) break;
+
+                                emailSubject = "Tickets - Chamado Encaminhado";
+                                emailBody = `
+                                <p><img alt='' src='https://uploaddeimagens.com.br/images/004/756/786/thumb/Logo_Kora.png?1710514563' /></p>
+                                <p> 
+                                    Olá prezado(a)!<br>Um ticket foi encaminhado para sua área, para acessar 
+                                    <strong><a href='${window.location.protocol}//${window.location.host}/suporte/minha-equipe'>clique aqui.</a></strong>
+                                </p>
+                                <p>Dados do Chamado:</p>
+                                <ul>
+                                    <li>N° Ticket: ${data.cod_fluxo}</li>
+                                    <li>Aberto Por: ${data.nome}</li>
+                                    <li>Status: ${toTitleCase(ultimoItem?.status ?? data.status)}</li>
+                                    <li>HUB: ${data.hub}</li>
+                                    <li>Unidade: ${data.unidade}</li>
+                                    <li>Categoria: ${data.categoria}</li>
+                                    <li>Subcategoria: ${data.subcategoria}</li>
+                                    <li>Assunto: ${data.assunto}</li>
+                                    <li>Descrição Ticket: ${data.descricao}</li>
+                                    <li>Encaminhado Por: ${taskCopy.executor}</li>
+                                    <li>Descrição Encaminhamento: ${taskCopy.descricao}</li>
+                                </ul>
+                                <p><i>Mensagem enviada de forma automática, favor não responder.</i></p>
+                                `;
+                                await sendEmail(emails.join(';'), emailSubject, emailBody);
+
+                                if (taskCopy.tipo_atividade !== "Pública") break;
+
+                                emailSubject = "Tickets - Chamado Movimentado";
+                                emailBody = `
+                                <p><img alt='' src='https://uploaddeimagens.com.br/images/004/756/786/thumb/Logo_Kora.png?1710514563' /></p>
+                                <p> 
+                                    Olá prezado(a)!<br>Seu chamado foi encaminhado, para acessar 
+                                    <strong><a href='https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#view=Meus%20Tickets'>clique aqui.</a></strong>
+                                </p>
+                                <p>Dados do Chamado:</p>
+                                <ul>
+                                    <li>N° Ticket: ${data.cod_fluxo}</li>
+                                    <li>Aberto Por: ${data.nome}</li>
+                                    <li>Status: ${toTitleCase(ultimoItem?.status ?? data.status)}</li>
+                                    <li>HUB: ${data.hub}</li>
+                                    <li>Unidade: ${data.unidade}</li>
+                                    <li>Categoria: ${data.categoria}</li>
+                                    <li>Subcategoria: ${data.subcategoria}</li>
+                                    <li>Assunto: ${data.assunto}</li>
+                                    <li>Descrição Ticket: ${data.descricao}</li>
+                                    <li>Encaminhado Por: ${taskCopy.executor}</li>
+                                    <li>Descrição Encaminhamento: ${taskCopy.descricao}</li>
+                                </ul>
+                                <p><i>Mensagem enviada de forma automática, favor não responder.</i></p>
+                                `;
+                                await sendEmail(data.email_solicitante, emailSubject, emailBody);
+
+                                break;
+
+                            case "AGENDADA":
+                                emailSubject = "Tickets - Chamado Agendado";
+                                emailBody = `
+                                <p><img alt='' src='https://uploaddeimagens.com.br/images/004/756/786/thumb/Logo_Kora.png?1710514563' /></p>
+                                <p> 
+                                    Olá prezado(a)!<br>Um ticket aberto por você foi agendado, para acessar 
+                                    <strong><a href='https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#view=Meus%20Tickets'>clique aqui.</a></strong>
+                                </p>
+                                <p>Dados do Chamado:</p>
+                                <ul>
+                                    <li>N° Ticket: ${data.cod_fluxo}</li>
+                                    <li>Aberto Por: ${data.nome}</li>
+                                    <li>Status: ${toTitleCase(ultimoItem?.status ?? data.status)}</li>
+                                    <li>HUB: ${data.hub}</li>
+                                    <li>Unidade: ${data.unidade}</li>
+                                    <li>Categoria: ${data.categoria}</li>
+                                    <li>Subcategoria: ${data.subcategoria}</li>
+                                    <li>Assunto: ${data.assunto}</li>
+                                    <li>Descrição Ticket: ${data.descricao}</li>
+                                    <li>Agendado Por: ${taskCopy.executor}</li>
+                                    <li>Descrição Agendamento: ${taskCopy.descricao}</li>
+                                </ul>
+                                <p><i>Mensagem enviada de forma automática, favor não responder.</i></p>
+                                `;
+                                await sendEmail(data.email_solicitante, emailSubject, emailBody);
+                                break;
+
+                            case "FINALIZADO":
+                                emailSubject = "Tickets - Finalizado";
+                                emailBody = `
+                                <p><img alt='' src='https://uploaddeimagens.com.br/images/004/756/786/thumb/Logo_Kora.png?1710514563' /></p>
+                                <p> 
+                                    Olá prezado(a)!<br>Seu chamado foi finalizado, para acessar 
+                                    <strong><a href='https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#view=Meus%20Tickets'>clique aqui.</a></strong>
+                                </p>
+                                <p>Dados do Chamado:</p>
+                                <ul>
+                                    <li>N° Ticket: ${data.cod_fluxo}</li>
+                                    <li>Aberto Por: ${data.nome}</li>
+                                    <li>Status: ${toTitleCase(ultimoItem?.status ?? data.status)}</li>
+                                    <li>HUB: ${data.hub}</li>
+                                    <li>Unidade: ${data.unidade}</li>
+                                    <li>Categoria: ${data.categoria}</li>
+                                    <li>Subcategoria: ${data.subcategoria}</li>
+                                    <li>Assunto: ${data.assunto}</li>
+                                    <li>Descrição Ticket: ${data.descricao}</li>
+                                    <li>Finalizado Por: ${taskCopy.executor}</li>
+                                    <li>Descrição Finalizado: ${taskCopy.descricao}</li>
+                                </ul>
+                                <p><i>Mensagem enviada de forma automática, favor não responder.</i></p>
+                                `;
+                                await sendEmail(data.email_solicitante, emailSubject, emailBody);
+
+                                emailSubject = "Tickets - Avalie a sua Experiência";
+                                emailBody = `
+                                <p><img alt="" src="https://uploaddeimagens.com.br/images/004/756/786/thumb/Logo_Kora.png?1710514563" /></p>
+                                <p> 
+                                    Olá ${data.nome}!<br>Avalie a sua experiência com o nosso atendimento, para avaliar
+                                    <strong><a href='https://www.appsheet.com/start/b914109c-dee9-49d1-82f9-17abaa287982#appName=TicketsPesquisadeSatifação-448944302&page=form&row=&table=tb_tickets_form_user&view=Pesquisa+de+Satisfação&defaults={"cod_fluxo":"${data.cod_fluxo}"}'> clique aqui.</a></strong>
+                                </p>
+                                <p>Dados do Chamado:<p/>
+                                <ul>
+                                    <li>N° Ticket: ${data.cod_fluxo}</li>
+                                    <li>Status: ${toTitleCase(ultimoItem?.status ?? data.status)}</li>
+                                    <li>HUB: ${data.hub}</li>
+                                    <li>Unidade: ${data.unidade}</li>
+                                    <li>Categoria: ${data.categoria}</li>
+                                    <li>Subcategoria: ${data.subcategoria}</li>
+                                    <li>Assunto: ${data.assunto}</li>
+                                </ul>
+                                <p><i>Mensagem enviada de forma automática, favor não responder.</i></p>
+                                `;
+                                await sendEmail(data.email_solicitante, emailSubject, emailBody);
+                                break;
+
+                            default:
+                                break;
+                        }
                     }
 
                     setAtividades(prevAtividades =>
@@ -640,6 +814,29 @@ const Modal = ({ data, onClose }) => {
             .join(' ');
     };
 
+    const sendEmail = async (to, subject, body, cc = [], bcc = []) => {
+        const emailConfig = {
+            method: 'post',
+            url: `${process.env.REACT_APP_API_BASE_URL}/email/send`,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: JSON.stringify({
+                to,
+                subject,
+                body,
+                cc,
+                bcc
+            })
+        };
+        await sendRequest(emailConfig);
+    };
+
+    const getEmailsForQueue = async (executor, unidade) => {
+        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/email-fila?id_fila=${executor}&unidade=${unidade}`);
+        return response.data;
+    };
+
     const showLoadingOverlay = () => {
         document.getElementById('loading-overlay').style.display = 'flex';
     };
@@ -720,6 +917,8 @@ const Modal = ({ data, onClose }) => {
 
     const handleFecharAtividadesModal = () => {
         setIsClosingAtividadesModal(true);
+        setIsTaskPublic(false);
+        setExecutor(null);
         setTimeout(() => {
             setShowAtividadesModal(false);
             setIsClosingAtividadesModal(false);
@@ -738,10 +937,9 @@ const Modal = ({ data, onClose }) => {
         const aberto_por = document.querySelector('#aberto-por-task').value;
         const descricao = document.querySelector('#descricao-task').value.trim();
         const status = document.querySelector('#status-task').value;
-        var tipo_atividade_checkbox = document.querySelector('input#tipo-atividade');
 
         var tipo_atividade = 'Privada';
-        if (tipo_atividade_checkbox && tipo_atividade_checkbox.checked) {
+        if (isTaskPublic) {
             tipo_atividade = 'Pública';
         }
 
@@ -890,6 +1088,16 @@ const Modal = ({ data, onClose }) => {
         setDataLimite(data_atualizada);
     };
 
+    const handleStatusTaskChange = (event) => {
+        const status = event.target.value;
+
+        if (status === "AGUARDANDO RETORNO" || status === "FINALIZADO") {
+            setIsTaskPublic(true);
+        } else {
+            setIsTaskPublic(false);
+        }
+    }
+
     const handleSalvarTicket = async (statusParam = null, senha = null) => {
         if (!selectedHub || !selectedUnidade || !selectedCategoria || !selectedSubcategoria || !selectedAssunto || !prioridadeSelecionada || !selectedDestinatario) {
             alert('Por favor, preencha todos os campos obrigatórios.');
@@ -971,6 +1179,35 @@ const Modal = ({ data, onClose }) => {
                 };
 
                 await sendRequest(taskConfig);
+
+                let emailSubject, emailBody, emails;
+                emails = await getEmailsForQueue(ultimoItem?.id_executor ?? data.executor, selectedUnidade ?? data.unidade);
+                if (emails.length > 0) {
+                    emailSubject = "Tickets - Chamado Encaminhado";
+                    emailBody = `
+                    <p><img alt='' src='https://uploaddeimagens.com.br/images/004/756/786/thumb/Logo_Kora.png?1710514563' /></p>
+                    <p> 
+                        Olá prezado(a)!<br>Um ticket foi encaminhado para sua área, para acessar 
+                        <strong><a href='${window.location.protocol}//${window.location.host}/suporte/minha-equipe'>clique aqui.</a></strong>
+                    </p>
+                    <p>Dados do Chamado:</p>
+                    <ul>
+                        <li>N° Ticket: ${data.cod_fluxo}</li>
+                        <li>Aberto Por: ${data.nome}</li>
+                        <li>Status: ${statusParam === null ? toTitleCase(ultimoItem?.status ?? data.status) : statusParam}</li>
+                        <li>HUB: ${selectedHub ?? data.hub}</li>
+                        <li>Unidade: ${selectedUnidade ?? data.unidade}</li>
+                        <li>Categoria: ${selectedCategoria ?? data.categoria}</li>
+                        <li>Subcategoria: ${selectedSubcategoria ?? data.subcategoria}</li>
+                        <li>Assunto: ${selectedAssunto ?? data.assunto}</li>
+                        <li>Descrição Ticket: ${data.descricao}</li>
+                        <li>Encaminhado Por: ${task.executor}</li>
+                        <li>Descrição Encaminhamento: ${task.descricao}</li>
+                    </ul>
+                    <p><i>Mensagem enviada de forma automática, favor não responder.</i></p>
+                    `;
+                    await sendEmail(emails.join(';'), emailSubject, emailBody);
+                }
             }
 
             axios.post(`${process.env.REACT_APP_API_BASE_URL}/tickets/update/sla?cod_fluxo=${data.cod_fluxo}`);
@@ -1157,6 +1394,7 @@ const Modal = ({ data, onClose }) => {
         setIsClosingModal(true);
         setTimeout(() => {
             onClose();
+            triggerRefresh();
             setIsClosingModal(false);
         }, 500);
     };
@@ -1192,7 +1430,12 @@ const Modal = ({ data, onClose }) => {
 
     };
 
-    const categoriaOptions = options.categoria.map(option => ({ value: option, label: option }));
+    const categoriaOptions = [
+        ...options.categoria.map(option => ({ value: option, label: option })),
+        ...(options.categoria.includes(selectedCategoria)
+            ? []
+            : [{ value: selectedCategoria, label: selectedCategoria }])
+    ];
     const subcategoriaOptions = selectedCategoria
         ? [
             ...options.subcategoria.map(option => ({ value: option, label: option })),
@@ -1360,8 +1603,22 @@ const Modal = ({ data, onClose }) => {
                                 );
                             } else if (key === "organizacao_dominio" && isEmailDomainEditable) {
                                 return;
-                            }
-                            else {
+                            } else if (key === "material_referencia") {
+                                return (
+                                    value !== null && value !== undefined && value !== '' && (
+                                        <p key={key} style={{ display: 'flex', alignItems: 'center' }}>
+                                            <strong>{formsEspecificosLabels[key]}:</strong>
+                                            <a onClick={() => handleAnexoClick(value)} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                                {value.split('/').pop()}
+                                                <FaFileAlt
+                                                    className="icone-anexo"
+                                                    style={{ marginLeft: '5px' }}
+                                                />
+                                            </a>
+                                        </p>
+                                    )
+                                );
+                            } else {
                                 return (
                                     value !== null && value !== undefined && value !== '' && value !== 'R$ 0/Mês' && (
                                         <p key={key}>
@@ -1639,7 +1896,7 @@ const Modal = ({ data, onClose }) => {
                                     <textarea className="textarea-atividade" placeholder="Descrição" id="descricao-task" rows="3"></textarea>
                                     <div>
                                         <label>Status:</label><br></br>
-                                        <select id="status-task" >
+                                        <select id="status-task" onChange={handleStatusTaskChange}>
                                             <option></option>
                                             {options.status.map((status, index) => (
                                                 <option key={index} value={status}>{status}</option>
@@ -1655,12 +1912,18 @@ const Modal = ({ data, onClose }) => {
                                             isClearable
                                             placeholder=""
                                             onChange={selectedOption => setExecutor(selectedOption)}
+                                            value={executor}
                                         />
                                     </div>
                                     <div className="switch-container">
                                         <label htmlFor="tipo-atividade">Pública:</label>
                                         <label className="switch">
-                                            <input type="checkbox" id="tipo-atividade" />
+                                            <input
+                                                type="checkbox"
+                                                id="tipo-atividade"
+                                                checked={isTaskPublic}
+                                                onChange={(e) => setIsTaskPublic(e.target.checked)}
+                                            />
                                             <span className="slider round"></span>
                                         </label>
                                     </div>
