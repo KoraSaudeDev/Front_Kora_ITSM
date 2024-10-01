@@ -54,8 +54,6 @@ main.main-content.reduced-margin {
   opacity: 0.8; 
 }
 
-
-
 #usuario {
   color: #284557;
   font-weight: 500;
@@ -71,6 +69,6 @@ main.main-content.reduced-margin {
   
 }
 
-
-
-
+#webpack-dev-server-client-overlay{
+  display: none !important;
+}

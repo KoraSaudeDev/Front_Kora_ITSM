@@ -1419,6 +1419,7 @@ const Modal = ({ data, onClose }) => {
     };
 
     const handleOverlayClick = (event) => {
+        return
         if (event.target.classList.contains('modal-overlay')) {
             if (showAtividadesModal) {
                 handleFecharAtividadesModal();
@@ -1427,7 +1428,6 @@ const Modal = ({ data, onClose }) => {
                 handleCloseModal();
             }
         }
-
     };
 
     const categoriaOptions = [
