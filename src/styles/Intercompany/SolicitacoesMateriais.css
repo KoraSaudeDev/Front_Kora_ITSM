@@ -1,87 +1,322 @@
-.container-solicitacoes {
-    margin: 20px;
+/* Estilos Gerais */
+body {
+    font-family: 'Jost', -apple-system, sans-serif;
+    font-size: 15px;
+    color: #3E4676;
+    background-color: #f7f8fa;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 40px auto;
     padding: 20px;
     background-color: #fff;
     border-radius: 12px;
-    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
-    overflow-x: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
-.tabela-tickets {
+.cadastro-material-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+#titulo-cadastro {
+    font-size: 24px;
+    color: #3E4676;
+    font-weight: 500;
+}
+
+.cart-container {
+    position: relative;
+}
+
+.cart-icon {
+    font-size: 32px;
+    color: #007aff;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.cart-icon:hover {
+    transform: scale(1.1);
+}
+
+#cart-notification {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #ff3b30;
+    color: white;
+    border-radius: 50%;
+    padding: 5px 8px;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 10;
+}
+
+/* Campos de Seleção */
+.campo {
+    margin-bottom: 20px;
+}
+
+.campo label {
+    font-size: 14px;
+    color: #3E4676;
+    margin-bottom: 5px;
+    display: block;
+    font-weight: 500;
+}
+
+.campo select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+.campo select:focus {
+    border-color: #007aff;
+    outline: none;
+}
+
+/* Tabela de Detalhes do Material */
+table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px; 
-    font-family: 'Arial', sans-serif;
+    margin-top: 20px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+table th, table td {
+    padding: 12px 15px;
+    text-align: center;
+    border: 1px solid #eee;
     font-size: 14px;
 }
 
-.tabela-tickets th,
-.tabela-tickets td {
-    padding: 12px;
-    border: 1px solid #ddd;
-    text-align: center;
-}
-
-.tabela-tickets th {
-    background-color: #f4f4f4;
-    color: #3e4676; 
+table th {
+    background-color: #f0f0f5;
+    color: #3E4676;
     font-weight: bold;
 }
 
-.tabela-tickets tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
+table td {
+    background-color: white;
+    color: #3E4676;
 }
 
-.tabela-tickets tbody tr:hover {
-    background-color: #e1f5fe;
+table tbody tr:hover {
+    background-color: #f1f7ff;
 }
 
-.accordion {
-    margin-top: 20px;
-    width: 100%;
-    padding: 0;
-    border-radius: 8px;
-}
-
-.accordion h4 {
-    background-color: #f0f0f5;
-    padding: 15px 20px;
-    font-weight: 500;
+/* Botões de Incremento/Decremento */
+#button-decrement, #button-increment {
+    background-color: #007aff;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
     cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 0 5px;
+}
+
+#button-decrement:hover, #button-increment:hover {
+    background-color: #005bb5;
+}
+
+#quantidade {
+    width: 60px;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 14px;
+}
+
+/* Botão Adicionar ao Carrinho */
+#botao-adicionar-carrinho {
+    background-color: #28a745;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+#botao-adicionar-carrinho:hover {
+    background-color: #218838;
+}
+
+/* Ajuste para alinhar o botão dentro do card */
+#botao-enviar-pedido-container {
+    display: flex;
+    justify-content: flex-end; /* Alinha o botão à direita */
+    padding-top: 20px; /* Espaçamento opcional entre a tabela e o botão */
+}
+
+
+#botao-enviar-pedido {
+    padding: 14px 28px;
+    background-color: #007aff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#botao-enviar-pedido:hover {
+    background-color: #005bb5;
+}
+
+/* Modal do Carrinho */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#modal-carrinho {
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    max-width: 800px;
+    width: 100%;
+}
+
+.modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-header h3 {
+    font-size: 24px;
+    color: #3E4676;
+    font-weight: 500;
+}
+
+#modal-close {
+    font-size: 32px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+#modal-close:hover {
+    color: rgb(201, 23, 23);
+    transform: scale(1.1);
+}
+
+/* Tabela do Carrinho */
+.modal .tabela-itens table {
     border-radius: 8px;
-    border: 1px solid #d1d1d6;
-    font-size: 16px;
-    color: #1e1e1e;
-    margin-bottom: 8px;
-    transition: background-color 0.4s ease, color 0.4s ease;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-.accordion h4.active {
-    background-color: #e0e7ff;
-    color: #007aff;
-}
-
-.accordion-content {
-    display: none;
-    background-color: #f9f9f9;
-    padding: 15px 20px;
+.modal .tabela-itens th, 
+.modal .tabela-itens td {
+    padding: 12px;
     border: 1px solid #ddd;
+}
+
+.modal .tabela-itens th {
+    background-color: #f0f0f5;
+    font-weight: bold;
+    color: #3E4676;
+}
+
+.modal .tabela-itens td {
+    background-color: white;
+}
+
+/* Botão Confirmar Pedido */
+#botao-confirmar-pedido {
+    padding: 12px 24px;
+    background-color: #28a745;
+    color: white;
+    border: none;
     border-radius: 8px;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    animation: slideDown 0.4s ease forwards;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 20px;
+    width: 190px;
+    float: right;
+    transition: background-color 0.3s ease;
 }
 
-.accordion-content.active {
-    display: block;
-    animation: slideUp 0.4s ease forwards;
+#botao-confirmar-pedido:hover {
+    background-color: #218838;
 }
 
-@keyframes slideDown {
+.popup-sucesso {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #f0f0f5;
+    color: #3E4676;
+    padding: 25px 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 9999;
+    font-size: 16px;
+    text-align: center;
+    opacity: 0;
+    animation: fadeInOut 3.5s forwards;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.popup-sucesso::before {
+    content: "✔";
+    font-size: 24px;
+    color: #4CAF50;
+    margin-right: 10px;
+}
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+
+@keyframes fadeIn {
     0% {
         opacity: 0;
         transform: translateY(-10px);
@@ -92,41 +327,13 @@
     }
 }
 
-@keyframes slideUp {
+@keyframes fadeOut {
     0% {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    100% {
         opacity: 1;
         transform: translateY(0);
     }
-}
-
-.tabela-historico {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-    margin-top: 10px;
-}
-
-.tabela-historico th,
-.tabela-historico td {
-    padding: 12px;
-    border: 1px solid #d1d1d6;
-    text-align: center;
-}
-
-.tabela-historico th {
-    background-color: #f0f0f5;
-    font-weight: 600;
-    color: #1e1e1e;
-}
-
-.tabela-historico td {
-    background-color: #fff;
-}
-
-.tabela-historico tr:nth-child(even) {
-    background-color: #f9f9f9;
+    100% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
 }
