@@ -16,7 +16,6 @@ COPY . .
 # Define a variável de ambiente do React
 ARG REACT_APP_API_BASE_URL
 ENV REACT_APP_API_BASE_URL=$REACT_APP_API_BASE_URL
-ENV NODE_ENV=production
 
 # Exponha a porta em que a aplicação irá rodar
 EXPOSE 80
