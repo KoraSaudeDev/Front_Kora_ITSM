@@ -5,6 +5,7 @@ body {
     background-color: #fff;
     margin: 0;
     padding: 0;
+    background: url('../../assets/images/bg_home.png');
 }
 
 .container-novo-ticket {

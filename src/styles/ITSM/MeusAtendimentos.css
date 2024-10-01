@@ -1,6 +1,6 @@
 body,
 html {
-    font-family: 'Hind Vadodara', sans-serif;
+    font-family: 'Jost', -apple-system, sans-serif;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -253,8 +253,7 @@ html {
 
 #cont-tabela {
     font-size: 14px;
-
-
+    color: #3E4676;
 }
 
 .sla-inline {

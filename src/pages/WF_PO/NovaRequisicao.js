@@ -17,8 +17,15 @@ const NovaRequisicao = () => {
             { value: 'Produto', label: 'Produto' },
             { value: 'Serviço', label: 'Serviço' },
         ],
+        motivoSolic: [
+            { value: 'Requisição Semanal', label: 'Requisição Semanal' },
+            { value: 'Requisição Mensal', label: 'Requisição Mensal' },
+            { value: 'Requisição Urgente', label: 'Requisição Urgente' },
+            { value: 'Outro', label: 'Outro' },
+        ],
         material: [],
         grupoMaterial: [],
+        fornecedores: []
     });
 
     const [selectedHub, setSelectedHub] = useState(null);
@@ -27,18 +34,20 @@ const NovaRequisicao = () => {
     const [selectedGrupoMaterial, setSelectedGrupoMaterial] = useState(null);
     const [selectedAreaNegocio, setSelectedAreaNegocio] = useState(null);
     const [selectedTipoSolicitacao, setSelectedTipoSolicitacao] = useState(null);
+    const [selectedMotivoSolic, setSelectedMotivoSolic] = useState(null);
     const [descricao, setDescricao] = useState('');
     const [observacao, setObservacao] = useState('');
 
     const [codigoMaterial, setCodigoMaterial] = useState('');
     const [selectedMaterial, setSelectedMaterial] = useState(null);
+    const [inputMaterial, setInputMaterial] = useState('');
     const [quantidade, setQuantidade] = useState('');
     const [preco, setPreco] = useState('');
     const [unidadeMedida, setUnidadeMedida] = useState('');
 
     const [dataRemessa, setDataRemessa] = useState('');
     const [codigoFornecedor, setCodigoFornecedor] = useState('');
-    const [fornecedor, setFornecedor] = useState('');
+    const [fornecedor, setFornecedor] = useState(null);
     const [inicioServico, setInicioServico] = useState('');
     const [fimServico, setFimServico] = useState('');
 
@@ -123,7 +132,7 @@ const NovaRequisicao = () => {
             .catch(error => console.error('Error fetching areas de negocio:', error));
     }, []);
 
-    const fetchMaterials = debounce((inputValue) => {
+    const fetchMaterials = debounce((inputValue, pesquisa) => {
 
         if (!inputValue || !selectedTipoSolicitacao?.value || !selectedGrupoMaterial?.value) return;
 
@@ -132,23 +141,64 @@ const NovaRequisicao = () => {
                 material: inputValue,
                 tipo: selectedTipoSolicitacao?.value,
                 grupo: selectedGrupoMaterial?.value,
+                pesquisa
+            },
+        })
+            .then(response => {
+                if(pesquisa === 'nome'){
+                    setOptions(prevOptions => ({
+                        ...prevOptions,
+                        material: response.data.map(item => ({
+                            value: item.material,
+                            label: item.material,
+                            codigo: item.codigo,
+                            grupo: item.grupo,
+                            unidadeMedida: item.unidadeMedida,
+                            preco: item.preco,
+                        }))
+                    }));
+                }
+                else if(pesquisa === 'cod'){
+                    if (response.data.length < 1) return;
+                    setSelectedMaterial({
+                        value: response.data[0].material,
+                            label: response.data[0].material,
+                            codigo: response.data[0].codigo,
+                            grupo: response.data[0].grupo,
+                            unidadeMedida: response.data[0].unidadeMedida,
+                            preco: response.data[0].preco,
+                    });
+                    setPreco(response.data[0].preco);
+                    setUnidadeMedida(response.data[0].unidadeMedida);
+                }
+                
+            })
+            .catch(error => {
+                console.error('Erro ao buscar materiais:', error);
+            });
+    }, 10);
+
+    const fetchFornecedores = debounce((inputValue) => {
+
+        if (!inputValue) return;
+
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/sap/fornecedor`, {
+            params: {
+                fornecedor: inputValue,
             },
         })
             .then(response => {
                 setOptions(prevOptions => ({
                     ...prevOptions,
-                    material: response.data.map(item => ({
-                        value: item.material,
-                        label: item.material,
+                    fornecedores: response.data.map(item => ({
+                        value: item.fornecedor,
+                        label: item.fornecedor,
                         codigo: item.codigo,
-                        grupo: item.grupo,
-                        unidadeMedida: item.unidadeMedida,
-                        preco: item.preco,
                     }))
                 }));
             })
             .catch(error => {
-                console.error('Erro ao buscar materiais:', error);
+                console.error('Erro ao buscar fornecedores:', error);
             });
     }, 10);
 
@@ -158,7 +208,20 @@ const NovaRequisicao = () => {
             setCodigoMaterial(selectedMaterial.codigo);
             setUnidadeMedida(selectedMaterial.unidadeMedida);
         }
+        else {
+            setPreco('');
+            setUnidadeMedida('');
+        }
     }, [selectedMaterial]);
+
+    useEffect(() => {
+        if (fornecedor) {
+            setCodigoFornecedor(fornecedor.codigo);
+        }
+        else {
+            setCodigoFornecedor('');
+        }
+    }, [fornecedor]);
 
     useEffect(() => {
         setItems([]);
@@ -169,6 +232,30 @@ const NovaRequisicao = () => {
         setPreco('');
         setUnidadeMedida('');
     }, [selectedTipoSolicitacao, selectedGrupoMaterial]);
+
+    const handleCodigoChange = (event) => {
+        const value = event.target.value;
+        setCodigoMaterial(value);
+        fetchMaterials(value, 'cod');
+        setSelectedMaterial(null);
+        setOptions(prevOptions => ({
+            ...prevOptions,
+            material: []
+        }));
+        setPreco('');
+        setUnidadeMedida('');
+    };
+
+    const handleMaterialInputChange = (inputValue) => {
+        setInputMaterial(inputValue);
+        fetchMaterials(inputValue, 'nome');
+        if(!selectedMaterial){
+            setCodigoMaterial('');
+            setPreco('');
+            setUnidadeMedida('');
+            setSelectedMaterial(null);
+        }
+    };
 
     const handleAddItem = () => {
         const materialPreco = selectedMaterial ? parseFloat(selectedMaterial.preco) : 0;
@@ -207,7 +294,7 @@ const NovaRequisicao = () => {
         const updatedItems = [...items];
         const materialPreco = selectedMaterial ? parseFloat(selectedMaterial.preco) : 0;
         const quantidadeNumerica = parseFloat(quantidade) || 1;
-        
+
         updatedItems[editingIndex] = {
             codigo: codigoMaterial,
             material: selectedMaterial?.label || '',
@@ -216,7 +303,7 @@ const NovaRequisicao = () => {
             total: (quantidadeNumerica * materialPreco).toFixed(2),
             unidadeMedida: unidadeMedida,
         };
-    
+
         setItems(updatedItems);
         setEditingIndex(null);
         setCodigoMaterial('');
@@ -224,7 +311,7 @@ const NovaRequisicao = () => {
         setQuantidade('');
         setPreco('');
         setUnidadeMedida('');
-    };    
+    };
 
     const handleSendTicket = () => {
         setShowSuccessPopup(true);
@@ -240,7 +327,7 @@ const NovaRequisicao = () => {
     return (
         <div className="container">
             <div className="form-wrapper">
-                
+
                 <form className="formulario">
                     <div className="row">
                         <div className="campo">
@@ -329,15 +416,20 @@ const NovaRequisicao = () => {
                                     id="codigoFornecedor"
                                     value={codigoFornecedor}
                                     onChange={(e) => setCodigoFornecedor(e.target.value)}
+                                    disabled
                                 />
                             </div>
                             <div className="campo">
                                 <label htmlFor="fornecedor">Fornecedor</label>
-                                <input
-                                    type="text"
+                                <Select
                                     id="fornecedor"
                                     value={fornecedor}
-                                    onChange={(e) => setFornecedor(e.target.value)}
+                                    onChange={setFornecedor}
+                                    options={options.fornecedores}
+                                    placeholder="Digite para pesquisar"
+                                    className="select-field"
+                                    onInputChange={(inputValue) => fetchFornecedores(inputValue)}
+                                    isClearable
                                 />
                             </div>
                             <div className="campo">
@@ -368,6 +460,15 @@ const NovaRequisicao = () => {
                                 value={selectedGrupoMaterial}
                                 onChange={setSelectedGrupoMaterial}
                                 options={options.grupoMaterial}
+                                isClearable
+                            />
+                        </div>
+                        <div className="campo">
+                            <label htmlFor="motivoSolic">Motivo da Solicitação</label>
+                            <Select
+                                value={selectedMotivoSolic}
+                                onChange={setSelectedMotivoSolic}
+                                options={options.motivoSolic}
                                 isClearable
                             />
                         </div>
@@ -411,8 +512,8 @@ const NovaRequisicao = () => {
                                 type="text"
                                 id="codigoMaterial"
                                 value={codigoMaterial}
-                                readOnly
-                                className="campo-leitura"
+                                onChange={handleCodigoChange}
+                                disabled={!selectedTipoSolicitacao || !selectedGrupoMaterial}
                             />
                         </div>
                         <div className="campo" style={{ width: '100%' }}>
@@ -424,7 +525,7 @@ const NovaRequisicao = () => {
                                 options={options.material}
                                 placeholder="Digite para pesquisar"
                                 className="select-field"
-                                onInputChange={(inputValue) => fetchMaterials(inputValue)}
+                                onInputChange={handleMaterialInputChange}
                                 isDisabled={!selectedTipoSolicitacao || !selectedGrupoMaterial}
                                 isClearable
                             />

@@ -32,10 +32,12 @@ const Aprovacoes = ({ cartItems = [] }) => {
                 />
             ),
         }];
-
-        setTickets(newTickets);
-        setTotalPages(Math.ceil(newTickets.length / itemsPerPage));
-    }, [cartItems]);
+    
+        if (JSON.stringify(newTickets) !== JSON.stringify(tickets)) {
+            setTickets(newTickets);
+            setTotalPages(Math.ceil(newTickets.length / itemsPerPage));
+        }
+    }, [cartItems, tickets, itemsPerPage]);
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {

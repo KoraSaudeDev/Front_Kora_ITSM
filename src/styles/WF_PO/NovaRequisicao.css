@@ -2,9 +2,10 @@ body {
     font-family: 'Jost', -apple-system, sans-serif;
     font-size: 15px;
     color: #3E4676;
-    background-color: #f0f2f5;
+    background-color: #fff;
     margin: 0;
     padding: 0;
+    background: url('../../assets/images/bg_home.png');
 }
 
 #nome-rc,
