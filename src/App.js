@@ -1,4 +1,5 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
+import axios from 'axios';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
@@ -19,6 +20,14 @@ import AcessoMarketing from './components/Helper/AcessoMarketing';
 import AcessoFinanceiro from './components/Helper/AcessoFinanceiro';
 import AcessoAssistencial from './components/Helper/AcessoAssistencial';
 import AcessoContabilidade from './components/Helper/AcessoContabilidade';
+
+axios.interceptors.response.use(
+  response => response,
+  error => {
+    console.error('Axios error:', error);
+    return Promise.reject(error);
+  }
+);
 
 const App = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);

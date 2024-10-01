@@ -386,8 +386,8 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
                     }))
                 };
 
-                options.status.push({value: "Finalizado", label: "Finalizado"})
-                options.status.push({value: "Cancelado", label: "Cancelado"})
+                options.status.push({ value: "Finalizado", label: "Finalizado" })
+                options.status.push({ value: "Cancelado", label: "Cancelado" })
 
                 setExportOptions(options);
             } catch (error) {
@@ -677,54 +677,54 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
     };
 
     const handleDateExportChange = useCallback((column, type, value) => {
-        const newDateFilters = {
-            ...dateFilters,
+        const newDateExportFilters = {
+            ...dateExportFilters,
             [column]: {
-                ...dateFilters[column],
+                ...dateExportFilters[column],
                 [type]: value
             }
         };
-
-        if (newDateFilters[column].startDate && newDateFilters[column].endDate) {
-            const startDate = new Date(newDateFilters[column].startDate);
-            const endDate = new Date(newDateFilters[column].endDate);
-
+    
+        if (newDateExportFilters[column].startDate && newDateExportFilters[column].endDate) {
+            const startDate = new Date(newDateExportFilters[column].startDate);
+            const endDate = new Date(newDateExportFilters[column].endDate);
+    
             if (startDate > endDate) {
                 setDateExportErrors(prev => ({
                     ...prev,
                     [column]: 'A data de início não pode ser posterior à data de fim.'
                 }));
-
-                if (errorTimeouts[column]) {
-                    clearTimeout(errorTimeouts[column]);
+    
+                if (errorExportTimeouts[column]) {
+                    clearTimeout(errorExportTimeouts[column]);
                 }
-
+    
                 const timeoutId = setTimeout(() => {
                     setDateExportErrors(prev => ({
                         ...prev,
                         [column]: ''
                     }));
                 }, 3000);
-
+    
                 setErrorExportTimeouts(prev => ({
                     ...prev,
                     [column]: timeoutId
                 }));
-
+    
                 return;
             } else {
                 setDateExportErrors(prev => ({
                     ...prev,
                     [column]: ''
                 }));
-
-                if (errorTimeouts[column]) {
-                    clearTimeout(errorTimeouts[column]);
+    
+                if (errorExportTimeouts[column]) {
+                    clearTimeout(errorExportTimeouts[column]);
                 }
             }
         }
-
-        setDateExportFilters(newDateFilters);
+    
+        setDateExportFilters(newDateExportFilters);
     }, [dateExportFilters, errorExportTimeouts]);
 
     const handleSelectExportChange = (col, selectedOptions) => {
@@ -953,7 +953,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
                 acc[key] = exportSelectedOptions[key].map(option => option?.value);
                 return acc;
             }, {}),
-            dateFilters
+            dateFilters: dateExportFilters
         };
 
         if (!validateDateFilters(savedFiltersLocal)) return;

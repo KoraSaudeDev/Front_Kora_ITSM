@@ -48,16 +48,12 @@ main.main-content {
   padding-top: 70px;
   transform: translateX(0);
   opacity: 1;
-  
- 
 }
 
 main.main-content.reduced-margin {
   transform: translateX(-25px); 
   opacity: 0.8; 
 }
-
-
 
 #usuario {
   color: #284557;
@@ -71,9 +67,8 @@ main.main-content.reduced-margin {
   margin-left: 0px;
   color: #284557;
   font-size: 15px;
-  
 }
 
-
-
-
+#webpack-dev-server-client-overlay{
+  display: none !important;
+}
