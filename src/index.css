@@ -19,8 +19,8 @@
 }
 
 body {
-  overflow-x: hidden; /* Impede a rolagem horizontal */
-  overflow-y: auto;   /* Permite a rolagem vertical */
+  overflow-x: hidden;
+  overflow-y: auto;   
   background-color: #F2F5FA;
 }
 
