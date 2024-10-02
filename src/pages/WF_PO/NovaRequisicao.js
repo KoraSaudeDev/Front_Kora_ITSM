@@ -47,7 +47,8 @@ const NovaRequisicao = () => {
 
     const [dataRemessa, setDataRemessa] = useState('');
     const [codigoFornecedor, setCodigoFornecedor] = useState('');
-    const [fornecedor, setFornecedor] = useState(null);
+    const [selectedFornecedor, setSelectedFornecedor] = useState(null);
+    const [inputFornecedor, setInputFornecedor] = useState('');
     const [inicioServico, setInicioServico] = useState('');
     const [fimServico, setFimServico] = useState('');
 
@@ -57,7 +58,7 @@ const NovaRequisicao = () => {
     const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
     useEffect(() => {
-        axios.get(`${process.env.REACT_APP_API_BASE_URL}/wf-requisicao/form/hub`)
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/wf-po/form/hub`)
             .then(response => {
                 setOptions(prevOptions => ({
                     ...prevOptions,
@@ -69,7 +70,7 @@ const NovaRequisicao = () => {
 
     useEffect(() => {
         if (selectedHub) {
-            axios.get(`${process.env.REACT_APP_API_BASE_URL}/wf-requisicao/form/unidade?hub=${selectedHub.value}`)
+            axios.get(`${process.env.REACT_APP_API_BASE_URL}/wf-po/form/unidade?hub=${selectedHub.value}`)
                 .then(response => {
                     setOptions(prevOptions => ({
                         ...prevOptions,
@@ -111,17 +112,6 @@ const NovaRequisicao = () => {
     }, [selectedUnidade]);
 
     useEffect(() => {
-        axios.get(`${process.env.REACT_APP_API_BASE_URL}/sap/grupo-mercadoria`)
-            .then(response => {
-                setOptions(prevOptions => ({
-                    ...prevOptions,
-                    grupoMaterial: response.data.map(item => ({ value: item, label: item }))
-                }));
-            })
-            .catch(error => console.error('Error fetching grupo de mercadoria:', error));
-    }, []);
-
-    useEffect(() => {
         axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/areas-negocio`)
             .then(response => {
                 setOptions(prevOptions => ({
@@ -145,7 +135,7 @@ const NovaRequisicao = () => {
             },
         })
             .then(response => {
-                if(pesquisa === 'nome'){
+                if (pesquisa === 'nome') {
                     setOptions(prevOptions => ({
                         ...prevOptions,
                         material: response.data.map(item => ({
@@ -158,44 +148,55 @@ const NovaRequisicao = () => {
                         }))
                     }));
                 }
-                else if(pesquisa === 'cod'){
+                else if (pesquisa === 'cod') {
                     if (response.data.length < 1) return;
                     setSelectedMaterial({
                         value: response.data[0].material,
-                            label: response.data[0].material,
-                            codigo: response.data[0].codigo,
-                            grupo: response.data[0].grupo,
-                            unidadeMedida: response.data[0].unidadeMedida,
-                            preco: response.data[0].preco,
+                        label: response.data[0].material,
+                        codigo: response.data[0].codigo,
+                        grupo: response.data[0].grupo,
+                        unidadeMedida: response.data[0].unidadeMedida,
+                        preco: response.data[0].preco,
                     });
                     setPreco(response.data[0].preco);
                     setUnidadeMedida(response.data[0].unidadeMedida);
                 }
-                
+
             })
             .catch(error => {
                 console.error('Erro ao buscar materiais:', error);
             });
     }, 10);
 
-    const fetchFornecedores = debounce((inputValue) => {
+    const fetchFornecedores = debounce((inputValue, pesquisa) => {
 
         if (!inputValue) return;
 
         axios.get(`${process.env.REACT_APP_API_BASE_URL}/sap/fornecedor`, {
             params: {
                 fornecedor: inputValue,
+                pesquisa
             },
         })
             .then(response => {
-                setOptions(prevOptions => ({
-                    ...prevOptions,
-                    fornecedores: response.data.map(item => ({
-                        value: item.fornecedor,
-                        label: item.fornecedor,
-                        codigo: item.codigo,
-                    }))
-                }));
+                if (pesquisa === 'nome') {
+                    setOptions(prevOptions => ({
+                        ...prevOptions,
+                        fornecedores: response.data.map(item => ({
+                            value: item.fornecedor,
+                            label: item.fornecedor,
+                            codigo: item.codigo,
+                        }))
+                    }));
+                }
+                else if (pesquisa === 'cod') {
+                    if (response.data.length < 1) return;
+                    setSelectedFornecedor({
+                        value: response.data[0].fornecedor,
+                        label: response.data[0].fornecedor,
+                        codigo: response.data[0].codigo,
+                    })
+                }
             })
             .catch(error => {
                 console.error('Erro ao buscar fornecedores:', error);
@@ -215,13 +216,10 @@ const NovaRequisicao = () => {
     }, [selectedMaterial]);
 
     useEffect(() => {
-        if (fornecedor) {
-            setCodigoFornecedor(fornecedor.codigo);
+        if (selectedFornecedor) {
+            setCodigoFornecedor(selectedFornecedor.codigo);
         }
-        else {
-            setCodigoFornecedor('');
-        }
-    }, [fornecedor]);
+    }, [selectedFornecedor]);
 
     useEffect(() => {
         setItems([]);
@@ -232,6 +230,23 @@ const NovaRequisicao = () => {
         setPreco('');
         setUnidadeMedida('');
     }, [selectedTipoSolicitacao, selectedGrupoMaterial]);
+
+    useEffect(() => {
+        setOptions(prevOptions => ({
+            ...prevOptions,
+            grupoMaterial: []
+        }));
+        if (selectedTipoSolicitacao) {
+            axios.get(`${process.env.REACT_APP_API_BASE_URL}/sap/grupo-mercadoria?tipo=${selectedTipoSolicitacao.value}`)
+                .then(response => {
+                    setOptions(prevOptions => ({
+                        ...prevOptions,
+                        grupoMaterial: response.data.map(item => ({ value: item, label: item }))
+                    }));
+                })
+                .catch(error => console.error('Error fetching grupo de mercadoria:', error));
+        }
+    }, [selectedTipoSolicitacao]);
 
     const handleCodigoChange = (event) => {
         const value = event.target.value;
@@ -249,11 +264,31 @@ const NovaRequisicao = () => {
     const handleMaterialInputChange = (inputValue) => {
         setInputMaterial(inputValue);
         fetchMaterials(inputValue, 'nome');
-        if(!selectedMaterial){
+        if (!selectedMaterial) {
             setCodigoMaterial('');
             setPreco('');
             setUnidadeMedida('');
             setSelectedMaterial(null);
+        }
+    };
+
+    const handleCodigoFornecedorChange = (event) => {
+        const value = event.target.value;
+        setCodigoFornecedor(value);
+        fetchFornecedores(value, 'cod');
+        setSelectedFornecedor(null);
+        setOptions(prevOptions => ({
+            ...prevOptions,
+            fornecedores: []
+        }));
+    };
+
+    const handleFornecedorInputChange = (inputValue) => {
+        setInputFornecedor(inputValue);
+        fetchFornecedores(inputValue, 'nome');
+        if (!selectedFornecedor) {
+            setCodigoFornecedor('');
+            setSelectedFornecedor(null);
         }
     };
 
@@ -409,26 +444,25 @@ const NovaRequisicao = () => {
 
                     {selectedTipoSolicitacao?.value === 'Serviço' && (
                         <div className="row">
-                            <div className="campo">
+                            <div className="campo" style={{ width: '100%' }}>
                                 <label htmlFor="codigoFornecedor">Código do Fornecedor</label>
                                 <input
                                     type="text"
                                     id="codigoFornecedor"
                                     value={codigoFornecedor}
-                                    onChange={(e) => setCodigoFornecedor(e.target.value)}
-                                    disabled
+                                    onChange={handleCodigoFornecedorChange}
                                 />
                             </div>
-                            <div className="campo">
+                            <div className="campo" style={{ width: '100%' }}>
                                 <label htmlFor="fornecedor">Fornecedor</label>
                                 <Select
                                     id="fornecedor"
-                                    value={fornecedor}
-                                    onChange={setFornecedor}
+                                    value={selectedFornecedor}
+                                    onChange={setSelectedFornecedor}
                                     options={options.fornecedores}
                                     placeholder="Digite para pesquisar"
                                     className="select-field"
-                                    onInputChange={(inputValue) => fetchFornecedores(inputValue)}
+                                    onInputChange={handleFornecedorInputChange}
                                     isClearable
                                 />
                             </div>
@@ -461,6 +495,7 @@ const NovaRequisicao = () => {
                                 onChange={setSelectedGrupoMaterial}
                                 options={options.grupoMaterial}
                                 isClearable
+                                isDisabled={!selectedTipoSolicitacao}
                             />
                         </div>
                         <div className="campo">
