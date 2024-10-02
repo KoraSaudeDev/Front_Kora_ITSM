@@ -32,7 +32,7 @@ const SidebarInterna = () => {
                 </li>
                 <li>
                     <NavLink
-                        to="/suporte/dashboard"
+                        to="http://10.27.254.161:8088/superset/dashboard/KoraHelper/"
                         className={({ isActive }) => `sidebar-link ${isActive ? 'active-interna' : ''}`}
                     >
                         Dashboard

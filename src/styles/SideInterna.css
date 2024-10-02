@@ -1,4 +1,4 @@
-/* Sidebar geral */
+
 .sidebar-interna {
     width: 350px;
     background-color: #ffffff;
@@ -11,20 +11,20 @@
     flex-shrink: 0;
 }
 
-/* Estilo de lista */
+
 .sidebar-interna ul {
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
-/* Estilo dos itens da lista */
+
 .sidebar-interna li {
     margin: 0;
     border-bottom: 1px solid #dcdcdc;
 }
 
-/* Estilo básico dos links */
+
 .sidebar-link {
     text-decoration: none;
     color: #3e4676;
@@ -37,20 +37,20 @@
     line-height: 40px;
 }
 
-/* Cor de fundo ao passar o mouse */
+
 .sidebar-link:hover {
     background-color: #e8e9eb;
 }
 
-/* Cor e estilo do link ativo */
+
 .active-interna {
     font-weight: bold;
     color: white;
-    background-color: #284557 !important; /* Mantém o fundo azul no link ativo */
+    background-color: #284557 !important; 
     
 }
 
-/* Resposta ao tamanho da tela */
+
 @media (max-width: 768px) {
     .sidebar-interna {
         width: 100%;
@@ -66,7 +66,7 @@
     }
 }
 
-/* Estilo do container */
+
 .container-pagina {
     display: flex;
     width: 100vw;
@@ -74,7 +74,7 @@
     padding: 20px;
 }
 
-/* Estilo do conteúdo principal */
+
 .conteudo-principal {
     flex-grow: 1;
     padding: 20px;
