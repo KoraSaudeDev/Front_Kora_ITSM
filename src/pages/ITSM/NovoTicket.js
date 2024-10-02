@@ -646,7 +646,7 @@ const NovoTicket = () => {
                 </div> */}
 
                 <div className="coluna-direita">
-                    <h2>Abertura de Ticket</h2>
+                    
                     <form className="formulario" onSubmit={handleSubmit}>
                     <div className="campo">
                             <label htmlFor="abertura">Abertura <span className="campo-obrigatorio">*</span></label>
