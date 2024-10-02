@@ -785,12 +785,14 @@ const Modal = ({ data, onClose }) => {
         }
     };
 
-    function formatDate(dateString, type = 1) {
+    function formatDate(dateString, type = 1, sub3Hrs = false) {
         if (!dateString) {
             return '';
         }
 
-        const date = new Date(dateString);
+        let date;
+        if (sub3Hrs) { date = new Date(new Date(dateString).getTime() + new Date(dateString).getTimezoneOffset() * 60000) } 
+        else { date = new Date(dateString) }
         const day = String(date.getDate()).padStart(2, '0');
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const year = date.getFullYear();
@@ -1663,7 +1665,7 @@ const Modal = ({ data, onClose }) => {
                             </div>
                         </div>
 
-                        <p><strong className="data">Abertura:</strong> {formatDate(data.abertura)}</p>
+                        <p><strong className="data">Abertura:</strong> {formatDate(data.abertura, 1, true)}</p>
                         <p><strong className="data">Data Limite:</strong> {formatDate(dataLimite)}</p>
                         <p><strong className="data">Tipo do SLA:</strong> {options.prioridades.find(p => p.prioridade === prioridadeSelecionada)?.tipo_tempo.toUpperCase() || ''}</p>
 
@@ -1787,7 +1789,7 @@ const Modal = ({ data, onClose }) => {
                             {anexos.slice().reverse().map((anexo, index) => (
                                 <div className="card-anexo" key={index} onClick={anexo.id ? () => handleAnexoClick(anexo.ds_anexo) : null}>
                                     <p><strong>Nome:</strong> {anexo.ds_adicionado_por}</p>
-                                    <p><strong>Data de Abertura:</strong> {formatDate(anexo.abertura)}</p>
+                                    <p><strong>Data de Abertura:</strong> {formatDate(anexo.abertura, 1, true)}</p>
                                     {anexo.ds_texto && <p><strong>Descrição:</strong> {anexo.ds_texto}</p>}
                                     <p><strong>Arquivo:</strong>
                                         <a>
