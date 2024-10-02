@@ -172,7 +172,7 @@ const Sidebar = () => {
                 </p>
               ))
             ) : (
-              <p id="cargoo">Cargo não informado</p>
+              <p id="cargo">Cargo não informado</p>
             )}
           </div>
         </div>

@@ -271,25 +271,9 @@ textarea {
 }
 
 
+
+
 .botao-enviar {
-    background-color: #007aff;
-    color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 6px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    margin-top: 15px;
-}
-
-.botao-enviar:hover {
-    background-color: #005bb5;
-    transform: translateY(-2px);
-}
-
-
-.modal .botao-enviar {
     background-color: #007aff;
     color: white;
     padding: 12px 20px;
@@ -304,7 +288,7 @@ textarea {
     height: 50px;
 }
 
-.modal .botao-enviar:hover {
+.botao-enviar:hover {
     background-color: #005bb5;
     transform: translateY(-2px);
 }

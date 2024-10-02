@@ -3,6 +3,8 @@ import Select from 'react-select';
 import axios from 'axios';
 import 'styles/ITSM/NovoTicket.css';
 import { useAuth } from '../../context/AuthContext';
+import SidebarInterna from '../../components/SidebarInterna'; 
+
 
 const camposAcessoRede = {
     "Acesso/Rede": {
@@ -593,6 +595,7 @@ const NovoTicket = () => {
     }, [selectedAssunto, selectedSubcategoria, selectedCategoria, options]);
     return (
         <div className="container-novo-ticket">
+            <SidebarInterna />
             <div className="info-basicas-duas-colunas">
                 {/* <div className="coluna-esquerda">
                     <h2>Informações Básicas</h2>
@@ -646,7 +649,6 @@ const NovoTicket = () => {
                 </div> */}
 
                 <div className="coluna-direita">
-                    
                     <form className="formulario" onSubmit={handleSubmit}>
                     <div className="campo">
                             <label htmlFor="abertura">Abertura <span className="campo-obrigatorio">*</span></label>
