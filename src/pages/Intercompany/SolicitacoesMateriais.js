@@ -24,6 +24,12 @@ const SolicitacoesMateriais = () => {
     const [items, setItems] = useState([]);
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+    const [modalHeight, setModalHeight] = useState('auto');
+
+    const [nome, setNome] = useState('');
+    const [matricula, setMatricula] = useState('');
+    const [hub, setHub] = useState('');
+    const [cargo, setCargo] = useState('');
 
     useEffect(() => {
         if (selectedMaterial && hospitalOrigem) {
@@ -32,6 +38,24 @@ const SolicitacoesMateriais = () => {
             setQuantidade(0);
         }
     }, [selectedMaterial, hospitalOrigem]);
+
+    useEffect(() => {
+        const updateModalHeight = () => {
+            const windowHeight = window.innerHeight;
+            if (windowHeight > 900) {
+                setModalHeight('80vh');
+            } else {
+                setModalHeight('auto');
+            }
+        };
+
+        window.addEventListener('resize', updateModalHeight);
+        updateModalHeight(); // Call when component mounts
+
+        return () => {
+            window.removeEventListener('resize', updateModalHeight);
+        };
+    }, []);
 
     const handleAddToCart = () => {
         if (quantidade > 0 && quantidade <= disponivel) {
@@ -53,6 +77,18 @@ const SolicitacoesMateriais = () => {
         }
     };
 
+    const handleRemoveItem = (indexToRemove) => {
+        const updatedItems = items.filter((_, index) => index !== indexToRemove);
+        setItems(updatedItems);
+    };
+
+    const handleUpdateQuantity = (index, newQuantity) => {
+        const updatedItems = items.map((item, idx) =>
+            idx === index ? { ...item, quantidade: newQuantity } : item
+        );
+        setItems(updatedItems);
+    };
+
     const handleEnviarPedido = () => {
         setIsCartOpen(true);
     };
@@ -63,6 +99,10 @@ const SolicitacoesMateriais = () => {
         setSelectedMaterial('');
         setHospitalOrigem('');
         setHospitalDestino('');
+        setNome('');
+        setMatricula('');
+        setHub('');
+        setCargo('');
         setDisponivel(0);
         setShowSuccessPopup(true);
         setTimeout(() => {
@@ -115,22 +155,7 @@ const SolicitacoesMateriais = () => {
                     </select>
                 </div>
 
-                <div className="campo">
-                    <label htmlFor="hospitalDestino">Hospital Destino (Receptor)</label>
-                    <select
-                        id="hospitalDestino"
-                        value={hospitalDestino}
-                        onChange={(e) => setHospitalDestino(e.target.value)}
-                    >
-                        <option value="">Selecione o hospital de destino</option>
-                        {hospitais.map(hospital => (
-                            <option key={hospital} value={hospital}>{hospital}</option>
-                        ))}
-                    </select>
-                </div>
-
-                {/* Mostrar a tabela apenas se todos os campos estiverem preenchidos */}
-                {selectedMaterial && hospitalOrigem && hospitalDestino && (
+                {selectedMaterial && hospitalOrigem && (
                     <div className="campo">
                         <h4>Detalhes do Material</h4>
                         <table>
@@ -208,45 +233,119 @@ const SolicitacoesMateriais = () => {
 
             {isCartOpen && (
                 <div className={`modal-overlay ${isCartOpen ? 'modal-opening' : 'modal-closing'}`} id="modal-overlay">
-                    <div className="modal" id="modal-carrinho">
+                    <div className="modal" id="modal-carrinho" style={{ height: modalHeight }}>
                         <div className="modal-header" id="modal-header">
                             <h3>Resumo da Solicitação</h3>
                             <span className="close" id="modal-close" onClick={toggleCartModal}>&times;</span>
                         </div>
-                        <div className="tabela-itens">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Hospital Origem</th>
-                                        <th>Hospital Destino</th>
-                                        <th>Material</th>
-                                        <th>Código</th>
-                                        <th>Descrição</th>
-                                        <th>Medida</th>
-                                        <th>Quantidade</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {items.length === 0 ? (
+                        
+                        <div className="modal-body">
+                            <div className="modal-left">
+                                <div className="campo">
+                                    <label htmlFor="nome">Nome</label>
+                                    <input
+                                        type="text"
+                                        id="nome"
+                                        value={nome}
+                                        onChange={(e) => setNome(e.target.value)}
+                                    />
+                                </div>
+                                <div className="campo">
+                                    <label htmlFor="matricula">Matrícula</label>
+                                    <input
+                                        type="text"
+                                        id="matricula"
+                                        value={matricula}
+                                        onChange={(e) => setMatricula(e.target.value)}
+                                    />
+                                </div>
+                                <div className="campo">
+                                    <label htmlFor="hub">HUB</label>
+                                    <input
+                                        type="text"
+                                        id="hub"
+                                        value={hub}
+                                        onChange={(e) => setHub(e.target.value)}
+                                    />
+                                </div>
+                                <div className="campo">
+                                    <label htmlFor="cargo">Cargo</label>
+                                    <input
+                                        type="text"
+                                        id="cargo"
+                                        value={cargo}
+                                        onChange={(e) => setCargo(e.target.value)}
+                                    />
+                                </div>
+                                <div className="campo">
+                                    <label htmlFor="hospitalDestino">Hospital Destino</label>
+                                    <select
+                                        id="hospitalDestino"
+                                        value={hospitalDestino}
+                                        onChange={(e) => setHospitalDestino(e.target.value)}
+                                    >
+                                        <option value="">Selecione o hospital de destino</option>
+                                        {hospitais.map(hospital => (
+                                            <option key={hospital} value={hospital}>{hospital}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="modal-right">
+                                <table>
+                                    <thead>
                                         <tr>
-                                            <td colSpan="7">Nenhum item no carrinho</td>
+                                            <th>Hospital Origem</th>
+                                            <th>Material</th>
+                                            <th>Código</th>
+                                            <th>Descrição</th>
+                                            <th>Medida</th>
+                                            <th>Quantidade</th>
+                                            <th>Ações</th>
                                         </tr>
-                                    ) : (
-                                        items.map((item, index) => (
-                                            <tr key={index}>
-                                                <td>{item.hospitalOrigem}</td>
-                                                <td>{item.hospitalDestino}</td>
-                                                <td>{item.material}</td>
-                                                <td>{item.codigo}</td>
-                                                <td>{item.descricao}</td>
-                                                <td>{item.medida}</td>
-                                                <td>{item.quantidade}</td>
+                                    </thead>
+                                    <tbody>
+                                        {items.length === 0 ? (
+                                            <tr>
+                                                <td colSpan="7">Nenhum item no carrinho</td>
                                             </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
+                                        ) : (
+                                            items.map((item, index) => (
+                                                <tr key={index}>
+                                                    <td>{item.hospitalOrigem}</td>
+                                                    <td>{item.material}</td>
+                                                    <td>{item.codigo}</td>
+                                                    <td>{item.descricao}</td>
+                                                    <td>{item.medida}</td>
+                                                    <td>
+                                                        <input
+                                                            type="number"
+                                                            value={item.quantidade}
+                                                            onChange={(e) =>
+                                                                handleUpdateQuantity(index, Number(e.target.value))
+                                                            }
+                                                            min="1"
+                                                            style={{ width: '50px', textAlign: 'center' }}
+                                                        />
+                                                    </td>
+                                                    <td>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleRemoveItem(index)}
+                                                            className="botao-remover"
+                                                        >
+                                                            Remover
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
+
                         <div className="modal-footer">
                             <button
                                 type="button"

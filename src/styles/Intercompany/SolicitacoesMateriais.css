@@ -1,4 +1,3 @@
-/* Estilos Gerais */
 body {
     font-family: 'Jost', -apple-system, sans-serif;
     font-size: 15px;
@@ -60,7 +59,6 @@ body {
     z-index: 10;
 }
 
-/* Campos de Seleção */
 .campo {
     margin-bottom: 20px;
 }
@@ -73,7 +71,7 @@ body {
     font-weight: 500;
 }
 
-.campo select {
+.campo select, .campo input {
     width: 100%;
     padding: 12px;
     border: 1px solid #ddd;
@@ -83,12 +81,11 @@ body {
     transition: border-color 0.3s ease;
 }
 
-.campo select:focus {
+.campo select:focus, .campo input:focus {
     border-color: #007aff;
     outline: none;
 }
 
-/* Tabela de Detalhes do Material */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -99,10 +96,11 @@ table {
 }
 
 table th, table td {
-    padding: 12px 15px;
+    padding: 14px 18px;
     text-align: center;
     border: 1px solid #eee;
-    font-size: 14px;
+    font-size: 15px;
+    color: #3E4676;
 }
 
 table th {
@@ -113,21 +111,20 @@ table th {
 
 table td {
     background-color: white;
-    color: #3E4676;
 }
 
 table tbody tr:hover {
     background-color: #f1f7ff;
 }
 
-/* Botões de Incremento/Decremento */
 #button-decrement, #button-increment {
     background-color: #007aff;
     color: white;
     border: none;
-    padding: 8px 12px;
+    padding: 10px 14px;
     border-radius: 6px;
     cursor: pointer;
+    font-size: 16px;
     transition: background-color 0.3s ease;
     margin: 0 5px;
 }
@@ -137,7 +134,7 @@ table tbody tr:hover {
 }
 
 #quantidade {
-    width: 60px;
+    width: 70px;
     text-align: center;
     border: 1px solid #ddd;
     border-radius: 6px;
@@ -145,29 +142,27 @@ table tbody tr:hover {
     font-size: 14px;
 }
 
-/* Botão Adicionar ao Carrinho */
 #botao-adicionar-carrinho {
-    background-color: #28a745;
+    background-color: #007aff;
     color: white;
-    padding: 12px 20px;
+    padding: 12px 24px;
     border: none;
     border-radius: 8px;
+    font-size: 15px;
     cursor: pointer;
-    font-size: 14px;
     transition: background-color 0.3s ease;
+    font-weight: 500;
 }
 
 #botao-adicionar-carrinho:hover {
-    background-color: #218838;
+    background-color: #005bb5;
 }
 
-/* Ajuste para alinhar o botão dentro do card */
 #botao-enviar-pedido-container {
     display: flex;
-    justify-content: flex-end; /* Alinha o botão à direita */
-    padding-top: 20px; /* Espaçamento opcional entre a tabela e o botão */
+    justify-content: flex-end;
+    padding-top: 20px;
 }
-
 
 #botao-enviar-pedido {
     padding: 14px 28px;
@@ -176,6 +171,7 @@ table tbody tr:hover {
     border: none;
     border-radius: 8px;
     font-size: 16px;
+    font-weight: 500;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
@@ -184,7 +180,6 @@ table tbody tr:hover {
     background-color: #005bb5;
 }
 
-/* Modal do Carrinho */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -193,17 +188,20 @@ table tbody tr:hover {
     height: 100%;
     background-color: rgba(0, 0, 0, 0.3);
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center; 
 }
 
 #modal-carrinho {
     background-color: white;
     padding: 30px;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    max-width: 800px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    max-width: 1300px;
     width: 100%;
+    display: flex;
+    justify-content: space-between;
+    height: auto;
 }
 
 .modal-header {
@@ -232,40 +230,94 @@ table tbody tr:hover {
     transform: scale(1.1);
 }
 
-/* Tabela do Carrinho */
-.modal .tabela-itens table {
+.modal-body {
+    display: flex;
+    gap: 20px;
+    position: relative;
+}
+
+.modal-body::before {
+    content: "";
+    position: absolute;
+    left: 36.5%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: #eee;
+}
+
+.modal-left {
+    width: 35%;
+    padding-right: 20px;
+}
+
+.modal-left .campo {
+    margin-bottom: 20px;
+}
+
+.modal-right {
+    width: 65%;
+    padding-left: 20px;
+}
+
+.modal-right table {
+    width: 100%;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-.modal .tabela-itens th, 
-.modal .tabela-itens td {
+.modal-right table th, 
+.modal-right table td {
     padding: 12px;
     border: 1px solid #ddd;
 }
 
-.modal .tabela-itens th {
+.modal-right table th {
     background-color: #f0f0f5;
     font-weight: bold;
     color: #3E4676;
 }
 
-.modal .tabela-itens td {
+.modal-right table td {
     background-color: white;
 }
 
-/* Botão Confirmar Pedido */
+.modal-right .botao-remover {
+    background-color: #ff3b30;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+    font-weight: 500;
+}
+
+.modal-right .botao-remover:hover {
+    background-color: #c82333;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.confirmar-pedido-container {
+    text-align: right;
+}
+
 #botao-confirmar-pedido {
-    padding: 12px 24px;
+    padding: 14px 28px;
     background-color: #28a745;
     color: white;
     border: none;
     border-radius: 8px;
     font-size: 16px;
     cursor: pointer;
-    margin-top: 20px;
     width: 190px;
-    float: right;
+    font-weight: 500;
     transition: background-color 0.3s ease;
 }
 
@@ -315,25 +367,12 @@ table tbody tr:hover {
     }
 }
 
-
-@keyframes fadeIn {
-    0% {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
+@media (min-height: 901px) {
+    #modal-carrinho {
+        height: 80vh;
     }
 }
 
-@keyframes fadeOut {
-    0% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    100% {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
+#hospitalDestino{
+    width: 105%;
 }
