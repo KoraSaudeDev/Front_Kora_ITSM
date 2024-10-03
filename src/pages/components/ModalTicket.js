@@ -421,7 +421,9 @@ const Modal = ({ data, onClose }) => {
                         method: 'patch',
                         url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/${data.cod_fluxo}`,
                         headers: {
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`,
+                            'X-User-Email': user.email,
                         },
                         data: JSON.stringify(update_tickets)
                     };
@@ -434,6 +436,8 @@ const Modal = ({ data, onClose }) => {
                             url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/task/${task.cod_task}`,
                             headers: {
                                 'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${authToken}`,
+                                'X-User-Email': user.email,
                             },
                             data: JSON.stringify(task),
                         };
@@ -451,6 +455,8 @@ const Modal = ({ data, onClose }) => {
                             url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/task`,
                             headers: {
                                 'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${authToken}`,
+                                'X-User-Email': user.email,
                             },
                             data: JSON.stringify(taskCopy),
                         };
@@ -730,6 +736,8 @@ const Modal = ({ data, onClose }) => {
                             url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/file`,
                             headers: {
                                 'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${authToken}`,
+                                'X-User-Email': user.email,
                             },
                             data: JSON.stringify(fileCopy),
                         };
@@ -830,7 +838,9 @@ const Modal = ({ data, onClose }) => {
             method: 'post',
             url: `${process.env.REACT_APP_API_BASE_URL}/email/send`,
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`,
+                'X-User-Email': user.email,
             },
             data: JSON.stringify({
                 to,
@@ -1169,7 +1179,9 @@ const Modal = ({ data, onClose }) => {
                 method: 'patch',
                 url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/${data.cod_fluxo}`,
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`,
+                    'X-User-Email': user.email,
                 },
                 data: JSON.stringify(update_tickets)
             };
@@ -1184,7 +1196,9 @@ const Modal = ({ data, onClose }) => {
                     method: 'post',
                     url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/task`,
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`,
+                        'X-User-Email': user.email,
                     },
                     data: JSON.stringify(task)
                 };
