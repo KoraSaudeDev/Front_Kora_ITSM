@@ -118,7 +118,7 @@ const Sidebar = () => {
 
   const renderMenuItems = (menus, parentId = null) => {
     return menus
-      .filter(menu => menu.parent_id === parentId)
+      .filter(menu => menu.parent_id === parentId && menu.parent_relation <= 2)
       .map(menu => {
         const hasSubMenu = menus.some(sub => sub.parent_id === menu.id);
         const count = menuCounts[menu.id] || null;
@@ -181,7 +181,7 @@ const Sidebar = () => {
           </div>
         </div>
         <ul className="botoes-navegacao">
-          {renderMenuItems(menus)}
+          {renderMenuItems(menus.filter(menu => menu.parent_relation <= 2))}
         </ul>
       </div>
       <div className="sidebar-footer">
