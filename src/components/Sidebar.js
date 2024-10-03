@@ -12,7 +12,7 @@ const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [activeDropdown, setActiveDropdown] = useState(null);
-  const { user, logout } = useAuth();
+  const { user, logout, token } = useAuth();
   const { refreshKey } = useRefresh();
   const [menuCounts, setMenuCounts] = useState({});
   const [menus, setMenus] = useState([]);
@@ -55,7 +55,11 @@ const Sidebar = () => {
           const axiosConfig = {
             method: menuConfig.method,
             url: `${process.env.REACT_APP_API_BASE_URL}${menuConfig.url}`,
-            ...(menuConfig.headers && { headers: menuConfig.headers }),
+            headers: {
+              ...(menuConfig.headers || {}),
+              'Authorization': `Bearer ${token}`,
+              'X-User-Email': user.email,
+            },
             ...(menuConfig.data && { data: menuConfig.data }),
             ...(menuConfig.maxBodyLength && { maxBodyLength: menuConfig.maxBodyLength }),
           };

@@ -240,7 +240,7 @@ const menuSuporte = [
 ];
 
 const NovoTicket = () => {
-    const { user } = useAuth();
+    const { user, token } = useAuth();
     const [options, setOptions] = useState({
         hub: [],
         unidade: [],
@@ -283,14 +283,14 @@ const NovoTicket = () => {
     };
 
     useEffect(() => {
-        axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/hub`)
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/hub`, { headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email } })
             .then(response => {
                 const hubs = response.data.map(hub => ({ value: hub, label: hub }));
                 setOptions(prev => ({ ...prev, hub: hubs }));
             })
             .catch(error => console.error('Erro ao carregar hubs:', error));
 
-        axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/categorias`)
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/categorias`, { headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email } })
             .then(response => {
                 const categorias = response.data.map(categoria => ({ value: categoria, label: categoria }));
                 setOptions(prev => ({ ...prev, categoria: categorias }));
@@ -300,7 +300,7 @@ const NovoTicket = () => {
 
     useEffect(() => {
         if (selectedHub) {
-            axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/unidade?hub=${selectedHub.value}`)
+            axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/unidade?hub=${selectedHub.value}`, { headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email } })
                 .then(response => {
                     const unidades = response.data.map(unidade => ({ value: unidade, label: unidade }));
                     setOptions(prev => ({ ...prev, unidade: unidades }));
@@ -313,7 +313,7 @@ const NovoTicket = () => {
 
     useEffect(() => {
         if (selectedCategoria) {
-            axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/subcategorias?categoria=${selectedCategoria.value}`)
+            axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/subcategorias?categoria=${selectedCategoria.value}`, { headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email } })
                 .then(response => {
                     const subcategorias = response.data.map(subcategoria => ({ value: subcategoria, label: subcategoria }));
                     setOptions(prev => ({ ...prev, subcategoria: subcategorias }));
@@ -327,7 +327,7 @@ const NovoTicket = () => {
 
     useEffect(() => {
         if (selectedSubcategoria) {
-            axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/assuntos?categoria=${selectedCategoria?.value}&subcategoria=${selectedSubcategoria?.value}`)
+            axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/assuntos?categoria=${selectedCategoria?.value}&subcategoria=${selectedSubcategoria?.value}`, { headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email } })
                 .then(response => {
                     const assuntos = response.data.map(assunto => ({ value: assunto.assunto, label: assunto.assunto }));
                     setOptions(prev => ({ ...prev, assunto: assuntos }));
@@ -489,28 +489,28 @@ const NovoTicket = () => {
 
    
      useEffect(() => {
-        axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/hub`)
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/hub`, { headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email } })
             .then(response => {
                 const hubs = response.data.map(hub => ({ value: hub, label: hub }));
                 setOptions(prev => ({ ...prev, hub: hubs }));
             })
             .catch(error => console.error('Erro ao carregar hubs:', error));
 
-        axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/categorias`)
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/categorias`, { headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email } })
             .then(response => {
                 const categorias = response.data.map(categoria => ({ value: categoria, label: categoria }));
                 setOptions(prev => ({ ...prev, categoria: categorias }));
             })
             .catch(error => console.error('Erro ao carregar categorias:', error));
 
-        axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/cargo`)
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/cargo`, { headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email } })
             .then(response => {
                 const cargos = response.data.map(cargo => ({ value: cargo, label: cargo }));
                 setOptions(prev => ({ ...prev, cargo: cargos }));
             })
             .catch(error => console.error('Erro ao carregar cargos:', error));
 
-        axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/areas-negocio`)
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/areas-negocio`, { headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email } })
             .then(response => {
                 const departamentos = response.data.map(departamento => ({ value: departamento, label: departamento }));
                 setOptions(prev => ({ ...prev, departamento: departamentos }));
@@ -520,7 +520,7 @@ const NovoTicket = () => {
 
     useEffect(() => {
         if (selectedHub) {
-            axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/unidade-novo-usu?hub=${selectedHub.value}`)
+            axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/unidade-novo-usu?hub=${selectedHub.value}`, { headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email } })
                 .then(response => {
                     const unidades = response.data.map(unidade => ({ value: unidade, label: unidade }));
                     setOptions(prev => ({ ...prev, unidade: unidades }));
@@ -534,7 +534,7 @@ const NovoTicket = () => {
     useEffect(() => {
         if (selectedUnidade) {
             const codSapUnidade = selectedUnidade.value;
-            axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/centro-custo?cod_sap=${codSapUnidade}`)
+            axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/centro-custo?cod_sap=${codSapUnidade}`, { headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email } })
                 .then(response => {
                     const centrosCusto = response.data.map(centro => ({ value: centro, label: centro }));
                     setOptions(prev => ({ ...prev, centroCusto: centrosCusto }));
@@ -545,7 +545,7 @@ const NovoTicket = () => {
 
     useEffect(() => {
         if (selectedCategoria) {
-            axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/subcategorias?categoria=${selectedCategoria.value}`)
+            axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/subcategorias?categoria=${selectedCategoria.value}`, { headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email } })
                 .then(response => {
                     const subcategorias = response.data.map(subcategoria => ({ value: subcategoria, label: subcategoria }));
                     setOptions(prev => ({ ...prev, subcategoria: subcategorias }));
@@ -559,7 +559,7 @@ const NovoTicket = () => {
 
     useEffect(() => {
         if (selectedSubcategoria) {
-            axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/assuntos?categoria=${selectedCategoria?.value}&subcategoria=${selectedSubcategoria?.value}`)
+            axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/assuntos?categoria=${selectedCategoria?.value}&subcategoria=${selectedSubcategoria?.value}`, { headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email } })
                 .then(response => {
                     const assuntos = response.data.map(assunto => ({ value: assunto.assunto, label: assunto.assunto }));
                     setOptions(prev => ({ ...prev, assunto: assuntos }));

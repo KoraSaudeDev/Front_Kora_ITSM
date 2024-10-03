@@ -8,7 +8,7 @@ import axios from 'axios';
 import SidebarInterna from '../../components/SidebarInterna';
 
 const NovaRequisicao = () => {
-    const { user } = useAuth();
+    const { user, token } = useAuth();
     const [options, setOptions] = useState({
         hub: [],
         unidade: [],
@@ -59,7 +59,7 @@ const NovaRequisicao = () => {
     const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
     useEffect(() => {
-        axios.get(`${process.env.REACT_APP_API_BASE_URL}/wf-po/form/hub`)
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/wf-po/form/hub`, { headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email } })
             .then(response => {
                 setOptions(prevOptions => ({
                     ...prevOptions,
@@ -71,7 +71,7 @@ const NovaRequisicao = () => {
 
     useEffect(() => {
         if (selectedHub) {
-            axios.get(`${process.env.REACT_APP_API_BASE_URL}/wf-po/form/unidade?hub=${selectedHub.value}`)
+            axios.get(`${process.env.REACT_APP_API_BASE_URL}/wf-po/form/unidade?hub=${selectedHub.value}`, { headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email } })
                 .then(response => {
                     setOptions(prevOptions => ({
                         ...prevOptions,
@@ -94,7 +94,7 @@ const NovaRequisicao = () => {
 
     useEffect(() => {
         if (selectedUnidade) {
-            axios.get(`${process.env.REACT_APP_API_BASE_URL}/sap/centro-custo?empresa=${selectedUnidade.value}`)
+            axios.get(`${process.env.REACT_APP_API_BASE_URL}/sap/centro-custo?empresa=${selectedUnidade.value}`, { headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email } })
                 .then(response => {
                     setOptions(prevOptions => ({
                         ...prevOptions,
@@ -113,7 +113,7 @@ const NovaRequisicao = () => {
     }, [selectedUnidade]);
 
     useEffect(() => {
-        axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/areas-negocio`)
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/areas-negocio`, { headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email } })
             .then(response => {
                 setOptions(prevOptions => ({
                     ...prevOptions,
@@ -134,6 +134,7 @@ const NovaRequisicao = () => {
                 grupo: selectedGrupoMaterial?.value,
                 pesquisa
             },
+            headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email }
         })
             .then(response => {
                 if (pesquisa === 'nome') {
@@ -178,6 +179,7 @@ const NovaRequisicao = () => {
                 fornecedor: inputValue,
                 pesquisa
             },
+            headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email }
         })
             .then(response => {
                 if (pesquisa === 'nome') {
@@ -238,7 +240,7 @@ const NovaRequisicao = () => {
             grupoMaterial: []
         }));
         if (selectedTipoSolicitacao) {
-            axios.get(`${process.env.REACT_APP_API_BASE_URL}/sap/grupo-mercadoria?tipo=${selectedTipoSolicitacao.value}`)
+            axios.get(`${process.env.REACT_APP_API_BASE_URL}/sap/grupo-mercadoria?tipo=${selectedTipoSolicitacao.value}`, { headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email } })
                 .then(response => {
                     setOptions(prevOptions => ({
                         ...prevOptions,

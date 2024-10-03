@@ -3,6 +3,7 @@ import Autosuggest from 'react-autosuggest';
 import axios from 'axios';
 import Modal from '../components/ITSM/ModalTicket'; 
 import { FaSearch } from 'react-icons/fa'; 
+import { useAuth } from '../context/AuthContext';
 import '../styles/SearchBar.css';
 
 const statusOptions = {
@@ -18,6 +19,7 @@ const statusOptions = {
 };
 
 const SearchBar = () => {
+  const { user, token } = useAuth();
   const [value, setValue] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -45,7 +47,7 @@ const SearchBar = () => {
     }
 
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/tickets-preview?p=${inputValue}&page=1&per_page=100`);
+      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/tickets-preview?p=${inputValue}&page=1&per_page=100`, { headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email } });
       return response.data.tickets.map((ticket) => ({
         name: `${ticket.cod_fluxo} - ${ticket.nome}`,
         status: ticket.status, 
@@ -85,7 +87,7 @@ const SearchBar = () => {
 
   const handleClick = async (ticket) => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/ticket?cod_fluxo=${ticket.cod_fluxo}`);
+      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/ticket?cod_fluxo=${ticket.cod_fluxo}`, { headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email } });
       setModalData(response.data);
       setShowModal(true);
     } catch (error) {

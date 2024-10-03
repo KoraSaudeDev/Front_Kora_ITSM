@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate, useLocation, Link } from 'react-router-dom'; 
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import '../styles/Login.css';
 import axios from 'axios';
 
@@ -12,18 +12,18 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || '/helper'; 
+  const from = location.state?.from?.pathname || '/helper';
   const [userData, setUserData] = useState(null);
   const [stayLoggedIn, setStayLoggedIn] = useState(false);
 
   useEffect(() => {
     const storedUser = localStorage.getItem(process.env.REACT_APP_CACHE_USER);
     const storedMenu = localStorage.getItem(process.env.REACT_APP_CACHE_MENU);
-    if (storedUser && storedMenu) {
+    const storedToken = localStorage.getItem(process.env.REACT_APP_TOKEN_USER);
+    if (storedUser && storedMenu && storedToken) {
       const user = JSON.parse(storedUser);
       const menu = JSON.parse(storedMenu);
-      setUserData(user);
-      login(user, menu);
+      login(user, menu, storedToken);
       navigate(from);
     }
   }, [login, navigate]);
@@ -42,54 +42,80 @@ const Login = () => {
       const token = res?.credential;
       const user = jwtDecode(token);
 
-      const config = {
-        method: 'get',
-        maxBodyLength: Infinity,
-        url: `${process.env.REACT_APP_API_BASE_URL}/access/minhas-filas?email=${user.email}`,
-        headers: {}
-      };
+      const backendResponse = await axios.post(
+        `${process.env.REACT_APP_API_BASE_URL}/verify-token`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      const response = await axios.request(config);
-      
-      if (Array.isArray(response.data.filas_id) && response.data.filas_id.length > 0) {
-        user.bl_analista = true;
-      } else {
-        user.bl_analista = false;
-      }
+      if (backendResponse.status === 200) {
+        localStorage.setItem(process.env.REACT_APP_TOKEN_USER, token);
 
-      if (response.data.gestor) {
-        const uniqueIds = new Set();
-
-        for (const filaId in response.data.gestor) {
-          if (response.data.gestor.hasOwnProperty(filaId)) {
-            const fila = response.data.gestor[filaId];
-
-            uniqueIds.add(filaId);
-
-            fila.usuarios.forEach(userId => uniqueIds.add(userId));
+        const config = {
+          method: 'get',
+          maxBodyLength: Infinity,
+          url: `${process.env.REACT_APP_API_BASE_URL}/access/minhas-filas?email=${user.email}`,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'X-User-Email': user.email,
           }
+        };
+
+        const response = await axios.request(config);
+
+        if (Array.isArray(response.data.filas_id) && response.data.filas_id.length > 0) {
+          user.bl_analista = true;
+        } else {
+          user.bl_analista = false;
         }
 
-        user.filas_id = Array.from(uniqueIds);
+        if (response.data.gestor) {
+          const uniqueIds = new Set();
 
-        if (response.data.filas) user.filas = response.data.filas;
-        if (response.data.id_user) user.id_user = response.data.id_user;
+          for (const filaId in response.data.gestor) {
+            if (response.data.gestor.hasOwnProperty(filaId)) {
+              const fila = response.data.gestor[filaId];
+
+              uniqueIds.add(filaId);
+
+              fila.usuarios.forEach(userId => uniqueIds.add(userId));
+            }
+          }
+
+          user.filas_id = Array.from(uniqueIds);
+
+          if (response.data.filas) user.filas = response.data.filas;
+          if (response.data.id_user) user.id_user = response.data.id_user;
+        }
+        else {
+          if (response.data.filas) user.filas = response.data.filas;
+          if (response.data.filas_id) user.filas_id = response.data.filas_id;
+          if (response.data.id_user) user.id_user = response.data.id_user;
+        }
+
+        const menus = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/menu/`, { headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email } });
+
+        login(user, menus.data, token);
+        hideLoadingOverlay();
+        navigate(from);
       }
       else {
-        if (response.data.filas) user.filas = response.data.filas;
-        if (response.data.filas_id) user.filas_id = response.data.filas_id;
-        if (response.data.id_user) user.id_user = response.data.id_user;
+        console.error('Invalid Google token:', backendResponse.data);
+        alert('Acesso negado');
+        hideLoadingOverlay();
       }
 
-      const menus = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/menu/`);
-
-      setUserData(user);
-      login(user, menus.data);
-      hideLoadingOverlay();
-      navigate(from);
-      
     } catch (error) {
-      console.error(error);
+      if (error.response && error.response.status === 401) {
+        alert('Acesso negado');
+      } else {
+        console.error(error);
+        alert('Ocorreu um erro inesperado. Tente novamente mais tarde.');
+      }
       hideLoadingOverlay();
     }
   };
@@ -139,8 +165,8 @@ const Login = () => {
               Mantenha-me conectado
             </label>
           </div>
-          
-         
+
+
           <p className="custom-no-account-text">
             Ainda não possui uma conta Kora? <Link to="/cadastro" className="custom-link">Clique aqui</Link>
           </p>
