@@ -18,7 +18,7 @@ ARG REACT_APP_API_BASE_URL
 ENV REACT_APP_API_BASE_URL=$REACT_APP_API_BASE_URL
 
 # Exponha a porta em que a aplicação irá rodar
-EXPOSE 80
+EXPOSE 33963
 
 # Comando para iniciar a aplicação com npm start
 CMD ["npm", "start"]
