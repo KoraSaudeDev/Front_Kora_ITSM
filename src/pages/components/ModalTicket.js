@@ -396,7 +396,7 @@ const Modal = ({ data, onClose }) => {
                         try {
                             const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/tickets/file/upload`, formData, {
                                 headers: {
-                                    'Content-Type': 'application/json',
+                                    'Content-Type': 'multipart/form-data',
                                     'Authorization': `Bearer ${authToken}`,
                                     'X-User-Email': user.email,
                                 },
@@ -700,7 +700,7 @@ const Modal = ({ data, onClose }) => {
                         try {
                             const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/tickets/file/upload`, formData, {
                                 headers: {
-                                    'Content-Type': 'application/json',
+                                    'Content-Type': 'multipart/form-data',
                                     'Authorization': `Bearer ${authToken}`,
                                     'X-User-Email': user.email,
                                 },
