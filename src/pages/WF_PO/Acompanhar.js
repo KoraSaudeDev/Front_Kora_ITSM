@@ -16,11 +16,12 @@ const Acompanhar = ({ cartItems = [] }) => {
 
     
     const menuRequisicao = [
-        { label: 'Nova Requisição', path: 'suporte/nova-requisicao-wf' },
+        { label: 'Nova Requisição', path: '/suporte/nova-requisicao-wf' },
         { label: 'Minhas Solicitações', path: '/suporte/minhas-solicitacoes' },
         { label: 'Aprovações', path: '/suporte/aprovacoes' },
         { label: 'Acompanhar', path: '/suporte/acompanhar' },
     ];
+    
 
 
     useEffect(() => {

@@ -263,11 +263,12 @@ const NovaRequisicao = () => {
     };
 
     const menuRequisicao = [
-        { label: 'Nova Requisição', path: 'suporte/nova-requisicao-wf' },
+        { label: 'Nova Requisição', path: '/suporte/nova-requisicao-wf' },
         { label: 'Minhas Solicitações', path: '/suporte/minhas-solicitacoes' },
         { label: 'Aprovações', path: '/suporte/aprovacoes' },
         { label: 'Acompanhar', path: '/suporte/acompanhar' },
     ];
+    
 
     const handleMaterialInputChange = (inputValue) => {
         setInputMaterial(inputValue);
@@ -369,7 +370,7 @@ const NovaRequisicao = () => {
 
     return (
         <div className="layout-geral">
-            <SidebarInterna menuItems={menuRequisicao} /> {/* Adicionando o menu lateral */}
+            <SidebarInterna menuItems={menuRequisicao} /> 
             <div className="container">
                 <div className="form-wrapper">
 

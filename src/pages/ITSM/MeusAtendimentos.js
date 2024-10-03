@@ -17,7 +17,7 @@ const MeusAtendimentos = () => {
 
     return (
         <div className="layout-geral">
-            {/* Passando o menuSuporte como props para o SidebarInterna */}
+        
             <SidebarInterna menuItems={menuSuporte} />
             <div className="container-meus-atendimento">
                 <div className="conteudo-principal">

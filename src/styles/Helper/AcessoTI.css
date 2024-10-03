@@ -310,10 +310,10 @@ body, html {
 .tooltip::after {
     content: "";
     position: absolute;
-    bottom: -9px; /* Seta abaixo do tooltip */
+    bottom: -9px; 
     left: 50%;
     margin-left: -5px;
     border-width: 5px;
     border-style: solid;
-    border-color: #4a4a4a transparent transparent transparent; /* Seta com cor na parte superior */
+    border-color: #4a4a4a transparent transparent transparent; 
 }
