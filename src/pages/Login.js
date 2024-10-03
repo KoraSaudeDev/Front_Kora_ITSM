@@ -41,53 +41,79 @@ const Login = () => {
       const token = res?.credential;
       const user = jwtDecode(token);
 
-      const config = {
-        method: 'get',
-        maxBodyLength: Infinity,
-        url: `${process.env.REACT_APP_API_BASE_URL}/access/minhas-filas?email=${user.email}`,
-        headers: {}
-      };
+      const backendResponse = await axios.post(
+        `${process.env.REACT_APP_API_BASE_URL}/verify-token`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      const response = await axios.request(config);
-      
-      if (Array.isArray(response.data.filas_id) && response.data.filas_id.length > 0) {
-        user.bl_analista = true;
-      } else {
-        user.bl_analista = false;
-      }
+      if (backendResponse.status === 200) {
+        localStorage.setItem(process.env.REACT_APP_TOKEN_USER, token);
 
-      if (response.data.gestor) {
-        const uniqueIds = new Set();
-
-        for (const filaId in response.data.gestor) {
-          if (response.data.gestor.hasOwnProperty(filaId)) {
-            const fila = response.data.gestor[filaId];
-
-            uniqueIds.add(filaId);
-
-            fila.usuarios.forEach(userId => uniqueIds.add(userId));
+        const config = {
+          method: 'get',
+          maxBodyLength: Infinity,
+          url: `${process.env.REACT_APP_API_BASE_URL}/access/minhas-filas?email=${user.email}`,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'X-User-Email': user.email,
           }
+        };
+        const response = await axios.request(config);
+
+        if (Array.isArray(response.data.filas_id) && response.data.filas_id.length > 0) {
+          user.bl_analista = true;
+        }
+        else {
+          user.bl_analista = false;
         }
 
-        user.filas_id = Array.from(uniqueIds);
+        if (response.data.gestor) {
+          const uniqueIds = new Set();
 
-        if (response.data.filas) user.filas = response.data.filas;
-        if (response.data.id_user) user.id_user = response.data.id_user;
-      }
-      else {
-        if (response.data.filas) user.filas = response.data.filas;
-        if (response.data.filas_id) user.filas_id = response.data.filas_id;
-        if (response.data.id_user) user.id_user = response.data.id_user;
-        if (response.data.id_user) user.id_user = response.data.id_user;
-      }
+          for (const filaId in response.data.gestor) {
+            if (response.data.gestor.hasOwnProperty(filaId)) {
+              const fila = response.data.gestor[filaId];
 
-      setUserData(user);
-      login(user);
-      hideLoadingOverlay();
-      navigate(from);
-      
-    } catch (error) {
-      console.error(error);
+              uniqueIds.add(filaId);
+
+              fila.usuarios.forEach(userId => uniqueIds.add(userId));
+            }
+          }
+
+          user.filas_id = Array.from(uniqueIds);
+
+          if (response.data.filas) user.filas = response.data.filas;
+          if (response.data.id_user) user.id_user = response.data.id_user;
+        }
+        else {
+          if (response.data.filas) user.filas = response.data.filas;
+          if (response.data.filas_id) user.filas_id = response.data.filas_id;
+          if (response.data.id_user) user.id_user = response.data.id_user;
+          if (response.data.id_user) user.id_user = response.data.id_user;
+        }
+
+        setUserData(user);
+        login(user);
+        hideLoadingOverlay();
+        navigate(from);
+      } else {
+        console.error('Invalid Google token:', backendResponse.data);
+        alert('Acesso negado');
+        hideLoadingOverlay();
+      }
+    }
+    catch (error) {
+      if (error.response && error.response.status === 401) {
+        alert('Acesso negado');
+      } else {
+        console.error(error);
+        alert('Ocorreu um erro inesperado. Tente novamente mais tarde.');
+      }
       hideLoadingOverlay();
     }
   };
@@ -138,7 +164,7 @@ const Login = () => {
             </label>
           </div>
           <div className="sidebar-footer">
-            <p>Version 1.024</p>
+            <p>Version 1.025</p>
           </div>
         </div>
       </div>

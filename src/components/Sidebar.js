@@ -9,6 +9,7 @@ import { useRefresh } from '../context/RefreshContext';
 import axios from 'axios';
 
 const Sidebar = () => {
+  const authToken = localStorage.getItem(process.env.REACT_APP_TOKEN_USER);
   const location = useLocation();
   const navigate = useNavigate();
   const [activeDropdown, setActiveDropdown] = useState('dropdownAtendimentos');
@@ -27,6 +28,8 @@ const Sidebar = () => {
             {
               headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`,
+                'X-User-Email': user.email,
               },
             }
           );
@@ -40,10 +43,12 @@ const Sidebar = () => {
         try {
           const response = await axios.post(
             `${process.env.REACT_APP_API_BASE_URL}/tickets/meus-atendimentos?user_id=${user.id_user}&page=1&per_page=1`,
-            { filtros: {}},
+            { filtros: {} },
             {
               headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`,
+                'X-User-Email': user.email,
               },
             }
           );
@@ -131,9 +136,9 @@ const Sidebar = () => {
           </div>
         </div>
         <ul className="botoes-navegacao">
-          
+
           <li className={`item-navegacao ${activeDropdown === 'dropdownAtendimentos' ? 'active' : ''}`}>
-            
+
             <a href="#" className={`link-navegacao ${location.pathname.includes('/suporte') ? 'active' : ''}`} onClick={() => alternarDropdown('dropdownAtendimentos')}>
               <FaHeadset className="icon" />
               <span>ITSM</span>
@@ -150,7 +155,7 @@ const Sidebar = () => {
                   Novo Ticket
                 </a>
               </li>
-               {/* <li className={location.pathname === '/suporte/novo-ticket-futuro' ? 'active' : ''}>
+              {/* <li className={location.pathname === '/suporte/novo-ticket-futuro' ? 'active' : ''}>
                 <Link to="/suporte/novo-ticket-futuro" className={location.pathname === '/suporte/novo-ticket-futuro' ? 'active' : ''}>
                   Novo Ticket Futuro
                 </Link>
@@ -187,7 +192,7 @@ const Sidebar = () => {
         </ul>
       </div>
       <div className="sidebar-footer">
-        <p>Version 1.024</p>
+        <p>Version 1.025</p>
       </div>
     </nav>
   );
