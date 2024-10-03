@@ -7,9 +7,18 @@ import '../../styles/ITSM/MeusAtendimentos.css';
 const MinhaEquipe = () => {
     const { user } = useAuth();
 
+    
+    const menuSuporte = [
+        { label: 'Novo Ticket', path: '/suporte/novo-ticket-futuro' },
+        { label: 'Meus Atendimentos', path: '/suporte/meus-atendimentos' },
+        { label: 'Minha Equipe', path: '/suporte/minha-equipe' },
+        { label: 'Dashboard', path: 'http://10.27.254.161:8088/superset/dashboard/KoraHelper/' },
+    ];
+
     return (
         <div className="layout-geral">
-            <SidebarInterna />
+            
+            <SidebarInterna menuItems={menuSuporte} />
             <div className="container-meus-atendimento">
                 <div className="conteudo-principal">
                     <AtendimentosTable

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaChevronLeft, FaChevronRight, FaShoppingCart } from 'react-icons/fa';
+import SidebarInterna from '../../components/SidebarInterna';
 import '../../styles/WF_PO/Solicitacoes.css';
 
 const Aprovacoes = ({ cartItems = [] }) => {
@@ -9,12 +10,18 @@ const Aprovacoes = ({ cartItems = [] }) => {
     const [totalPages, setTotalPages] = useState(1);
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [selectedTicket, setSelectedTicket] = useState(null);
-
-
     const [isHistoricoOpen, setIsHistoricoOpen] = useState(false);
     const [isAtividadesOpen, setIsAtividadesOpen] = useState(false);
-
     const [searchQuery, setSearchQuery] = useState('');
+
+    const menuRequisicao = [
+        { label: 'Nova Requisição', path: 'suporte/nova-requisicao-wf' },
+        { label: 'Minhas Solicitações', path: '/suporte/minhas-solicitacoes' },
+        { label: 'Aprovações', path: '/suporte/aprovacoes' },
+        { label: 'Acompanhar', path: '/suporte/acompanhar' },
+    ];
+
+
 
     useEffect(() => {
         let newTickets = cartItems.length > 0 ? cartItems : [{
@@ -32,7 +39,7 @@ const Aprovacoes = ({ cartItems = [] }) => {
                 />
             ),
         }];
-    
+
         if (JSON.stringify(newTickets) !== JSON.stringify(tickets)) {
             setTickets(newTickets);
             setTotalPages(Math.ceil(newTickets.length / itemsPerPage));
@@ -79,55 +86,55 @@ const Aprovacoes = ({ cartItems = [] }) => {
         setSelectedTicket(null);
     };
 
-
     const toggleHistorico = () => setIsHistoricoOpen(!isHistoricoOpen);
     const toggleAtividades = () => setIsAtividadesOpen(!isAtividadesOpen);
 
     return (
-        <div className="container-solicitacoes">
+        <>
+            <div className="layout-geral">
+                <SidebarInterna menuItems={menuRequisicao} />
+                <div className="container-solicitacoes">
+                    <table className="tabela-tickets">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Abertura</th>
+                                <th>Nome</th>
+                                <th>Email</th>
+                                <th>Fase</th>
+                                <th>Responsável</th>
+                                <th>HUB</th>
+                                <th>Unidade</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {tickets.length > 0 ? renderTickets() : (
+                                <tr>
+                                    <td colSpan="9">Nenhum registro encontrado</td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
 
-           
-
-            <table className="tabela-tickets">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Abertura</th>
-                        <th>Nome</th>
-                        <th>Email</th>
-                        <th>Fase</th>
-                        <th>Responsável</th>
-                        <th>HUB</th>
-                        <th>Unidade</th>
-                        <th>Ação</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {tickets.length > 0 ? renderTickets() : (
-                        <tr>
-                            <td colSpan="9">Nenhum registro encontrado</td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
-
-            <div className="pagination">
-                <button 
-                    onClick={() => handlePageChange(currentPage - 1)} 
-                    disabled={currentPage === 1} 
-                    id="btn-prev-page">
-                    <FaChevronLeft />
-                </button>
-                <span id="pagination-info">{currentPage} de {totalPages}</span>
-                <button 
-                    onClick={() => handlePageChange(currentPage + 1)} 
-                    disabled={currentPage === totalPages} 
-                    id="btn-next-page">
-                    <FaChevronRight />
-                </button>
+                    <div className="pagination">
+                        <button 
+                            onClick={() => handlePageChange(currentPage - 1)} 
+                            disabled={currentPage === 1} 
+                            id="btn-prev-page">
+                            <FaChevronLeft />
+                        </button>
+                        <span id="pagination-info">{currentPage} de {totalPages}</span>
+                        <button 
+                            onClick={() => handlePageChange(currentPage + 1)} 
+                            disabled={currentPage === totalPages} 
+                            id="btn-next-page">
+                            <FaChevronRight />
+                        </button>
+                    </div>
+                </div>
             </div>
 
-    
             {isCartOpen && selectedTicket && (
                 <div className="modal-overlay" id="modal-cart">
                     <div className="modal" id="modal-details">
@@ -136,7 +143,6 @@ const Aprovacoes = ({ cartItems = [] }) => {
                             <span className="close" onClick={closeTicketModal} id="btn-close-modal">&times;</span>
                         </div>
                         <div className="modal-content" id="modal-content">
-                      
                             <div className="requisicao-info" id="requisicao-info">
                                 <p><strong>Requisição:</strong> 109</p>
                                 <p><strong>Abertura:</strong> 13/08/2024 20:45:55</p>
@@ -197,13 +203,11 @@ const Aprovacoes = ({ cartItems = [] }) => {
                                 </div>
                             </div>
 
-                     
                             <div className="form-actions">
                                 <button className="btn-aprovar" id="btn-aprovarr">Aprovar</button>
                                 <button className="btn-reprovar" id="btn-reprovarr">Reprovar</button>
                             </div>
 
-                       
                             <table className="tabela-tickets">
                                 <thead>
                                     <tr>
@@ -231,12 +235,10 @@ const Aprovacoes = ({ cartItems = [] }) => {
                                 </tbody>
                             </table>
 
-                           
                             <div className="total">
                                 <p id="total-info">Total: R$900.00</p>
                             </div>
 
-                        
                             <div className="accordion" id="accordion-historico">
                                 <h4 onClick={toggleHistorico} className={isHistoricoOpen ? 'active' : ''}>
                                     Histórico de Aprovações dos Materiais
@@ -273,7 +275,6 @@ const Aprovacoes = ({ cartItems = [] }) => {
                                 )}
                             </div>
 
-                   
                             <div className="accordion" id="accordion-atividades">
                                 <h4 onClick={toggleAtividades} className={isAtividadesOpen ? 'active' : ''}>
                                     Atividades
@@ -306,12 +307,10 @@ const Aprovacoes = ({ cartItems = [] }) => {
                                 )}
                             </div>
 
-                        
                             <div className="footer-note" id="footer-note">
                                 <p>ATENÇÃO! Você é o último responsável pela aprovação dos materiais, ao enviar, será criado uma cotação no bionexo!</p>
                             </div>
 
-                        
                             <div className="modal-footer" id="modal-footer">
                                 <button className="btn-voltar" id="btn-voltar" onClick={closeTicketModal}>Voltar</button>
                                 <button className="btn-enviar" id="btn-enviar">Enviar Cotação</button>
@@ -320,7 +319,7 @@ const Aprovacoes = ({ cartItems = [] }) => {
                     </div>
                 </div>
             )}
-        </div>
+        </>
     );
 };
 

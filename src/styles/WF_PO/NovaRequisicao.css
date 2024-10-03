@@ -14,16 +14,18 @@ body {
 }
 
 .container {
-    max-width: 1400px;
+    width: 100%;
     margin: 20px auto;
     padding: 20px;
     background-color: #fff;
-    border-radius: 8px;
+    border-radius: 4px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-top: 0px;
 }
 
 .form-wrapper {
     padding: 20px;
+
 }
 
 .row {
@@ -305,6 +307,21 @@ textarea {
     font-size: 24px;
     color: #3E4676;
     font-weight: 500;
+}
+
+.layout-geral{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.container-solicitacoes{
+    width: 84%;
+    min-height: auto;
+    border-radius: 4px;
+    margin-top: 0px;
+    margin-left: 0px;
 }
 
 #material-nr {

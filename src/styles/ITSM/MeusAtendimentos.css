@@ -22,8 +22,8 @@ html {
 
 .container-meus-atendimento{
     width: 84%;
-    height: 600px;
-    min-height: 600px;
+    
+    min-height: auto;
 }
 
 .filter-icon-container,
@@ -796,7 +796,7 @@ a {
 }
 
 .container-meus-atendimentos {
-    border-radius: 6px;
+    border-radius: 4px;
 }
 
 .tabela-atendimentos th {

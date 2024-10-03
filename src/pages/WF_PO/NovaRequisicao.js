@@ -5,6 +5,7 @@ import { FaShoppingCart } from 'react-icons/fa';
 import '../../styles/WF_PO/NovaRequisicao.css';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
+import SidebarInterna from '../../components/SidebarInterna';
 
 const NovaRequisicao = () => {
     const { user } = useAuth();
@@ -261,6 +262,13 @@ const NovaRequisicao = () => {
         setUnidadeMedida('');
     };
 
+    const menuRequisicao = [
+        { label: 'Nova Requisição', path: 'suporte/nova-requisicao-wf' },
+        { label: 'Minhas Solicitações', path: '/suporte/minhas-solicitacoes' },
+        { label: 'Aprovações', path: '/suporte/aprovacoes' },
+        { label: 'Acompanhar', path: '/suporte/acompanhar' },
+    ];
+
     const handleMaterialInputChange = (inputValue) => {
         setInputMaterial(inputValue);
         fetchMaterials(inputValue, 'nome');
@@ -360,342 +368,345 @@ const NovaRequisicao = () => {
     const isAddButtonDisabled = !selectedMaterial || !quantidade || !unidadeMedida;
 
     return (
-        <div className="container">
-            <div className="form-wrapper">
+        <div className="layout-geral">
+            <SidebarInterna menuItems={menuRequisicao} /> {/* Adicionando o menu lateral */}
+            <div className="container">
+                <div className="form-wrapper">
 
-                <form className="formulario">
-                    <div className="row">
-                        <div className="campo">
-                            <label htmlFor="email">Email</label>
-                            <input type="email" id="email" value={user?.email || ''} readOnly />
-                        </div>
-                        <div className="campo">
-                            <label htmlFor="nome">Nome</label>
-                            <input type="text" id="nome" value={user?.name || 'Solicitante'} readOnly />
-                        </div>
-                    </div>
-
-                    <div className="row">
-                        <div className="campo">
-                            <label htmlFor="hub">Hub</label>
-                            <Select
-                                value={selectedHub}
-                                onChange={setSelectedHub}
-                                options={options.hub}
-                                isClearable
-                            />
-                        </div>
-                        <div className="campo">
-                            <label htmlFor="unidade">Unidade</label>
-                            <Select
-                                value={selectedUnidade}
-                                onChange={setSelectedUnidade}
-                                options={options.unidade}
-                                isClearable
-                                isDisabled={!selectedHub}
-                            />
-                        </div>
-                        <div className="campo">
-                            <label htmlFor="centroCusto">Centro de Custo</label>
-                            <Select
-                                value={selectedCentroCusto}
-                                onChange={setSelectedCentroCusto}
-                                options={options.centroCusto}
-                                isClearable
-                                isDisabled={!selectedUnidade}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="row">
-                        <div className="campo">
-                            <label htmlFor="areaNegocio">Área de Negócio</label>
-                            <Select
-                                value={selectedAreaNegocio}
-                                onChange={setSelectedAreaNegocio}
-                                options={options.areaNegocio}
-                                isClearable
-                            />
-                        </div>
-                        <div className="campo">
-                            <label htmlFor="tipoSolicitacao">Tipo de Solicitação</label>
-                            <Select
-                                value={selectedTipoSolicitacao}
-                                onChange={setSelectedTipoSolicitacao}
-                                options={options.tipoSolicitacao}
-                                isClearable
-                            />
-                        </div>
-                    </div>
-
-                    {selectedTipoSolicitacao?.value === 'Produto' && (
+                    <form className="formulario">
                         <div className="row">
                             <div className="campo">
-                                <label htmlFor="dataRemessa">Data de Remessa</label>
-                                <input
-                                    type="date"
-                                    id="dataRemessa"
-                                    value={dataRemessa}
-                                    onChange={(e) => setDataRemessa(e.target.value)}
-                                />
+                                <label htmlFor="email">Email</label>
+                                <input type="email" id="email" value={user?.email || ''} readOnly />
+                            </div>
+                            <div className="campo">
+                                <label htmlFor="nome">Nome</label>
+                                <input type="text" id="nome" value={user?.name || 'Solicitante'} readOnly />
                             </div>
                         </div>
-                    )}
 
-                    {selectedTipoSolicitacao?.value === 'Serviço' && (
                         <div className="row">
-                            <div className="campo" style={{ width: '100%' }}>
-                                <label htmlFor="codigoFornecedor">Código do Fornecedor</label>
-                                <input
-                                    type="text"
-                                    id="codigoFornecedor"
-                                    value={codigoFornecedor}
-                                    onChange={handleCodigoFornecedorChange}
-                                />
-                            </div>
-                            <div className="campo" style={{ width: '100%' }}>
-                                <label htmlFor="fornecedor">Fornecedor</label>
+                            <div className="campo">
+                                <label htmlFor="hub">Hub</label>
                                 <Select
-                                    id="fornecedor"
-                                    value={selectedFornecedor}
-                                    onChange={setSelectedFornecedor}
-                                    options={options.fornecedores}
-                                    placeholder="Digite para pesquisar"
-                                    className="select-field"
-                                    onInputChange={handleFornecedorInputChange}
+                                    value={selectedHub}
+                                    onChange={setSelectedHub}
+                                    options={options.hub}
                                     isClearable
                                 />
                             </div>
                             <div className="campo">
-                                <label htmlFor="inicioServico">Início do Serviço</label>
-                                <input
-                                    type="date"
-                                    id="inicioServico"
-                                    value={inicioServico}
-                                    onChange={(e) => setInicioServico(e.target.value)}
+                                <label htmlFor="unidade">Unidade</label>
+                                <Select
+                                    value={selectedUnidade}
+                                    onChange={setSelectedUnidade}
+                                    options={options.unidade}
+                                    isClearable
+                                    isDisabled={!selectedHub}
                                 />
                             </div>
                             <div className="campo">
-                                <label htmlFor="fimServico">Fim do Serviço</label>
-                                <input
-                                    type="date"
-                                    id="fimServico"
-                                    value={fimServico}
-                                    onChange={(e) => setFimServico(e.target.value)}
+                                <label htmlFor="centroCusto">Centro de Custo</label>
+                                <Select
+                                    value={selectedCentroCusto}
+                                    onChange={setSelectedCentroCusto}
+                                    options={options.centroCusto}
+                                    isClearable
+                                    isDisabled={!selectedUnidade}
                                 />
                             </div>
                         </div>
-                    )}
 
-                    <div className="row">
-                        <div className="campo">
-                            <label htmlFor="grupoMaterial">Grupo de Material</label>
-                            <Select
-                                value={selectedGrupoMaterial}
-                                onChange={setSelectedGrupoMaterial}
-                                options={options.grupoMaterial}
-                                isClearable
-                                isDisabled={!selectedTipoSolicitacao}
-                            />
-                        </div>
-                        <div className="campo">
-                            <label htmlFor="motivoSolic">Motivo da Solicitação</label>
-                            <Select
-                                value={selectedMotivoSolic}
-                                onChange={setSelectedMotivoSolic}
-                                options={options.motivoSolic}
-                                isClearable
-                            />
-                        </div>
-                    </div>
-
-                    <div className="row">
-                        <div className="campo">
-                            <label htmlFor="descricao">Descrição</label>
-                            <textarea
-                                id="descricao"
-                                rows="3"
-                                value={descricao}
-                                onChange={(e) => setDescricao(e.target.value)}
-                            />
-                        </div>
-                        <div className="campo">
-                            <label htmlFor="observacao">Observações</label>
-                            <textarea
-                                id="observacao"
-                                rows="3"
-                                value={observacao}
-                                onChange={(e) => setObservacao(e.target.value)}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="cadastro-material">
-                        <div className="cadastro-material-header">
-                            <h3 id='titulo-cadastro'>Cadastrar Material</h3>
-                            <div className="cart-container">
-                                <FaShoppingCart className="cart-icon" onClick={toggleCartModal} />
-                                {items.length > 0 && (
-                                    <span className="cart-notification">{items.length}</span>
-                                )}
+                        <div className="row">
+                            <div className="campo">
+                                <label htmlFor="areaNegocio">Área de Negócio</label>
+                                <Select
+                                    value={selectedAreaNegocio}
+                                    onChange={setSelectedAreaNegocio}
+                                    options={options.areaNegocio}
+                                    isClearable
+                                />
+                            </div>
+                            <div className="campo">
+                                <label htmlFor="tipoSolicitacao">Tipo de Solicitação</label>
+                                <Select
+                                    value={selectedTipoSolicitacao}
+                                    onChange={setSelectedTipoSolicitacao}
+                                    options={options.tipoSolicitacao}
+                                    isClearable
+                                />
                             </div>
                         </div>
 
-                        <div className="campo" style={{ width: '100%' }}>
-                            <label htmlFor="codigoMaterial">Código do Material</label>
-                            <input
-                                type="text"
-                                id="codigoMaterial"
-                                value={codigoMaterial}
-                                onChange={handleCodigoChange}
-                                disabled={!selectedTipoSolicitacao || !selectedGrupoMaterial}
-                            />
-                        </div>
-                        <div className="campo" style={{ width: '100%' }}>
-                            <label htmlFor="material">Material</label>
-                            <Select
-                                id="material"
-                                value={selectedMaterial}
-                                onChange={setSelectedMaterial}
-                                options={options.material}
-                                placeholder="Digite para pesquisar"
-                                className="select-field"
-                                onInputChange={handleMaterialInputChange}
-                                isDisabled={!selectedTipoSolicitacao || !selectedGrupoMaterial}
-                                isClearable
-                            />
-                        </div>
-                        <div className="campo" style={{ width: '100%' }}>
-                            <label htmlFor="quantidade">Quantidade</label>
-                            <input
-                                type="number"
-                                id="quantidade"
-                                value={quantidade}
-                                onChange={(e) => setQuantidade(e.target.value)}
-                            />
-                        </div>
-                        <div className="campo" style={{ width: '100%' }}>
-                            <label htmlFor="preco">Preço</label>
-                            <input
-                                type="number"
-                                id="preco"
-                                value={preco}
-                                readOnly
-                            />
-                        </div>
-                        <div className="campo" style={{ width: '100%' }}>
-                            <label htmlFor="unidadeMedida">Unidade de Medida</label>
-                            <input
-                                type="text"
-                                id="unidadeMedida"
-                                value={unidadeMedida}
-                                onChange={(e) => setUnidadeMedida(e.target.value)}
-                                className="campo-leitura"
-                                readOnly
-                            />
+                        {selectedTipoSolicitacao?.value === 'Produto' && (
+                            <div className="row">
+                                <div className="campo">
+                                    <label htmlFor="dataRemessa">Data de Remessa</label>
+                                    <input
+                                        type="date"
+                                        id="dataRemessa"
+                                        value={dataRemessa}
+                                        onChange={(e) => setDataRemessa(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        {selectedTipoSolicitacao?.value === 'Serviço' && (
+                            <div className="row">
+                                <div className="campo" style={{ width: '100%' }}>
+                                    <label htmlFor="codigoFornecedor">Código do Fornecedor</label>
+                                    <input
+                                        type="text"
+                                        id="codigoFornecedor"
+                                        value={codigoFornecedor}
+                                        onChange={handleCodigoFornecedorChange}
+                                    />
+                                </div>
+                                <div className="campo" style={{ width: '100%' }}>
+                                    <label htmlFor="fornecedor">Fornecedor</label>
+                                    <Select
+                                        id="fornecedor"
+                                        value={selectedFornecedor}
+                                        onChange={setSelectedFornecedor}
+                                        options={options.fornecedores}
+                                        placeholder="Digite para pesquisar"
+                                        className="select-field"
+                                        onInputChange={handleFornecedorInputChange}
+                                        isClearable
+                                    />
+                                </div>
+                                <div className="campo">
+                                    <label htmlFor="inicioServico">Início do Serviço</label>
+                                    <input
+                                        type="date"
+                                        id="inicioServico"
+                                        value={inicioServico}
+                                        onChange={(e) => setInicioServico(e.target.value)}
+                                    />
+                                </div>
+                                <div className="campo">
+                                    <label htmlFor="fimServico">Fim do Serviço</label>
+                                    <input
+                                        type="date"
+                                        id="fimServico"
+                                        value={fimServico}
+                                        onChange={(e) => setFimServico(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="row">
+                            <div className="campo">
+                                <label htmlFor="grupoMaterial">Grupo de Material</label>
+                                <Select
+                                    value={selectedGrupoMaterial}
+                                    onChange={setSelectedGrupoMaterial}
+                                    options={options.grupoMaterial}
+                                    isClearable
+                                    isDisabled={!selectedTipoSolicitacao}
+                                />
+                            </div>
+                            <div className="campo">
+                                <label htmlFor="motivoSolic">Motivo da Solicitação</label>
+                                <Select
+                                    value={selectedMotivoSolic}
+                                    onChange={setSelectedMotivoSolic}
+                                    options={options.motivoSolic}
+                                    isClearable
+                                />
+                            </div>
                         </div>
 
-                        <button
-                            type="button"
-                            onClick={editingIndex === null ? handleAddItem : handleSaveEdit}
-                            className="botao-adicionar"
-                            disabled={isAddButtonDisabled}
-                        >
-                            {editingIndex === null ? 'Adicionar' : 'Salvar'}
-                        </button>
-                    </div>
-
-                    <div className="total-info">
-                        <p>
-                            Total: R$
-                            {items.reduce((acc, item) => acc + parseFloat(item.total), 0).toFixed(2)}
-                        </p>
-                    </div>
-
-                    <div className="campo botoes">
-                        <button type="button" className="botao-enviar" onClick={toggleCartModal}>Enviar</button>
-                    </div>
-                </form>
-            </div>
-
-            {isCartOpen && (
-                <div className={`modal-overlay ${isCartOpen ? 'modal-opening' : 'modal-closing'}`}>
-                    <div className="modal">
-                        <div className="modal-header">
-                            <h3>Itens do Carrinho</h3>
-                            <span className="close" onClick={toggleCartModal}>&times;</span>
+                        <div className="row">
+                            <div className="campo">
+                                <label htmlFor="descricao">Descrição</label>
+                                <textarea
+                                    id="descricao"
+                                    rows="3"
+                                    value={descricao}
+                                    onChange={(e) => setDescricao(e.target.value)}
+                                />
+                            </div>
+                            <div className="campo">
+                                <label htmlFor="observacao">Observações</label>
+                                <textarea
+                                    id="observacao"
+                                    rows="3"
+                                    value={observacao}
+                                    onChange={(e) => setObservacao(e.target.value)}
+                                />
+                            </div>
                         </div>
-                        <div className="tabela-itens">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Código</th>
-                                        <th>Item</th>
-                                        <th>Quantidade</th>
-                                        <th>Preço</th>
-                                        <th>Unidade</th>
-                                        <th>Total</th>
-                                        <th>Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {items.length === 0 ? (
-                                        <tr>
-                                            <td colSpan="7">Nenhum registro encontrado</td>
-                                        </tr>
-                                    ) : (
-                                        items.map((item, index) => (
-                                            <tr key={index}>
-                                                <td>{item.codigo}</td>
-                                                <td>{item.material}</td>
-                                                <td>{item.quantidade}</td>
-                                                <td>{item.preco}</td>
-                                                <td>{item.unidadeMedida}</td>
-                                                <td>{item.total}</td>
-                                                <td>
-                                                    <button
-                                                        type="button"
-                                                        className="botao-editar"
-                                                        onClick={() => handleEditItem(index)}
-                                                    >
-                                                        Editar
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        className="botao-excluir"
-                                                        onClick={() =>
-                                                            setItems(items.filter((_, i) => i !== index))
-                                                        }
-                                                    >
-                                                        Remover
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))
+
+                        <div className="cadastro-material">
+                            <div className="cadastro-material-header">
+                                <h3 id='titulo-cadastro'>Cadastrar Material</h3>
+                                <div className="cart-container">
+                                    <FaShoppingCart className="cart-icon" onClick={toggleCartModal} />
+                                    {items.length > 0 && (
+                                        <span className="cart-notification">{items.length}</span>
                                     )}
-                                </tbody>
-                            </table>
+                                </div>
+                            </div>
+
+                            <div className="campo" style={{ width: '100%' }}>
+                                <label htmlFor="codigoMaterial">Código do Material</label>
+                                <input
+                                    type="text"
+                                    id="codigoMaterial"
+                                    value={codigoMaterial}
+                                    onChange={handleCodigoChange}
+                                    disabled={!selectedTipoSolicitacao || !selectedGrupoMaterial}
+                                />
+                            </div>
+                            <div className="campo" style={{ width: '100%' }}>
+                                <label htmlFor="material">Material</label>
+                                <Select
+                                    id="material"
+                                    value={selectedMaterial}
+                                    onChange={setSelectedMaterial}
+                                    options={options.material}
+                                    placeholder="Digite para pesquisar"
+                                    className="select-field"
+                                    onInputChange={handleMaterialInputChange}
+                                    isDisabled={!selectedTipoSolicitacao || !selectedGrupoMaterial}
+                                    isClearable
+                                />
+                            </div>
+                            <div className="campo" style={{ width: '100%' }}>
+                                <label htmlFor="quantidade">Quantidade</label>
+                                <input
+                                    type="number"
+                                    id="quantidade"
+                                    value={quantidade}
+                                    onChange={(e) => setQuantidade(e.target.value)}
+                                />
+                            </div>
+                            <div className="campo" style={{ width: '100%' }}>
+                                <label htmlFor="preco">Preço</label>
+                                <input
+                                    type="number"
+                                    id="preco"
+                                    value={preco}
+                                    readOnly
+                                />
+                            </div>
+                            <div className="campo" style={{ width: '100%' }}>
+                                <label htmlFor="unidadeMedida">Unidade de Medida</label>
+                                <input
+                                    type="text"
+                                    id="unidadeMedida"
+                                    value={unidadeMedida}
+                                    onChange={(e) => setUnidadeMedida(e.target.value)}
+                                    className="campo-leitura"
+                                    readOnly
+                                />
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={editingIndex === null ? handleAddItem : handleSaveEdit}
+                                className="botao-adicionar"
+                                disabled={isAddButtonDisabled}
+                            >
+                                {editingIndex === null ? 'Adicionar' : 'Salvar'}
+                            </button>
                         </div>
+
                         <div className="total-info">
                             <p>
                                 Total: R$
                                 {items.reduce((acc, item) => acc + parseFloat(item.total), 0).toFixed(2)}
                             </p>
                         </div>
+
                         <div className="campo botoes">
-                            <button type="button" className="botao-enviar" onClick={handleSendTicket}>
-                                Enviar
-                            </button>
+                            <button type="button" className="botao-enviar" onClick={toggleCartModal}>Enviar</button>
+                        </div>
+                    </form>
+                </div>
+
+                {isCartOpen && (
+                    <div className={`modal-overlay ${isCartOpen ? 'modal-opening' : 'modal-closing'}`}>
+                        <div className="modal">
+                            <div className="modal-header">
+                                <h3>Itens do Carrinho</h3>
+                                <span className="close" onClick={toggleCartModal}>&times;</span>
+                            </div>
+                            <div className="tabela-itens">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Código</th>
+                                            <th>Item</th>
+                                            <th>Quantidade</th>
+                                            <th>Preço</th>
+                                            <th>Unidade</th>
+                                            <th>Total</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {items.length === 0 ? (
+                                            <tr>
+                                                <td colSpan="7">Nenhum registro encontrado</td>
+                                            </tr>
+                                        ) : (
+                                            items.map((item, index) => (
+                                                <tr key={index}>
+                                                    <td>{item.codigo}</td>
+                                                    <td>{item.material}</td>
+                                                    <td>{item.quantidade}</td>
+                                                    <td>{item.preco}</td>
+                                                    <td>{item.unidadeMedida}</td>
+                                                    <td>{item.total}</td>
+                                                    <td>
+                                                        <button
+                                                            type="button"
+                                                            className="botao-editar"
+                                                            onClick={() => handleEditItem(index)}
+                                                        >
+                                                            Editar
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            className="botao-excluir"
+                                                            onClick={() =>
+                                                                setItems(items.filter((_, i) => i !== index))
+                                                            }
+                                                        >
+                                                            Remover
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div className="total-info">
+                                <p>
+                                    Total: R$
+                                    {items.reduce((acc, item) => acc + parseFloat(item.total), 0).toFixed(2)}
+                                </p>
+                            </div>
+                            <div className="campo botoes">
+                                <button type="button" className="botao-enviar" onClick={handleSendTicket}>
+                                    Enviar
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
 
-            {showSuccessPopup && (
-                <div className="popup-sucesso">
-                    <p>Enviado com sucesso!</p>
-                </div>
-            )}
+                {showSuccessPopup && (
+                    <div className="popup-sucesso">
+                        <p>Enviado com sucesso!</p>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

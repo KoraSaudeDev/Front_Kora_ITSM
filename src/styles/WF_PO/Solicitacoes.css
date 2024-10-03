@@ -65,6 +65,20 @@ html {
     position: relative;
 }
 
+.layout-geral{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    width: 100%;
+}
+.container-solicitacoes{
+    width: 84%;
+    min-height: auto;
+    border-radius: 4px;
+    margin-top: 0px;
+    margin-left: 0px;
+}
+
 h2 {
     color: #3e4676;
     margin-bottom: 20px;

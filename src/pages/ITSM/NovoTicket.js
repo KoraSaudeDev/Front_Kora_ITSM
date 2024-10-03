@@ -232,6 +232,13 @@ const camposAcessoRede = {
     }
 };
 
+const menuSuporte = [
+    { label: 'Novo Ticket', path: '/suporte/novo-ticket-futuro' },
+    { label: 'Meus Atendimentos', path: '/suporte/meus-atendimentos' },
+    { label: 'Minha Equipe', path: '/suporte/minha-equipe' },
+    { label: 'Dashboard', path: 'http://10.27.254.161:8088/superset/dashboard/KoraHelper/' },
+];
+
 const NovoTicket = () => {
     const { user } = useAuth();
     const [options, setOptions] = useState({
@@ -595,7 +602,7 @@ const NovoTicket = () => {
     }, [selectedAssunto, selectedSubcategoria, selectedCategoria, options]);
     return (
         <div className="container-novo-ticket">
-            <SidebarInterna />
+            <SidebarInterna menuItems={menuSuporte} />
             <div className="info-basicas-duas-colunas">
                 {/* <div className="coluna-esquerda">
                     <h2>Informações Básicas</h2>
