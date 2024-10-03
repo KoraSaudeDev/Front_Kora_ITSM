@@ -19,6 +19,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem(process.env.REACT_APP_CACHE_USER);
+    localStorage.removeItem(process.env.REACT_APP_TOKEN_USER);
     setUser(null);
   };
 

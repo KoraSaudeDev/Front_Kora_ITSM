@@ -6,6 +6,7 @@ import { useRefresh } from '../../context/RefreshContext';
 import axios from 'axios';
 
 const Modal = ({ data, onClose }) => {
+    const authToken = localStorage.getItem(process.env.REACT_APP_TOKEN_USER);
     const { user } = useAuth();
     const { triggerRefresh } = useRefresh();
     const [inicioCheck, setInicioCheck] = useState('');
@@ -190,18 +191,18 @@ const Modal = ({ data, onClose }) => {
     };
 
     useEffect(() => {
-        axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/hub`)
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/hub`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } })
             .then(response => setOptions(prev => ({ ...prev, hub: response.data })))
             .catch(error => console.error('Erro ao carregar hubs:', error));
 
-        axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/categorias`)
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/categorias`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } })
             .then(response => setOptions(prev => ({ ...prev, categoria: response.data })))
             .catch(error => console.error('Erro ao carregar categorias:', error));
     }, []);
 
     useEffect(() => {
         if (selectedHub) {
-            axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/unidade?hub=${selectedHub}`)
+            axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/unidade?hub=${selectedHub}`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } })
                 .then(response => setOptions(prev => ({ ...prev, unidade: response.data })))
                 .catch(error => console.error('Erro ao carregar unidades:', error));
         } else {
@@ -211,7 +212,7 @@ const Modal = ({ data, onClose }) => {
 
     useEffect(() => {
         if (selectedCategoria) {
-            axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/subcategorias?categoria=${selectedCategoria}`)
+            axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/subcategorias?categoria=${selectedCategoria}`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } })
                 .then(response => setOptions(prev => ({ ...prev, subcategoria: response.data })))
                 .catch(error => console.error('Erro ao carregar subcategorias:', error));
         } else {
@@ -222,7 +223,7 @@ const Modal = ({ data, onClose }) => {
 
     useEffect(() => {
         if (selectedSubcategoria) {
-            axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/assuntos?categoria=${selectedCategoria}&subcategoria=${selectedSubcategoria}`)
+            axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/assuntos?categoria=${selectedCategoria}&subcategoria=${selectedSubcategoria}`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } })
                 .then(response => setOptions(prev => ({ ...prev, assunto: response.data })))
                 .catch(error => console.error('Erro ao carregar assuntos:', error));
         } else {
@@ -233,7 +234,7 @@ const Modal = ({ data, onClose }) => {
     useEffect(() => {
         const fetchAtividades = async () => {
             try {
-                const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/ticket-tasks?id=${data.id}`);
+                const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/ticket-tasks?id=${data.id}`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } });
                 const sortedAtividades = response.data.sort((a, b) => new Date(a.dataAbertura) - new Date(b.dataAbertura));
                 setAtividades(sortedAtividades);
             } catch (error) {
@@ -247,7 +248,7 @@ const Modal = ({ data, onClose }) => {
     useEffect(() => {
         const fetchFiles = async () => {
             try {
-                const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/ticket-files?id=${data.id}`);
+                const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/ticket-files?id=${data.id}`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } });
                 const sortedFiles = response.data.sort((a, b) => new Date(a.dataAbertura) - new Date(b.dataAbertura));
                 setAnexos(sortedFiles);
             } catch (error) {
@@ -281,7 +282,7 @@ const Modal = ({ data, onClose }) => {
     }, [showAtividadesModal, showAnexosModal]);
 
     useEffect(() => {
-        axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/status`)
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/status`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } })
             .then(response => {
                 setOptions(prevOptions => ({ ...prevOptions, status: response.data }));
             })
@@ -289,7 +290,7 @@ const Modal = ({ data, onClose }) => {
                 console.error('Error fetching status options:', error);
             });
 
-        axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/usuarios-executores`)
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/usuarios-executores`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } })
             .then(response => {
                 const formattedData = response.data.map(destinatario => {
                     if (String(destinatario.id) === String(selectedDestinatario)) {
@@ -308,7 +309,7 @@ const Modal = ({ data, onClose }) => {
     }, []);
 
     useEffect(() => {
-        axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/sla`)
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/sla`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } })
             .then(response => {
                 setOptions(prevOptions => ({
                     ...prevOptions,
@@ -338,7 +339,7 @@ const Modal = ({ data, onClose }) => {
             setIsEmailDomainEditable(true);
             setIsAllowedCreateUser(true);
 
-            axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/dominios-email`)
+            axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/dominios-email`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } })
                 .then(response => {
                     setEmailDomains(response.data);
                 })
@@ -395,7 +396,9 @@ const Modal = ({ data, onClose }) => {
                         try {
                             const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/tickets/file/upload`, formData, {
                                 headers: {
-                                    'Content-Type': 'multipart/form-data',
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${authToken}`,
+                                    'X-User-Email': user.email,
                                 },
                             });
 
@@ -639,13 +642,15 @@ const Modal = ({ data, onClose }) => {
                         })
                     );
 
-                    axios.post(`${process.env.REACT_APP_API_BASE_URL}/tickets/update/sla?cod_fluxo=${data.cod_fluxo}`);
+                    axios.post(`${process.env.REACT_APP_API_BASE_URL}/tickets/update/sla?cod_fluxo=${data.cod_fluxo}`, {}, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } });
 
                     const logConfig = {
                         method: 'post',
                         url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/log`,
                         headers: {
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`,
+                            'X-User-Email': user.email,
                         },
                         data: JSON.stringify({
                             "nome": user.name,
@@ -695,7 +700,9 @@ const Modal = ({ data, onClose }) => {
                         try {
                             const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/tickets/file/upload`, formData, {
                                 headers: {
-                                    'Content-Type': 'multipart/form-data',
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${authToken}`,
+                                    'X-User-Email': user.email,
                                 },
                             });
 
@@ -743,7 +750,9 @@ const Modal = ({ data, onClose }) => {
                         method: 'post',
                         url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/log`,
                         headers: {
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`,
+                            'X-User-Email': user.email,
                         },
                         data: JSON.stringify({
                             "nome": user.name,
@@ -791,7 +800,7 @@ const Modal = ({ data, onClose }) => {
         }
 
         let date;
-        if (sub3Hrs) { date = new Date(new Date(dateString).getTime() + new Date(dateString).getTimezoneOffset() * 60000) } 
+        if (sub3Hrs) { date = new Date(new Date(dateString).getTime() + new Date(dateString).getTimezoneOffset() * 60000) }
         else { date = new Date(dateString) }
         const day = String(date.getDate()).padStart(2, '0');
         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -835,7 +844,7 @@ const Modal = ({ data, onClose }) => {
     };
 
     const getEmailsForQueue = async (executor, unidade) => {
-        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/email-fila?id_fila=${executor}&unidade=${unidade}`);
+        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/email-fila?id_fila=${executor}&unidade=${unidade}`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } });
         return response.data;
     };
 
@@ -849,7 +858,7 @@ const Modal = ({ data, onClose }) => {
 
     const handleAnexoClick = async (anexoPath) => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/file/open-url?path=${anexoPath}`);
+            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/file/open-url?path=${anexoPath}`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } });
             if (response.data) {
                 window.open(response.data);
             }
@@ -1212,13 +1221,15 @@ const Modal = ({ data, onClose }) => {
                 }
             }
 
-            axios.post(`${process.env.REACT_APP_API_BASE_URL}/tickets/update/sla?cod_fluxo=${data.cod_fluxo}`);
+            axios.post(`${process.env.REACT_APP_API_BASE_URL}/tickets/update/sla?cod_fluxo=${data.cod_fluxo}`, {}, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } });
 
             const logConfig = {
                 method: 'post',
                 url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/log`,
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`,
+                    'X-User-Email': user.email,
                 },
                 data: JSON.stringify({
                     "nome": user.name,
@@ -1367,7 +1378,9 @@ const Modal = ({ data, onClose }) => {
                     method: 'post',
                     url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/create-user-google`,
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`,
+                        'X-User-Email': user.email,
                     },
                     data: JSON.stringify(param)
                 };

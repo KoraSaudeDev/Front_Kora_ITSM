@@ -9,6 +9,7 @@ import { useRefresh } from '../../context/RefreshContext';
 import axios from 'axios';
 
 const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtro }) => {
+    const authToken = localStorage.getItem(process.env.REACT_APP_TOKEN_USER);
     const { user } = useAuth();
     const { refreshKey } = useRefresh();
     const [atendimentos, setAtendimentos] = useState([]);
@@ -159,7 +160,9 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
                     maxBodyLength: Infinity,
                     url: url,
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`,
+                        'X-User-Email': user.email,
                     },
                     data: filtrosExtras
                 };
@@ -209,15 +212,15 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
         const fetchFilterOptions = async (hubs = [], categoria = [], subcategoria = []) => {
             try {
                 const responses = await Promise.all([
-                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/hub`),
-                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/categorias`),
-                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/status-tickets`),
-                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/usuarios-executores`),
-                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/sla`),
-                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/areas-negocio`),
-                    hubs.length > 0 ? axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/unidade?hub=${hubs.join(',')}`) : Promise.resolve({ data: [] }),
-                    categoria.length > 0 ? axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/subcategorias?categoria=${categoria[0]}`) : Promise.resolve({ data: [] }),
-                    (categoria.length > 0 && subcategoria.length > 0) ? axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/assuntos?categoria=${categoria[0]}&subcategoria=${subcategoria[0]}`) : Promise.resolve({ data: [] })
+                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/hub`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } }),
+                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/categorias`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } }),
+                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/status-tickets`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } }),
+                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/usuarios-executores`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } }),
+                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/sla`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } }),
+                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/areas-negocio`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } }),
+                    hubs.length > 0 ? axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/unidade?hub=${hubs.join(',')}`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } }) : Promise.resolve({ data: [] }),
+                    categoria.length > 0 ? axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/subcategorias?categoria=${categoria[0]}`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } }) : Promise.resolve({ data: [] }),
+                    (categoria.length > 0 && subcategoria.length > 0) ? axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/assuntos?categoria=${categoria[0]}&subcategoria=${subcategoria[0]}`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } }) : Promise.resolve({ data: [] })
                 ]);
 
                 const [
@@ -314,15 +317,15 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
         const fetchExportOptions = async (hubs = [], categoria = [], subcategoria = []) => {
             try {
                 const responses = await Promise.all([
-                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/hub`),
-                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/categorias`),
-                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/status-tickets`),
-                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/usuarios-executores`),
-                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/sla`),
-                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/areas-negocio`),
-                    hubs.length > 0 ? axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/unidade?hub=${hubs.join(',')}`) : Promise.resolve({ data: [] }),
-                    categoria.length > 0 ? axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/subcategorias?categoria=${categoria[0]}`) : Promise.resolve({ data: [] }),
-                    (categoria.length > 0 && subcategoria.length > 0) ? axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/assuntos?categoria=${categoria[0]}&subcategoria=${subcategoria[0]}`) : Promise.resolve({ data: [] })
+                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/hub`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } }),
+                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/categorias`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } }),
+                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/status-tickets`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } }),
+                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/usuarios-executores`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } }),
+                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/sla`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } }),
+                    axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/areas-negocio`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } }),
+                    hubs.length > 0 ? axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/unidade?hub=${hubs.join(',')}`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } }) : Promise.resolve({ data: [] }),
+                    categoria.length > 0 ? axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/subcategorias?categoria=${categoria[0]}`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } }) : Promise.resolve({ data: [] }),
+                    (categoria.length > 0 && subcategoria.length > 0) ? axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/assuntos?categoria=${categoria[0]}&subcategoria=${subcategoria[0]}`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } }) : Promise.resolve({ data: [] })
                 ]);
 
                 const [
@@ -401,7 +404,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
     useEffect(() => {
         const fetchSavedFilters = async () => {
             try {
-                const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/${filtro}/${user.id_user}`);
+                const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/${filtro}/${user.id_user}`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } });
 
                 if (response.data.length === 0) return;
 
@@ -455,7 +458,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
         if (cod_fluxo) {
             const fetchTicketData = async () => {
                 try {
-                    const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/ticket?cod_fluxo=${cod_fluxo}`);
+                    const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/ticket?cod_fluxo=${cod_fluxo}`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } });
                     setModalData(response.data);
                     setShowModal(true);
 
@@ -494,7 +497,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
 
     const handleClick = async (ticket) => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/ticket?cod_fluxo=${ticket.cod_fluxo}`);
+            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/ticket?cod_fluxo=${ticket.cod_fluxo}`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } });
             setModalData(response.data);
             setShowModal(true);
         } catch (error) {
@@ -521,7 +524,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
 
     const handleOpen = async (ticket) => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/ticket?cod_fluxo=${ticket.cod_fluxo}`);
+            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/ticket?cod_fluxo=${ticket.cod_fluxo}`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } });
             setModalData(response.data);
             setShowModal(true);
             setShowMenu(false);
@@ -547,7 +550,9 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
             maxBodyLength: Infinity,
             url: `${apiUrl}page=${currentPage}&per_page=${itemsPerPage}&cod_fluxo=${e.target.value}`,
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`,
+                'X-User-Email': user.email,
             },
             data: filtrosExtras
         };
@@ -684,46 +689,46 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
                 [type]: value
             }
         };
-    
+
         if (newDateExportFilters[column].startDate && newDateExportFilters[column].endDate) {
             const startDate = new Date(newDateExportFilters[column].startDate);
             const endDate = new Date(newDateExportFilters[column].endDate);
-    
+
             if (startDate > endDate) {
                 setDateExportErrors(prev => ({
                     ...prev,
                     [column]: 'A data de início não pode ser posterior à data de fim.'
                 }));
-    
+
                 if (errorExportTimeouts[column]) {
                     clearTimeout(errorExportTimeouts[column]);
                 }
-    
+
                 const timeoutId = setTimeout(() => {
                     setDateExportErrors(prev => ({
                         ...prev,
                         [column]: ''
                     }));
                 }, 3000);
-    
+
                 setErrorExportTimeouts(prev => ({
                     ...prev,
                     [column]: timeoutId
                 }));
-    
+
                 return;
             } else {
                 setDateExportErrors(prev => ({
                     ...prev,
                     [column]: ''
                 }));
-    
+
                 if (errorExportTimeouts[column]) {
                     clearTimeout(errorExportTimeouts[column]);
                 }
             }
         }
-    
+
         setDateExportFilters(newDateExportFilters);
     }, [dateExportFilters, errorExportTimeouts]);
 
@@ -838,7 +843,9 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
                     method: 'post',
                     url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/${filtro}?user_id=${user.id_user}`,
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`,
+                        'X-User-Email': user.email,
                     },
                     data: JSON.stringify(cleanedFilters)
                 };
@@ -862,7 +869,11 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
 
                 const filterConfig = {
                     method: 'post',
-                    url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/delete-${filtro}?user_id=${user.id_user}`
+                    url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/delete-${filtro}?user_id=${user.id_user}`,
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'X-User-Email': user.email,
+                      }
                 };
 
                 const response = await axios.request(filterConfig);
@@ -888,7 +899,11 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
 
             const filterConfig = {
                 method: 'post',
-                url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/delete-${filtro}?user_id=${user.id_user}`
+                url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/delete-${filtro}?user_id=${user.id_user}`,
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'X-User-Email': user.email,
+                  }
             };
 
             const response = await axios.request(filterConfig);
