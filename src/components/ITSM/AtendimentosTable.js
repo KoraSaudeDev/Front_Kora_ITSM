@@ -980,7 +980,9 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
                 method: 'post',
                 url: `${process.env.REACT_APP_API_BASE_URL}/tickets/export`,
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    'X-User-Email': user.email,
                 },
                 data: JSON.stringify(cleanedFilters),
                 responseType: 'blob'
