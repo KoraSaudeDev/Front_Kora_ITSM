@@ -2,6 +2,7 @@ import React from 'react';
 import SidebarInterna from '../../components/SidebarInterna'; 
 import AtendimentoTable from '../../components/WF_PO/AtendimentosTable';
 import '../../styles/WF_PO/Solicitacoes.css';
+import '../../styles/WF_PO/NovaRequisicao.css';
 
 const Solicitacoes = ({ cartItems = [] }) => {
     const menuRequisicao = [
