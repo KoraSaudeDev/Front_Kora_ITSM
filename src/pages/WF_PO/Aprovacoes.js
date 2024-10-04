@@ -20,9 +20,6 @@ const Aprovacoes = ({ cartItems = [] }) => {
         { label: 'Aprovações', path: '/suporte/aprovacoes' },
         { label: 'Acompanhar', path: '/suporte/acompanhar' },
     ];
-    
-
-
 
     useEffect(() => {
         let newTickets = cartItems.length > 0 ? cartItems : [{

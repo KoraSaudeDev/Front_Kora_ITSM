@@ -53,13 +53,13 @@ const App = () => {
   const renderDynamicRoutes = (menus) => {
     try {
       const supportRoutes = menus.filter((menu) => menu.route && menu.route.startsWith('/suporte'));
-
-      return supportRoutes.map((menu) => {
+  
+      return supportRoutes.map((menu, index) => {
         if (menu.componentPath) {
           const Component = lazy(() => import(`${menu.componentPath}`));
           return (
             <Route
-              key={menu.route}
+              key={menu.id || menu.route}
               path={menu.route.replace('/suporte/', '')}
               element={
                 <ProtectedRoute
@@ -75,12 +75,18 @@ const App = () => {
             />
           );
         } else {
-          return <Route path="*" element={<NotFound />} />;
+          return (
+            <Route 
+              key={`not-found-${index}`}
+              path="*" 
+              element={<NotFound />} 
+            />
+          );
         }
       });
     } catch (error) {
       console.error('Erro ao renderizar rotas dinâmicas:', error);
-      return <Route path="*" element={<NotFound />} />;
+      return <Route path="*" element={<NotFound />} key="error-route" />;
     }
   };
 
