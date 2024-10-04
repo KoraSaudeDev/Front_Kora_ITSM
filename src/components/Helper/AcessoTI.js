@@ -38,11 +38,11 @@ function AcessoTI() {
 
     const secoesMaiores = [
         { nome: 'MV', icone: faServer, link: '/suporte/novo-ticket-futuro', categoria: 'MV' },
-        { nome: 'Tasy', icone: faLaptopMedical, link: 'https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#appName=TicketsGeral-448944302&view=Novo%20Ticket&defaults={%22Categoria%22:%22TASY%22}' },
-        { nome: 'SAP', icone: faClipboardCheck, link: 'https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#appName=TicketsGeral-448944302&view=Novo%20Ticket&defaults={%22Categoria%22:%22SAP%22}' },
-        { nome: 'Rede e E-mail', icone: faEnvelope, link: 'https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#appName=TicketsGeral-448944302&view=Novo%20Ticket&defaults={%22Categoria%22:%22Acesso/Rede%22}' },
+        { nome: 'Tasy', icone: faLaptopMedical, link: '/suporte/novo-ticket-futuro', categoria: 'TASY' },
+        { nome: 'SAP', icone: faClipboardCheck, link: '/suporte/novo-ticket-futuro', categoria: 'SAP' },
+        { nome: 'Rede e E-mail', icone: faEnvelope, link: '/suporte/novo-ticket-futuro', categoria: 'Acesso/Rede' },
         { nome: 'Compras', icone: faShoppingCart, link: 'https://www.appsheet.com/start/64d80ab4-16d2-4a14-816b-6a007b9b2980#appName=Solicita%C3%A7%C3%A3odeEquipamento-488885362&page=form&row=&table=SL_Adicionar&view=Novo+Ticket' },
-        { nome: 'Acesso Rede', icone: faNetworkWired, link: 'https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#appName=TicketsGeral-448944302&view=Novo%20Ticket&defaults={%22Categoria%22:%22Acesso/Rede%22}' }
+        { nome: 'Acesso Rede', icone: faNetworkWired, link: '/suporte/novo-ticket-futuro', categoria: 'Acesso/Rede' }
     ];
 
     const secoesMenores = [
@@ -79,6 +79,7 @@ function AcessoTI() {
             setShowAlert(true); 
             setTimeout(() => setShowAlert(false), 3000); 
         } else {
+            localStorage.setItem('categoria', secao.categoria);
             window.open(secao.link, '_blank');
         }
     };

@@ -3,8 +3,7 @@ import Select from 'react-select';
 import axios from 'axios';
 import 'styles/ITSM/NovoTicket.css';
 import { useAuth } from '../../context/AuthContext';
-import SidebarInterna from '../../components/SidebarInterna'; 
-
+import SidebarInterna from '../../components/SidebarInterna';
 
 const camposAcessoRede = {
     "Acesso/Rede": {
@@ -90,10 +89,10 @@ const camposAcessoRede = {
                     readOnly: true,
                     className: "campo-plano"
                 },
-                
-                
-                
-                
+
+
+
+
                 { id: "licenca", label: "Licença do Novo Usuário", type: "select", options: ["Frontline Starter", "Enterprise Starter", "Enterprise Standard"], className: "campo" },
                 { id: "custo", label: "Custo", type: "number", className: "campo" },
                 { id: "gestor", label: "Gestor Imediato", type: "text", className: "campo" },
@@ -239,9 +238,6 @@ const menuSuporteAnalista = [
     { label: 'Dashboard', path: 'http://10.27.254.161:8088/superset/dashboard/KoraHelper/' },
 ];
 
-
-
-
 const NovoTicket = () => {
     const { user, token } = useAuth();
     const [options, setOptions] = useState({
@@ -254,7 +250,10 @@ const NovoTicket = () => {
 
     const [selectedHub, setSelectedHub] = useState(null);
     const [selectedUnidade, setSelectedUnidade] = useState(null);
-    const [selectedCategoria, setSelectedCategoria] = useState(null);
+    const [selectedCategoria, setSelectedCategoria] = useState(() => {
+        const categoria = localStorage.getItem("categoria");
+        return categoria ? { value: categoria, label: categoria } : null;
+    });
     const [selectedSubcategoria, setSelectedSubcategoria] = useState(null);
     const [selectedAssunto, setSelectedAssunto] = useState(null);
     const [dynamicFields, setDynamicFields] = useState([]);
@@ -297,6 +296,7 @@ const NovoTicket = () => {
             .then(response => {
                 const categorias = response.data.map(categoria => ({ value: categoria, label: categoria }));
                 setOptions(prev => ({ ...prev, categoria: categorias }));
+                localStorage.removeItem("categoria")
             })
             .catch(error => console.error('Erro ao carregar categorias:', error));
     }, []);
@@ -345,17 +345,17 @@ const NovoTicket = () => {
         if (selectedAssunto) {
             const assunto = selectedAssunto.value;
             let campos = [];
-    
-        
+
+
             if (selectedCategoria?.value === 'Acesso/Rede' && selectedSubcategoria?.value) {
                 const categoriaAcessoRede = camposAcessoRede['Acesso/Rede'];
                 const subcategoria = categoriaAcessoRede[selectedSubcategoria.value];
-    
+
                 if (subcategoria && subcategoria[assunto]) {
                     campos = subcategoria[assunto];
                 }
             }
-    
+
             if (assunto === 'Ajuste de acesso') {
                 campos = [
                     { id: 'nomeCompleto', label: 'Nome Completo Usuário', type: 'text', required: true },
@@ -370,7 +370,7 @@ const NovoTicket = () => {
                     { id: 'vinculoEmpregatício', label: 'Vínculo Empregatício', type: 'select', options: ['Funcionário da Rede', 'Terceiros (Cooperativa)'], required: true }
                 ];
             }
-    
+
             if (assunto === 'Criação de usuário') {
                 campos = [
                     { id: 'nomeCompleto', label: 'Nome Completo Usuário', type: 'text', required: true },
@@ -387,8 +387,8 @@ const NovoTicket = () => {
                     { id: 'tipoUsuario', label: 'Tipo de Usuário', type: 'select', options: ['Funcionário da Rede', 'Terceiros (Cooperativa)'], required: true }
                 ];
             }
-    
-         
+
+
             if (assunto === 'Troca de senha') {
                 campos = [
                     { id: 'nomeCompleto', label: 'Nome Completo Usuário', type: 'text', required: true },
@@ -398,8 +398,8 @@ const NovoTicket = () => {
                     { id: 'telefoneContato', label: 'Telefone para Contato', type: 'number', required: true }
                 ];
             }
-    
-       
+
+
             if (assunto === 'Ajuste no Perfil de Acesso') {
                 campos = [
                     { id: 'ambienteSap', label: 'Ambiente SAP', type: 'select', options: ['Produção', 'Desenvolvimento', 'Qualidade'], required: true },
@@ -409,8 +409,8 @@ const NovoTicket = () => {
                     { id: 'descricaoAlteracao', label: 'Descrição da Alteração Solicitada', type: 'text', required: true }
                 ];
             }
-    
-        
+
+
             if (assunto === 'Criação Login SAP') {
                 campos = [
                     { id: 'ambienteSap', label: 'Ambiente SAP', type: 'select', options: ['Produção', 'Desenvolvimento', 'Qualidade'], required: true },
@@ -429,8 +429,8 @@ const NovoTicket = () => {
                     { id: 'termoAceitacao', label: 'Termo de Aceitação', type: 'select', options: ['Sim', 'Não'], required: true }
                 ];
             }
-    
-           
+
+
             if (assunto === 'Reset de Senha SAP') {
                 campos = [
                     { id: 'ambienteSap', label: 'Ambiente SAP', type: 'select', options: ['Produção', 'Desenvolvimento', 'Qualidade'], required: true },
@@ -445,8 +445,8 @@ const NovoTicket = () => {
                     { id: 'materiaReferencia', label: 'Material de Referência', type: 'file', required: true }
                 ];
             }
-    
-           
+
+
             if (selectedCategoria?.value === 'TASY' && selectedSubcategoria?.value === 'Criação de Usuário') {
                 campos = [
                     { id: 'nomeCompleto', label: 'Nome Completo Usuário', type: 'text', required: true },
@@ -458,42 +458,37 @@ const NovoTicket = () => {
                     { id: 'unidadeUsuario', label: 'Unidade do Usuário', type: 'text', required: true },
                     { id: 'usuarioSimilar', label: 'Usuário Similar', type: 'text', required: true },
                     { id: 'telefoneContato', label: 'Telefone para Contato (Apenas Números)', type: 'number', required: true },
-                    { 
-                        id: 'tipoUsuario', 
-                        label: 'Tipo do Usuário', 
-                        type: 'select', 
-                        options: ['Administrativo', 'Assistencial'], 
-                        defaultValue: 'Administrativo', 
-                        required: true 
+                    {
+                        id: 'tipoUsuario',
+                        label: 'Tipo do Usuário',
+                        type: 'select',
+                        options: ['Administrativo', 'Assistencial'],
+                        defaultValue: 'Administrativo',
+                        required: true
                     },
                     { id: 'siglaConselho', label: 'Sigla do Conselho Profissional', type: 'text', required: true },
                     { id: 'registroConselho', label: 'Registro do Conselho Profissional', type: 'text', required: true },
-                    { 
-                        id: 'cargoo', 
-                        label: 'Tipo de Cargo', 
-                        type: 'select', 
-                        options: ['1', '2'], 
-                        required: true 
+                    {
+                        id: 'cargoo',
+                        label: 'Tipo de Cargo',
+                        type: 'select',
+                        options: ['1', '2'],
+                        required: true
                     }
                 ];
             }
-    
+
             setDynamicFields(campos);
         } else {
             setDynamicFields([]);
         }
     }, [selectedAssunto, selectedSubcategoria, selectedCategoria]);
-    
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        
     };
 
-    
-
-   
-     useEffect(() => {
+    useEffect(() => {
         axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/hub`, { headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email } })
             .then(response => {
                 const hubs = response.data.map(hub => ({ value: hub, label: hub }));
@@ -605,10 +600,11 @@ const NovoTicket = () => {
             setDynamicFields([]);
         }
     }, [selectedAssunto, selectedSubcategoria, selectedCategoria, options]);
+
     return (
         <div className="container-novo-ticket">
-              {user?.bl_analista && <SidebarInterna menuItems={menuSuporteAnalista} />}
-              <div className={`info-basicas-duas-colunas ${!user?.bl_analista ? 'form-centralizado' : ''}`}>
+            {user?.bl_analista && <SidebarInterna menuItems={menuSuporteAnalista} />}
+            <div className={`info-basicas-duas-colunas ${!user?.bl_analista ? 'form-centralizado' : ''}`}>
                 {/* <div className="coluna-esquerda">
                     <h2>Informações Básicas</h2>
                     <form className="formulario" onSubmit={handleSubmit}>
@@ -662,7 +658,7 @@ const NovoTicket = () => {
 
                 <div className="coluna-direita">
                     <form className="formulario" onSubmit={handleSubmit}>
-                    <div className="campo">
+                        <div className="campo">
                             <label htmlFor="abertura">Abertura <span className="campo-obrigatorio">*</span></label>
                             <input type="text" id="abertura" name="abertura" value={obterDataAtual()} readOnly className="campo-leitura" />
                         </div>
@@ -699,133 +695,132 @@ const NovoTicket = () => {
                             />
                         </div>
 
-                        
                         <div className="campo-dinamico">
-    {dynamicFields.map(field => (
-        <div key={field.id} className="campo">
-            <label htmlFor={field.id}>
-                {field.label} <span className="campo-obrigatorio">*</span>
-            </label>
-            
-         
-            {field.type === 'text' && !field.readOnly && (
-                <input type="text" id={field.id} name={field.id} required={field.required} />
-            )}
-            
+                            {dynamicFields.map(field => (
+                                <div key={field.id} className="campo">
+                                    <label htmlFor={field.id}>
+                                        {field.label} <span className="campo-obrigatorio">*</span>
+                                    </label>
 
-            {field.type === 'text' && field.readOnly && (
-                <div id={field.id} className={field.className} style={{ textAlign: 'left', whiteSpace: 'normal' }}>
-                    {field.value.split('\n').map((line, index) => (
-                        <p key={index} style={{ margin: 0 }}>
-                            {line}
-                        </p>
-                    ))}
-                </div>
-            )}
 
-      
-            {field.type === 'email' && (
-                <input type="email" id={field.id} name={field.id} required={field.required} />
-            )}
+                                    {field.type === 'text' && !field.readOnly && (
+                                        <input type="text" id={field.id} name={field.id} required={field.required} />
+                                    )}
 
-            {field.type === 'number' && (
-                <input type="number" id={field.id} name={field.id} required={field.required} />
-            )}
 
-        
-            {field.type === 'date' && (
-                <input type="date" id={field.id} name={field.id} required={field.required} />
-            )}
+                                    {field.type === 'text' && field.readOnly && (
+                                        <div id={field.id} className={field.className} style={{ textAlign: 'left', whiteSpace: 'normal' }}>
+                                            {field.value.split('\n').map((line, index) => (
+                                                <p key={index} style={{ margin: 0 }}>
+                                                    {line}
+                                                </p>
+                                            ))}
+                                        </div>
+                                    )}
 
-        
-            {field.type === 'select' && field.id === 'tipoColaborador' && (
-                <Select
-                    id={field.id}
-                    name={field.id}
-                    options={[
-                        { value: 'Funcionário', label: 'Funcionário' },
-                        { value: 'Terceirizado', label: 'Terceirizado' }
-                    ]}
-                    styles={customStyles}
-                    onChange={(selectedOption) => {
-                        
-                    }}
-                    isClearable
-                    placeholder="Selecione o tipo de colaborador"
-                />
-            )}
 
-           
-            {field.type === 'select' && field.id === 'licenca' && (
-                <Select
-                    id={field.id}
-                    name={field.id}
-                    options={[
-                        { value: 'Frontline Starter', label: 'Frontline Starter' },
-                        { value: 'Enterprise Starter', label: 'Enterprise Starter' },
-                        { value: 'Enterprise Standard', label: 'Enterprise Standard' }
-                    ]}
-                    styles={customStyles}
-                    onChange={(selectedOption) => {
-                        
-                    }}
-                    isClearable
-                    placeholder="Selecione a licença"
-                />
-            )}
+                                    {field.type === 'email' && (
+                                        <input type="email" id={field.id} name={field.id} required={field.required} />
+                                    )}
 
-            
-            {field.type === 'select' && field.id === 'cargo' && options.cargo && (
-                <Select
-                    id={field.id}
-                    name={field.id}
-                    options={options.cargo.map(option => ({ value: option.value, label: option.label }))}
-                    styles={customStyles}
-                    onChange={(selectedOption) => {
-                      
-                    }}
-                    isClearable
-                    placeholder="Selecione o cargo"
-                />
-            )}
+                                    {field.type === 'number' && (
+                                        <input type="number" id={field.id} name={field.id} required={field.required} />
+                                    )}
 
-     
-            {field.type === 'select' && field.id === 'departamento' && options.departamento && (
-                <Select
-                    id={field.id}
-                    name={field.id}
-                    options={options.departamento.map(option => ({ value: option.value, label: option.label }))}
-                    styles={customStyles}
-                    onChange={(selectedOption) => {
-                        
-                    }}
-                    isClearable
-                    placeholder="Selecione o departamento"
-                />
-            )}
 
-   
-            {field.type === 'select' && field.id === 'hub' && options.hub && (
-                <Select
-                    id={field.id}
-                    name={field.id}
-                    options={options.hub.map(option => ({ value: option.value, label: option.label }))}
-                    styles={customStyles}
-                    onChange={(selectedOption) => {
-                     
-                    }}
-                    isClearable
-                    placeholder="Selecione o HUB"
-                />
-            )}
+                                    {field.type === 'date' && (
+                                        <input type="date" id={field.id} name={field.id} required={field.required} />
+                                    )}
 
-           
-            {field.type === 'file' && (
-                <input type="file" id={field.id} name={field.id} required={field.required} />
-            )}
-        </div>
-    ))}
-</div>
+
+                                    {field.type === 'select' && field.id === 'tipoColaborador' && (
+                                        <Select
+                                            id={field.id}
+                                            name={field.id}
+                                            options={[
+                                                { value: 'Funcionário', label: 'Funcionário' },
+                                                { value: 'Terceirizado', label: 'Terceirizado' }
+                                            ]}
+                                            styles={customStyles}
+                                            onChange={(selectedOption) => {
+
+                                            }}
+                                            isClearable
+                                            placeholder="Selecione o tipo de colaborador"
+                                        />
+                                    )}
+
+
+                                    {field.type === 'select' && field.id === 'licenca' && (
+                                        <Select
+                                            id={field.id}
+                                            name={field.id}
+                                            options={[
+                                                { value: 'Frontline Starter', label: 'Frontline Starter' },
+                                                { value: 'Enterprise Starter', label: 'Enterprise Starter' },
+                                                { value: 'Enterprise Standard', label: 'Enterprise Standard' }
+                                            ]}
+                                            styles={customStyles}
+                                            onChange={(selectedOption) => {
+
+                                            }}
+                                            isClearable
+                                            placeholder="Selecione a licença"
+                                        />
+                                    )}
+
+
+                                    {field.type === 'select' && field.id === 'cargo' && options.cargo && (
+                                        <Select
+                                            id={field.id}
+                                            name={field.id}
+                                            options={options.cargo.map(option => ({ value: option.value, label: option.label }))}
+                                            styles={customStyles}
+                                            onChange={(selectedOption) => {
+
+                                            }}
+                                            isClearable
+                                            placeholder="Selecione o cargo"
+                                        />
+                                    )}
+
+
+                                    {field.type === 'select' && field.id === 'departamento' && options.departamento && (
+                                        <Select
+                                            id={field.id}
+                                            name={field.id}
+                                            options={options.departamento.map(option => ({ value: option.value, label: option.label }))}
+                                            styles={customStyles}
+                                            onChange={(selectedOption) => {
+
+                                            }}
+                                            isClearable
+                                            placeholder="Selecione o departamento"
+                                        />
+                                    )}
+
+
+                                    {field.type === 'select' && field.id === 'hub' && options.hub && (
+                                        <Select
+                                            id={field.id}
+                                            name={field.id}
+                                            options={options.hub.map(option => ({ value: option.value, label: option.label }))}
+                                            styles={customStyles}
+                                            onChange={(selectedOption) => {
+
+                                            }}
+                                            isClearable
+                                            placeholder="Selecione o HUB"
+                                        />
+                                    )}
+
+
+                                    {field.type === 'file' && (
+                                        <input type="file" id={field.id} name={field.id} required={field.required} />
+                                    )}
+                                </div>
+                            ))}
+                        </div>
 
 
 
