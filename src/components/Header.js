@@ -4,17 +4,18 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/Header.css';
 import { FaBell } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
-import logoKora from '../assets/images/logokora.png'; 
+import logoKora from '../assets/images/logokora.png';
 import SemFoto from '../assets/images/Sem_foto.png';
 
 const Header = ({ pendentes = [] }) => {
   const { user, logout } = useAuth();
   const [showNotifications, setShowNotifications] = useState(false);
   const [isSwinging, setIsSwinging] = useState(false);
-  const [isDropdownVisible, setDropdownVisible] = useState(false); 
+  const [isDropdownVisible, setDropdownVisible] = useState(false);
+  const [itsmOpen, setItsmOpen] = useState(false);
+  const [wfpoOpen, setWfpoOpen] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation(); 
-
+  const location = useLocation();
 
   const isSuportePage = location.pathname.includes('/suporte');
 
@@ -58,8 +59,8 @@ const Header = ({ pendentes = [] }) => {
   };
 
   const handleLogout = () => {
-    logout(); 
-    navigate('/login'); 
+    logout();
+    navigate('/login');
   };
 
   return (
@@ -71,21 +72,21 @@ const Header = ({ pendentes = [] }) => {
             &#9776;
           </div>
         ) : (
-          <img 
-            src={logoKora} 
-            alt="Kora Helper" 
-            className="logo-helper" 
-            onClick={() => navigate('/helper')} 
+          <img
+            src={logoKora}
+            alt="Kora Helper"
+            className="logo-helper"
+            onClick={() => navigate('/helper')}
           />
         )}
 
-   
+
         {isSuportePage && user && user.bl_analista && (
           <div className="barra-busca">
             <SearchBar />
           </div>
         )}
-        
+
         <div className="cabecalho2">
           <div className="conteudo-cabecalho2">
             <div
@@ -119,26 +120,64 @@ const Header = ({ pendentes = [] }) => {
                 )}
               </div>
             )}
-            <div 
-              className={`perfil-usuario ${isDropdownVisible ? 'dropdown-open' : ''}`} 
+            <div
+              className={`perfil-usuario ${isDropdownVisible ? 'dropdown-open' : ''}`}
               onClick={toggleDropdown}
             >
-              <img 
-                src={user?.picture || SemFoto} 
-                alt="Foto de Perfil" 
-                className="foto-perfil" 
+              <img
+                src={user?.picture || SemFoto}
+                alt="Foto de Perfil"
+                className="foto-perfil"
               />
 
               {isDropdownVisible && (
                 <div className="dropdown-perfil">
-                  <p>{user?.name || 'Nome do Usuário'}</p>
-                  {user?.filas?.length > 0 ? (
-                    user.filas.map((fila, index) => (
-                      <p key={index}>{fila}</p>
-                    ))
-                  ) : (
-                    <p>Cargo não informado</p>
+                  <p className="dropdown-username">{user?.name || 'Nome do Usuário'}</p>
+
+                  {/* Accordion ITSM */}
+                  {user?.filas?.length > 0 && (
+                    <>
+                      <div
+                        className="dropdown-section"
+                        onClick={(e) => {
+                          e.stopPropagation(); // Evita fechar o dropdown
+                          setItsmOpen(!itsmOpen);
+                        }}
+                      >
+                        <h4>ITSM</h4>
+                      </div>
+                      {itsmOpen && (
+                        <div className="dropdown-items">
+                          {user.filas.map((fila, index) => (
+                            <p key={`itsm-${index}`}>{fila}</p>
+                          ))}
+                        </div>
+                      )}
+                    </>
                   )}
+
+                  {/* Accordion WF-PO */}
+                  {user?.wf_po_grupos?.length > 0 && (
+                    <>
+                      <div
+                        className="dropdown-section"
+                        onClick={(e) => {
+                          e.stopPropagation(); // Evita fechar o dropdown
+                          setWfpoOpen(!wfpoOpen);
+                        }}
+                      >
+                        <h4>WF-PO</h4>
+                      </div>
+                      {wfpoOpen && (
+                        <div className="dropdown-items">
+                          {user.wf_po_grupos.map((grupo, index) => (
+                            <p key={`wf-po-${index}`}>{grupo}</p>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  )}
+
                   <div className="dropdown-separador"></div>
                   <div className="dropdown-logout" onClick={handleLogout}>
                     Logout

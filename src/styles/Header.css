@@ -290,7 +290,6 @@ header {
   display: none; 
 }
 
-
 .dropdown-perfil {
   position: absolute;
   top: 70px;
@@ -305,7 +304,7 @@ header {
   transition: opacity 0.3s ease, transform 0.3s ease;
   min-width: 250px;
   z-index: 1000;
-  pointer-events: none; 
+  pointer-events: none;
 }
 
 .perfil-usuario.dropdown-open .dropdown-perfil {
@@ -314,11 +313,19 @@ header {
   pointer-events: auto; 
 }
 
+.dropdown-username {
+  padding: 8px 20px;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  cursor: default;
+}
 
 .dropdown-perfil p {
-  padding: 15px 20px;
+  padding: 6px 20px;
   margin: 0;
-  font-size: 16px; 
+  font-size: 14px; 
   font-weight: 500;
   color: #333;
   cursor: default;
@@ -328,32 +335,40 @@ header {
   background-color: #f9f9f9;
 }
 
+.dropdown-section {
+  padding: 0px 20px;
+  margin: 0;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 12px;
+  color: #666;
+  border-bottom: 1px solid #ddd;
+}
+
+.dropdown-section:hover {
+  background-color: #f1f1f1;
+}
+
+.dropdown-items {
+  padding-left: 20px;
+  font-size: 12px;
+}
 
 .dropdown-separador {
   height: 1px;
-  background-color: #e0e0e0;
-  margin: 8px 0;
+  background-color: #ddd;
+  margin: 0;
 }
 
-
 .dropdown-logout {
-  padding: 15px 20px;
-  font-size: 16px;
-  font-weight: 600;
-  color: #d9534f;
+  padding: 10px 20px;
   cursor: pointer;
-  text-align: center;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  font-weight: bold;
+  color: red;
 }
 
 .dropdown-logout:hover {
-  background-color: #ffefef;
-  color: #c9302c;
-}
-
-
-.dropdown-perfil {
-  animation: dropdownFade 0.4s ease-out;
+  background-color: #f9f9f9;
 }
 
 @keyframes dropdownFade {

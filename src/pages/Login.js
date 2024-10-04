@@ -39,84 +39,89 @@ const Login = () => {
   const onSuccess = async (res) => {
     try {
       showLoadingOverlay();
+  
       const token = res?.credential;
       const user = jwtDecode(token);
-
+  
       const backendResponse = await axios.post(
         `${process.env.REACT_APP_API_BASE_URL}/verify-token`,
         {},
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
-
-      if (backendResponse.status === 200) {
-        localStorage.setItem(process.env.REACT_APP_TOKEN_USER, token);
-
-        const config = {
-          method: 'get',
-          maxBodyLength: Infinity,
-          url: `${process.env.REACT_APP_API_BASE_URL}/access/minhas-filas?email=${user.email}`,
+  
+      if (backendResponse.status !== 200) {
+        throw new Error('Invalid Google token');
+      }
+  
+      localStorage.setItem(process.env.REACT_APP_TOKEN_USER, token);
+  
+      const accessResponse = await axios.get(
+        `${process.env.REACT_APP_API_BASE_URL}/access/minhas-filas`,
+        {
+          params: { email: user.email },
           headers: {
             Authorization: `Bearer ${token}`,
             'X-User-Email': user.email,
-          }
-        };
-
-        const response = await axios.request(config);
-
-        if (Array.isArray(response.data.filas_id) && response.data.filas_id.length > 0) {
-          user.bl_analista = true;
-        } else {
-          user.bl_analista = false;
+          },
+          maxBodyLength: Infinity,
         }
-
-        if (response.data.gestor) {
-          const uniqueIds = new Set();
-
-          for (const filaId in response.data.gestor) {
-            if (response.data.gestor.hasOwnProperty(filaId)) {
-              const fila = response.data.gestor[filaId];
-
-              uniqueIds.add(filaId);
-
-              fila.usuarios.forEach(userId => uniqueIds.add(userId));
-            }
-          }
-
-          user.filas_id = Array.from(uniqueIds);
-
-          if (response.data.filas) user.filas = response.data.filas;
-          if (response.data.id_user) user.id_user = response.data.id_user;
-        }
-        else {
-          if (response.data.filas) user.filas = response.data.filas;
-          if (response.data.filas_id) user.filas_id = response.data.filas_id;
-          if (response.data.id_user) user.id_user = response.data.id_user;
-        }
-
-        const menus = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/menu/`, { headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email } });
-
-        login(user, menus.data, token);
-        hideLoadingOverlay();
-        navigate(from);
-      }
-      else {
-        console.error('Invalid Google token:', backendResponse.data);
-        alert('Acesso negado');
-        hideLoadingOverlay();
-      }
-
-    } catch (error) {
-      if (error.response && error.response.status === 401) {
-        alert('Acesso negado');
+      );
+  
+      const accessData = accessResponse.data;
+  
+      user.bl_analista = Array.isArray(accessData.filas_id) && accessData.filas_id.length > 0;
+  
+      if (accessData.gestor) {
+        user.filas_id = processGestorInfo(accessData.gestor);
       } else {
-        console.error(error);
-        alert('Ocorreu um erro inesperado. Tente novamente mais tarde.');
+        user.filas_id = accessData.filas_id || [];
       }
+  
+      Object.assign(user, {
+        filas: accessData.filas,
+        id_user: accessData.id_user,
+        wf_po_grupos: accessData.wf_po_grupos ?? [],
+        wf_po_grupos_id: accessData.wf_po_grupos ?? []
+      });
+  
+      const menuResponse = await axios.get(
+        `${process.env.REACT_APP_API_BASE_URL}/menu/`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'X-User-Email': user.email,
+          },
+        }
+      );
+  
+      login(user, menuResponse.data, token);
       hideLoadingOverlay();
+      navigate(from);
+    } catch (error) {
+      hideLoadingOverlay();
+      handleError(error);
+    }
+  };
+
+  const processGestorInfo = (gestor) => {
+    const uniqueIds = new Set();
+  
+    Object.entries(gestor).forEach(([filaId, fila]) => {
+      uniqueIds.add(filaId);
+      fila.usuarios.forEach(userId => uniqueIds.add(userId));
+    });
+  
+    return Array.from(uniqueIds);
+  };
+
+  const handleError = (error) => {
+    if (error.response && error.response.status === 401) {
+      alert('Acesso negado');
+    } else {
+      console.error(error.message || error);
+      alert('Ocorreu um erro inesperado. Tente novamente mais tarde.');
     }
   };
 
