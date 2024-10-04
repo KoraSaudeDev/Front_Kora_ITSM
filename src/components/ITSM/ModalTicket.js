@@ -1127,6 +1127,7 @@ const Modal = ({ data, onClose }) => {
         showLoadingOverlay();
 
         const insert_tasks = [];
+        const update_tasks = [];
 
         const ultimoItem = atividades[atividades.length - 1];
 
@@ -1139,10 +1140,11 @@ const Modal = ({ data, onClose }) => {
             id_executor = destinatarioParts[0];
             executor = selectedDestinatario.substring(id_executor.length + 3);
             statusParam = "Em Andamento";
+            const aberto_em = formatDate(new Date().toISOString(), 2);
 
             insert_tasks.push({
                 "cod_fluxo": data.id,
-                "aberto_em": formatDate(new Date().toISOString(), 2),
+                "aberto_em": aberto_em,
                 "aberto_por": user.name,
                 "status": "EM ATENDIMENTO",
                 "descricao": "Solicitação encaminhada...",
@@ -1150,6 +1152,31 @@ const Modal = ({ data, onClose }) => {
                 "executor": executor,
                 "tipo_atividade": "Privada"
             });
+
+            if (atividades.length > 0) {
+                const ultimaAtividadeIndex = atividades.length - 1;
+                const ultimaAtividade = atividades[ultimaAtividadeIndex];
+    
+                ultimaAtividade.alterar = 1;
+    
+                if (!ultimaAtividade.dt_fim) {
+                    ultimaAtividade.dt_fim = aberto_em;
+                }
+                if (!ultimaAtividade.ds_concluido_por) {
+                    ultimaAtividade.ds_concluido_por = user.name;
+                }
+    
+                const updatedAtividades = [...atividades];
+                updatedAtividades[ultimaAtividadeIndex] = ultimaAtividade;
+    
+                setAtividades(updatedAtividades);
+
+                update_tasks.push({
+                    cod_task: ultimaAtividade.cod_task,
+                    dt_fim: ultimaAtividade.dt_fim,
+                    ds_concluido_por: ultimaAtividade.ds_concluido_por
+                })
+            }
         }
 
         //const resposta_chamado = document.querySelector("#resp-chamado").value;
@@ -1179,7 +1206,7 @@ const Modal = ({ data, onClose }) => {
                 url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/${data.cod_fluxo}`,
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
+                    'Authorization': `Bearer ${authToken}`,
                     'X-User-Email': user.email,
                 },
                 data: JSON.stringify(update_tickets)
@@ -1196,7 +1223,7 @@ const Modal = ({ data, onClose }) => {
                     url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/task`,
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
+                        'Authorization': `Bearer ${authToken}`,
                         'X-User-Email': user.email,
                     },
                     data: JSON.stringify(task)
@@ -1234,14 +1261,29 @@ const Modal = ({ data, onClose }) => {
                 }
             }
 
-            axios.post(`${process.env.REACT_APP_API_BASE_URL}/tickets/update/sla?cod_fluxo=${data.cod_fluxo}`, {}, { headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email } });
+            for (const task of update_tasks) {
+                const taskConfig = {
+                    method: 'patch',
+                    url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/task/${task.cod_task}`,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`,
+                        'X-User-Email': user.email,
+                    },
+                    data: JSON.stringify(task),
+                };
+
+                await sendRequest(taskConfig);
+            }
+
+            axios.post(`${process.env.REACT_APP_API_BASE_URL}/tickets/update/sla?cod_fluxo=${data.cod_fluxo}`, {}, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } });
 
             const logConfig = {
                 method: 'post',
                 url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/log`,
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
+                    'Authorization': `Bearer ${authToken}`,
                     'X-User-Email': user.email,
                 },
                 data: JSON.stringify({
