@@ -244,6 +244,7 @@ const menuSuporteAnalista = [
 
 const NovoTicket = () => {
     const { user, token } = useAuth();
+    const location = useLocation(); 
     const [options, setOptions] = useState({
         hub: [],
         unidade: [],

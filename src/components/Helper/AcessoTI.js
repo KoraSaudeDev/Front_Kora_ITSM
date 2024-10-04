@@ -37,7 +37,7 @@ function AcessoTI() {
     const [alertMessage, setAlertMessage] = useState('');
 
     const secoesMaiores = [
-        { nome: 'MV', icone: faServer, link: 'https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#appName=TicketsGeral-448944302&view=Novo%20Ticket&defaults={%22Categoria%22:%22MV%22}' },
+        { nome: 'MV', icone: faServer, link: '/suporte/novo-ticket-futuro', categoria: 'MV' },
         { nome: 'Tasy', icone: faLaptopMedical, link: 'https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#appName=TicketsGeral-448944302&view=Novo%20Ticket&defaults={%22Categoria%22:%22TASY%22}' },
         { nome: 'SAP', icone: faClipboardCheck, link: 'https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#appName=TicketsGeral-448944302&view=Novo%20Ticket&defaults={%22Categoria%22:%22SAP%22}' },
         { nome: 'Rede e E-mail', icone: faEnvelope, link: 'https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#appName=TicketsGeral-448944302&view=Novo%20Ticket&defaults={%22Categoria%22:%22Acesso/Rede%22}' },
@@ -74,7 +74,10 @@ function AcessoTI() {
     }, []);
 
     const aoClicarHelper = (secao) => {
-        if (['Arsenal', 'Controladoria', 'Financeiro'].includes(secao.nome)) {
+        if (secao.nome === 'MV') {
+            
+            navigate(secao.link, { state: { categoria: secao.categoria } });
+        } else if (['Arsenal', 'Controladoria', 'Financeiro'].includes(secao.nome)) {
             setAlertMessage('Não contém no QAS'); 
             setShowAlert(true); 
             setTimeout(() => setShowAlert(false), 3000); 
