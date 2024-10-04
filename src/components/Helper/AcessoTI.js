@@ -64,7 +64,7 @@ function AcessoTI() {
         { nome: 'Aplicativos', icone: faMobile, link: 'https://www.appsheet.com/start/2b5f0d42-fa81-4e5c-b998-688347035abd#view=Novo%20Ticket' },
         { nome: 'VPN/ZTNA', icone: faShieldAlt, link: 'https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#=TicketsGeral-448944302&view=Novo%20Ticket&defaults={%22Categoria%22:%22Cybersecurity%22,%22Subcategoria%22:%22ZTNA%20-%20Conectividade%22}' },
         { nome: 'Micro Informática', icone: faLaptop, link: 'https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#appName=TicketsGeral-448944302&view=Novo%20Ticket&defaults={%22Categoria%22:%22Infraestrutura%22}' },
-        { nome: 'Suporte', icone: faHeadset, link: '/suporte/novo-ticket-futuro' }
+        { nome: 'Suporte', icone: faHeadset, link: '/suporte/meus-atendimentos' }
     ];
 
     useEffect(() => {
@@ -74,10 +74,7 @@ function AcessoTI() {
     }, []);
 
     const aoClicarHelper = (secao) => {
-        if (secao.nome === 'MV') {
-            
-            navigate(secao.link, { state: { categoria: secao.categoria } });
-        } else if (['Arsenal', 'Controladoria', 'Financeiro'].includes(secao.nome)) {
+        if (['Arsenal', 'Controladoria', 'Financeiro'].includes(secao.nome)) {
             setAlertMessage('Não contém no QAS'); 
             setShowAlert(true); 
             setTimeout(() => setShowAlert(false), 3000); 
