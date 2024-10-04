@@ -232,11 +232,16 @@ const camposAcessoRede = {
     }
 };
 
-const menuSuporte = [
+const menuSuporteAnalista = [
     { label: 'Novo Ticket', path: '/suporte/novo-ticket-futuro' },
     { label: 'Meus Atendimentos', path: '/suporte/meus-atendimentos', hasCount: true },
     { label: 'Minha Equipe', path: '/suporte/minha-equipe', hasCount: true },
     { label: 'Dashboard', path: 'http://10.27.254.161:8088/superset/dashboard/KoraHelper/' },
+];
+
+
+const menuSuporteUsuario = [
+    { label: 'Novo Ticket', path: '/suporte/novo-ticket-futuro' }
 ];
 
 const NovoTicket = () => {
@@ -487,6 +492,8 @@ const NovoTicket = () => {
         
     };
 
+    const menuItems = user?.bl_analista ? menuSuporteAnalista : menuSuporteUsuario;
+
    
      useEffect(() => {
         axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/hub`, { headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email } })
@@ -602,7 +609,7 @@ const NovoTicket = () => {
     }, [selectedAssunto, selectedSubcategoria, selectedCategoria, options]);
     return (
         <div className="container-novo-ticket">
-            <SidebarInterna menuItems={menuSuporte} />
+            <SidebarInterna menuItems={menuItems} />
             <div className="info-basicas-duas-colunas">
                 {/* <div className="coluna-esquerda">
                     <h2>Informações Básicas</h2>
