@@ -261,7 +261,7 @@ const SolicitacoesMateriais = () => {
                                         <label htmlFor="matricula">Matrícula</label>
                                         <input
                                             type="text"
-                                            id="matricula"
+                                            id="matricula-solicitacoes"
                                             value={matricula}
                                             onChange={(e) => setMatricula(e.target.value)}
                                         />
