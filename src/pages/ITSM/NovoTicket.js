@@ -240,9 +240,7 @@ const menuSuporteAnalista = [
 ];
 
 
-const menuSuporteUsuario = [
-    { label: 'Novo Ticket', path: '/suporte/novo-ticket-futuro' }
-];
+
 
 const NovoTicket = () => {
     const { user, token } = useAuth();
@@ -492,7 +490,7 @@ const NovoTicket = () => {
         
     };
 
-    const menuItems = user?.bl_analista ? menuSuporteAnalista : menuSuporteUsuario;
+    
 
    
      useEffect(() => {
@@ -609,8 +607,8 @@ const NovoTicket = () => {
     }, [selectedAssunto, selectedSubcategoria, selectedCategoria, options]);
     return (
         <div className="container-novo-ticket">
-            <SidebarInterna menuItems={menuItems} />
-            <div className="info-basicas-duas-colunas">
+              {user?.bl_analista && <SidebarInterna menuItems={menuSuporteAnalista} />}
+              <div className={`info-basicas-duas-colunas ${!user?.bl_analista ? 'form-centralizado' : ''}`}>
                 {/* <div className="coluna-esquerda">
                     <h2>Informações Básicas</h2>
                     <form className="formulario" onSubmit={handleSubmit}>
