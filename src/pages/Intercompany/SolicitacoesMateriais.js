@@ -121,7 +121,7 @@ const SolicitacoesMateriais = () => {
 
     return (
         <div className="layout-geral">
-            <SidebarInterna menuItems={menuRequisicao} /> {/* Adicionando o menu lateral */}
+            <SidebarInterna menuItems={menuRequisicao} /> 
             <div className="container">
                 <div className="cadastro-material">
                     <div className="cadastro-material-header">

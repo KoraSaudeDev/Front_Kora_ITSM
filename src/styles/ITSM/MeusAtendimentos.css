@@ -2107,3 +2107,55 @@ th.sorted-desc::before {
     display: block;
 }
 
+
+.sidebar-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+   
+    transition: background-color 0.3s ease;
+}
+
+
+
+.active-interna {
+    background-color: #1f4b8e; 
+}
+
+
+.count-badge {
+    background-color: #ff3b30; 
+    color: white;
+    border-radius: 50%;
+    padding: 3px 6px;
+    font-size: 11px;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px; 
+    height: 20px; 
+    position: absolute;
+    right: 12px; 
+    top: 50%;
+    transform: translateY(-50%);
+    transition: all 0.3s ease; 
+}
+
+
+.sidebar-interna ul {
+    list-style: none;
+    padding: 0;
+}
+
+
+
+.layout-geral {
+    display: flex;
+}

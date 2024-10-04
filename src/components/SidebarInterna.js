@@ -67,10 +67,14 @@ const SidebarInterna = ({ menuItems }) => {
                         >
                             {item.label}
                             {item.hasCount && (
-                                <span className="count-badge">
-                                    {item.label === 'Meus Atendimentos' && meusAtendimentosCount > 0 ? meusAtendimentosCount : ''}
-                                    {item.label === 'Minha Equipe' && minhaEquipeCount > 0 ? minhaEquipeCount : ''}
-                                </span>
+                                <>
+                                    {item.label === 'Meus Atendimentos' && meusAtendimentosCount > 0 && (
+                                        <span className="count-badge">{meusAtendimentosCount}</span>
+                                    )}
+                                    {item.label === 'Minha Equipe' && minhaEquipeCount > 0 && (
+                                        <span className="count-badge">{minhaEquipeCount}</span>
+                                    )}
+                                </>
                             )}
                         </NavLink>
                     </li>
