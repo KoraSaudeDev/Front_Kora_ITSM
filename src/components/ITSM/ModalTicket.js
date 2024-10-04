@@ -1206,7 +1206,7 @@ const Modal = ({ data, onClose }) => {
                 url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/${data.cod_fluxo}`,
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${authToken}`,
+                    'Authorization': `Bearer ${token}`,
                     'X-User-Email': user.email,
                 },
                 data: JSON.stringify(update_tickets)
@@ -1223,7 +1223,7 @@ const Modal = ({ data, onClose }) => {
                     url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/task`,
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${authToken}`,
+                        'Authorization': `Bearer ${token}`,
                         'X-User-Email': user.email,
                     },
                     data: JSON.stringify(task)
@@ -1267,7 +1267,7 @@ const Modal = ({ data, onClose }) => {
                     url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/task/${task.cod_task}`,
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${authToken}`,
+                        'Authorization': `Bearer ${token}`,
                         'X-User-Email': user.email,
                     },
                     data: JSON.stringify(task),
@@ -1276,14 +1276,14 @@ const Modal = ({ data, onClose }) => {
                 await sendRequest(taskConfig);
             }
 
-            axios.post(`${process.env.REACT_APP_API_BASE_URL}/tickets/update/sla?cod_fluxo=${data.cod_fluxo}`, {}, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } });
+            axios.post(`${process.env.REACT_APP_API_BASE_URL}/tickets/update/sla?cod_fluxo=${data.cod_fluxo}`, {}, { headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email } });
 
             const logConfig = {
                 method: 'post',
                 url: `${process.env.REACT_APP_API_BASE_URL}/tickets/update/log`,
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${authToken}`,
+                    'Authorization': `Bearer ${token}`,
                     'X-User-Email': user.email,
                 },
                 data: JSON.stringify({
