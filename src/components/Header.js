@@ -6,6 +6,7 @@ import { FaBell } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import logoKora from '../assets/images/logokora.png';
 import SemFoto from '../assets/images/Sem_foto.png';
+import { faDisplay } from '../../node_modules/@fortawesome/free-solid-svg-icons/index';
 
 const Header = ({ pendentes = [] }) => {
   const { user, logout } = useAuth();
@@ -16,8 +17,23 @@ const Header = ({ pendentes = [] }) => {
   const [wfpoOpen, setWfpoOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-
   const isSuportePage = location.pathname.includes('/suporte');
+
+  useEffect(() => {
+    if (isSuportePage && (!user || !user.bl_analista)) {
+      const interval = setInterval(() => {
+        const menu = document.querySelector('.menu-lateral');
+        const conteudoPrincipal = document.querySelector('main');
+        const cabecalho = document.querySelector('header');
+  
+        if (menu && conteudoPrincipal && cabecalho) {
+          alternarMenu();
+          clearInterval(interval);
+        }
+      }, 10);
+      return () => clearInterval(interval);
+    }
+  }, [isSuportePage, user]);
 
   const alternarMenu = () => {
     const menu = document.querySelector('.menu-lateral');
@@ -67,10 +83,27 @@ const Header = ({ pendentes = [] }) => {
     <header>
       <div className="conteudo-cabecalho">
 
-        {isSuportePage ? (
+        {isSuportePage && user && user.bl_analista ? (
           <div className="toggle-menu" onClick={alternarMenu} data-tooltip="Menu">
             &#9776;
           </div>
+        ) : isSuportePage ? (
+          <>
+            <div
+              className="toggle-menu"
+              onClick={alternarMenu}
+              data-tooltip="Menu"
+              style={{ display: 'none' }}
+            >
+              &#9776;
+            </div>
+            <img
+              src={logoKora}
+              alt="Kora Helper"
+              className="logo-helper"
+              onClick={() => navigate('/helper')}
+            />
+          </>
         ) : (
           <img
             src={logoKora}
@@ -79,7 +112,6 @@ const Header = ({ pendentes = [] }) => {
             onClick={() => navigate('/helper')}
           />
         )}
-
 
         {isSuportePage && user && user.bl_analista && (
           <div className="barra-busca">
@@ -134,13 +166,12 @@ const Header = ({ pendentes = [] }) => {
                 <div className="dropdown-perfil">
                   <p className="dropdown-username">{user?.name || 'Nome do Usuário'}</p>
 
-                  {/* Accordion ITSM */}
                   {user?.filas?.length > 0 && (
                     <>
                       <div
                         className="dropdown-section"
                         onClick={(e) => {
-                          e.stopPropagation(); // Evita fechar o dropdown
+                          e.stopPropagation();
                           setItsmOpen(!itsmOpen);
                         }}
                       >
@@ -156,13 +187,12 @@ const Header = ({ pendentes = [] }) => {
                     </>
                   )}
 
-                  {/* Accordion WF-PO */}
                   {user?.wf_po_grupos?.length > 0 && (
                     <>
                       <div
                         className="dropdown-section"
                         onClick={(e) => {
-                          e.stopPropagation(); // Evita fechar o dropdown
+                          e.stopPropagation();
                           setWfpoOpen(!wfpoOpen);
                         }}
                       >
