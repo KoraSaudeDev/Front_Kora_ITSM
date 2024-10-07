@@ -100,9 +100,9 @@ const App = () => {
             <Route path="/helper/AcessoRH" element={<ProtectedRoute element={<AcessoRH />} />} />
             <Route path="/helper/AcessoSuprimentos" element={<ProtectedRoute element={<AcessoSuprimentos />} />} />
             <Route path="/helper/AcessoMarketing" element={<ProtectedRoute element={<AcessoMarketing />} />} />
-            <Route path="/helper/AcessoFinanceiro" element={<AcessoFinanceiro />} />
-            <Route path="/helper/AcessoAssistencial" element={<AcessoAssistencial />} />
-            <Route path="/helper/AcessoContabilidade" element={<AcessoContabilidade />} />
+            <Route path="/helper/AcessoFinanceiro" element={<ProtectedRoute element={<AcessoFinanceiro />} />} />
+            <Route path="/helper/AcessoAssistencial" element={<ProtectedRoute element={<AcessoAssistencial />} />} />
+            <Route path="/helper/AcessoContabilidade" element={<ProtectedRoute element={<AcessoContabilidade />} />} />
             <Route path="/acesso" element={<Navigate to="/helper" />} />
             <Route path="/acesso/*" element={<Navigate to="/helper" />} />
 
@@ -118,7 +118,7 @@ const App = () => {
                   <Sidebar isOpen={isSidebarOpen} />
                   <Routes>
                     {renderDynamicRoutes(menus)}
-                    <Route path="*" element={<NotFound />} />
+                    <Route path="*" element={<ProtectedRoute element={<NotFound />} />} />
                   </Routes>
                 </div>
               }

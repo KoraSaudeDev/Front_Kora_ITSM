@@ -493,7 +493,7 @@ const Modal = ({ data, onClose }) => {
                                     <li>Subcategoria: ${data.subcategoria}</li>
                                     <li>Assunto: ${data.assunto}</li>
                                     <li>Descrição Ticket: ${data.descricao}</li>
-                                    <li>Encaminhado Por: ${taskCopy.executor}</li>
+                                    <li>Encaminhado Por: ${user.name}</li>
                                     <li>Descrição Encaminhamento: ${taskCopy.descricao}</li>
                                 </ul>
                                 <p><i>Mensagem enviada de forma automática, favor não responder.</i></p>
@@ -524,7 +524,7 @@ const Modal = ({ data, onClose }) => {
                                     <li>Subcategoria: ${data.subcategoria}</li>
                                     <li>Assunto: ${data.assunto}</li>
                                     <li>Descrição Ticket: ${data.descricao}</li>
-                                    <li>Encaminhado Por: ${taskCopy.executor}</li>
+                                    <li>Encaminhado Por: ${user.name}</li>
                                     <li>Descrição Encaminhamento: ${taskCopy.descricao}</li>
                                 </ul>
                                 <p><i>Mensagem enviada de forma automática, favor não responder.</i></p>
@@ -551,7 +551,7 @@ const Modal = ({ data, onClose }) => {
                                     <li>Subcategoria: ${data.subcategoria}</li>
                                     <li>Assunto: ${data.assunto}</li>
                                     <li>Descrição Ticket: ${data.descricao}</li>
-                                    <li>Encaminhado Por: ${taskCopy.executor}</li>
+                                    <li>Encaminhado Por: ${user.name}</li>
                                     <li>Descrição Encaminhamento: ${taskCopy.descricao}</li>
                                 </ul>
                                 <p><i>Mensagem enviada de forma automática, favor não responder.</i></p>
@@ -579,7 +579,7 @@ const Modal = ({ data, onClose }) => {
                                     <li>Subcategoria: ${data.subcategoria}</li>
                                     <li>Assunto: ${data.assunto}</li>
                                     <li>Descrição Ticket: ${data.descricao}</li>
-                                    <li>Agendado Por: ${taskCopy.executor}</li>
+                                    <li>Agendado Por: ${user.name}</li>
                                     <li>Descrição Agendamento: ${taskCopy.descricao}</li>
                                 </ul>
                                 <p><i>Mensagem enviada de forma automática, favor não responder.</i></p>
@@ -606,7 +606,7 @@ const Modal = ({ data, onClose }) => {
                                     <li>Subcategoria: ${data.subcategoria}</li>
                                     <li>Assunto: ${data.assunto}</li>
                                     <li>Descrição Ticket: ${data.descricao}</li>
-                                    <li>Finalizado Por: ${taskCopy.executor}</li>
+                                    <li>Finalizado Por: ${user.name}</li>
                                     <li>Descrição Finalizado: ${taskCopy.descricao}</li>
                                 </ul>
                                 <p><i>Mensagem enviada de forma automática, favor não responder.</i></p>
@@ -1252,7 +1252,7 @@ const Modal = ({ data, onClose }) => {
                         <li>Subcategoria: ${selectedSubcategoria ?? data.subcategoria}</li>
                         <li>Assunto: ${selectedAssunto ?? data.assunto}</li>
                         <li>Descrição Ticket: ${data.descricao}</li>
-                        <li>Encaminhado Por: ${task.executor}</li>
+                        <li>Encaminhado Por: ${user.name}</li>
                         <li>Descrição Encaminhamento: ${task.descricao}</li>
                     </ul>
                     <p><i>Mensagem enviada de forma automática, favor não responder.</i></p>

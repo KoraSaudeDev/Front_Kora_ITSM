@@ -83,7 +83,7 @@ const Login = () => {
         filas: accessData.filas,
         id_user: accessData.id_user,
         wf_po_grupos: accessData.wf_po_grupos ?? [],
-        wf_po_grupos_id: accessData.wf_po_grupos ?? []
+        wf_po_grupos_id: accessData.wf_po_grupos_id ?? []
       });
   
       const menuResponse = await axios.get(
