@@ -32,12 +32,16 @@ const NovaRequisicao = () => {
     const [selectedHub, setSelectedHub] = useState(null);
     const [selectedUnidade, setSelectedUnidade] = useState(null);
     const [selectedCentroCusto, setSelectedCentroCusto] = useState(null);
+    const [selectedBloco, setSelectedBloco] = useState(null);
     const [selectedGrupoMaterial, setSelectedGrupoMaterial] = useState(null);
     const [selectedAreaNegocio, setSelectedAreaNegocio] = useState(null);
     const [selectedTipoSolicitacao, setSelectedTipoSolicitacao] = useState(null);
     const [selectedMotivoSolic, setSelectedMotivoSolic] = useState(null);
     const [descricao, setDescricao] = useState('');
     const [observacao, setObservacao] = useState('');
+
+    const [fase, setFase] = useState(null);
+    const [grupo, setGrupo] = useState(null);
 
     const [codigoMaterial, setCodigoMaterial] = useState('');
     const [selectedMaterial, setSelectedMaterial] = useState(null);
@@ -54,6 +58,7 @@ const NovaRequisicao = () => {
     const [fimServico, setFimServico] = useState('');
 
     const [items, setItems] = useState([]);
+    const [total, setTotal] = useState(0);
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [editingIndex, setEditingIndex] = useState(null);
     const [showSuccessPopup, setShowSuccessPopup] = useState(false);
@@ -75,7 +80,12 @@ const NovaRequisicao = () => {
                 .then(response => {
                     setOptions(prevOptions => ({
                         ...prevOptions,
-                        unidade: response.data.map(item => ({ value: item.cod_sap, label: item.unidade }))
+                        unidade: response.data.map(item => ({
+                            value: item.cod_sap,
+                            label: item.unidade,
+                            bloco_produto: item.bloco_produto,
+                            bloco_servico: item.bloco_servico
+                        }))
                     }));
                     setSelectedUnidade(null);
                     setSelectedCentroCusto(null);
@@ -208,7 +218,7 @@ const NovaRequisicao = () => {
 
     useEffect(() => {
         if (selectedMaterial) {
-            setPreco(selectedMaterial.preco);
+            if (!preco) setPreco(selectedMaterial.preco);
             setCodigoMaterial(selectedMaterial.codigo);
             setUnidadeMedida(selectedMaterial.unidadeMedida);
         }
@@ -251,6 +261,50 @@ const NovaRequisicao = () => {
         }
     }, [selectedTipoSolicitacao]);
 
+    useEffect(() => {
+        if (selectedTipoSolicitacao && selectedUnidade) {
+            if (selectedTipoSolicitacao.value === "Produto") setSelectedBloco(selectedUnidade.bloco_produto);
+            else if (selectedTipoSolicitacao.value === "Serviço") setSelectedBloco(selectedUnidade.bloco_servico);
+        }
+        else setSelectedBloco(null);
+    }, [selectedTipoSolicitacao, selectedUnidade]);
+
+    useEffect(() => {
+        if (selectedBloco) {
+            fetchFases();
+        }
+    }, [selectedBloco, total])
+
+    const fetchFases = () => {
+        axios.get(
+            `${process.env.REACT_APP_API_BASE_URL}/wf-po/form/fases?bloco=${selectedBloco}&valor=${total}`,
+            { headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email } }
+        )
+            .then(response => {
+                if (response.data[0].id_fase) setFase(response.data[0].id_fase);
+                if (response.data[0].id_grupo) setGrupo(response.data[0].id_grupo);
+            })
+            .catch(error => console.error('Error fetching fases:', error));
+    }
+
+    const sendRequest = async (config) => {
+        try {
+            const response = await axios.request(config);
+            console.log(JSON.stringify(response.data));
+            return response.data;
+        } catch (error) {
+            console.error('Request Error:', error);
+        }
+    };
+
+    const showLoadingOverlay = () => {
+        document.getElementById('loading-overlay').style.display = 'flex';
+    };
+
+    const hideLoadingOverlay = () => {
+        document.getElementById('loading-overlay').style.display = 'none';
+    };
+
     const handleCodigoChange = (event) => {
         const value = event.target.value;
         setCodigoMaterial(value);
@@ -270,7 +324,6 @@ const NovaRequisicao = () => {
         { label: 'Aprovações', path: '/suporte/aprovacoes' },
         { label: 'Acompanhar', path: '/suporte/acompanhar' },
     ];
-    
 
     const handleMaterialInputChange = (inputValue) => {
         setInputMaterial(inputValue);
@@ -304,7 +357,7 @@ const NovaRequisicao = () => {
     };
 
     const handleAddItem = () => {
-        const materialPreco = selectedMaterial ? parseFloat(selectedMaterial.preco) : 0;
+        const materialPreco = parseFloat(preco) || 0;
         const quantidadeNumerica = parseFloat(quantidade) || 1;
         const newItem = {
             codigo: codigoMaterial || '0000000' + (items.length + 1),
@@ -314,6 +367,7 @@ const NovaRequisicao = () => {
             total: (quantidadeNumerica * materialPreco).toFixed(2),
             unidadeMedida: unidadeMedida,
         };
+        setTotal((prevTotal) => parseFloat(prevTotal) + quantidadeNumerica * materialPreco);
         setItems([...items, newItem]);
         setCodigoMaterial('');
         setSelectedMaterial(null);
@@ -330,16 +384,31 @@ const NovaRequisicao = () => {
         const itemToEdit = items[index];
         setEditingIndex(index);
         setCodigoMaterial(itemToEdit.codigo);
-        setSelectedMaterial(options.material.find(material => material.label === itemToEdit.material));
         setQuantidade(itemToEdit.quantidade);
         setPreco(itemToEdit.preco);
         setUnidadeMedida(itemToEdit.unidadeMedida);
+        setSelectedMaterial(options.material.find(material => material.label === itemToEdit.material));
+        toggleCartModal();
+    };
+
+    const handleRemoveItem = (index) => {
+        const itemToRemove = items[index];
+        setTotal((prevTotal) => parseFloat(prevTotal) - parseFloat(itemToRemove.total));
+        setItems(items.filter((_, i) => i !== index));
+        setEditingIndex(null);
+        setCodigoMaterial('');
+        setSelectedMaterial(null);
+        setQuantidade('');
+        setPreco('');
+        setUnidadeMedida('');
     };
 
     const handleSaveEdit = () => {
         const updatedItems = [...items];
-        const materialPreco = selectedMaterial ? parseFloat(selectedMaterial.preco) : 0;
+        const materialPreco = parseFloat(preco) || 0;
         const quantidadeNumerica = parseFloat(quantidade) || 1;
+
+        const oldItemTotal = parseFloat(updatedItems[editingIndex].total);
 
         updatedItems[editingIndex] = {
             codigo: codigoMaterial,
@@ -350,6 +419,8 @@ const NovaRequisicao = () => {
             unidadeMedida: unidadeMedida,
         };
 
+        const newItemTotal = quantidadeNumerica * materialPreco;
+        setTotal((prevTotal) => parseFloat(prevTotal) - oldItemTotal + newItemTotal);
         setItems(updatedItems);
         setEditingIndex(null);
         setCodigoMaterial('');
@@ -359,38 +430,182 @@ const NovaRequisicao = () => {
         setUnidadeMedida('');
     };
 
-    const handleSendTicket = () => {
-        setShowSuccessPopup(true);
-        setTimeout(() => {
-            setShowSuccessPopup(false);
-        }, 3000);
-        setItems([]);
-        toggleCartModal();
+    const handleSendTicket = async () => {
+        const wf_po = {
+            executor: grupo,
+            email: user.email,
+            nome: user.name,
+            area: selectedAreaNegocio?.value,
+            hub: selectedHub?.value,
+            unidade: selectedUnidade?.label,
+            centro_custo: selectedCentroCusto?.value,
+            numero_bloco: selectedBloco,
+            fase: fase,
+            tipo_solicitacao: selectedTipoSolicitacao?.value,
+            grupo_material: selectedGrupoMaterial?.value,
+            total_materiais: total,
+            descricao: descricao,
+            observacoes: observacao,
+            motivo_solicitacao: selectedMotivoSolic?.value,
+        };
+
+        if (selectedTipoSolicitacao.value === "Produto") {
+            wf_po.dt_remessa = dataRemessa;
+        } else if (selectedTipoSolicitacao.value === "Serviço") {
+            wf_po.cod_fornecedor = codigoFornecedor;
+            wf_po.fornecedor = selectedFornecedor.value;
+            wf_po.dt_inicio_serv = inicioServico;
+            wf_po.dt_fim_serv = fimServico;
+        }
+
+        const missingFields = [
+            wf_po.executor,
+            wf_po.email,
+            wf_po.nome,
+            wf_po.area,
+            wf_po.hub,
+            wf_po.unidade,
+            wf_po.numero_bloco,
+            wf_po.fase,
+            wf_po.tipo_solicitacao,
+            wf_po.grupo_material,
+            wf_po.total_materiais,
+            wf_po.descricao,
+            wf_po.motivo_solicitacao,
+            ...(selectedTipoSolicitacao.value === "Produto" ? [wf_po.dt_remessa] : []),
+            ...(selectedTipoSolicitacao.value === "Serviço" ? [wf_po.cod_fornecedor, wf_po.fornecedor, wf_po.dt_inicio_serv, wf_po.dt_fim_serv] : []),
+        ];
+
+        if (missingFields.includes(undefined) || missingFields.includes('') || missingFields.includes(null) || items.length === 0) {
+            alert('Preencha todos os campos obrigatórios e adicione pelo menos um item no carrinho.');
+            return;
+        }
+
+        showLoadingOverlay();
+
+        try {
+            const wf_po_Config = {
+                method: 'post',
+                url: `${process.env.REACT_APP_API_BASE_URL}/wf-po/update/wf-po`,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    'X-User-Email': user.email,
+                },
+                data: JSON.stringify(wf_po),
+            };
+
+            const retorno = await sendRequest(wf_po_Config);
+
+            if (retorno.id) {
+                const task_Config = {
+                    method: 'post',
+                    url: `${process.env.REACT_APP_API_BASE_URL}/wf-po/update/wf-po-task`,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        'X-User-Email': user.email,
+                    },
+                    data: JSON.stringify({
+                        referencia_id: retorno.id,
+                        fase: wf_po.fase,
+                        executor: wf_po.executor,
+                        numero_bloco: wf_po.numero_bloco,
+                    }),
+                };
+
+                await sendRequest(task_Config);
+
+                for (const item of items) {
+                    const body = {
+                        referencia_id: retorno.id,
+                        codigo: item.codigo,
+                        grupo: wf_po.grupo_material,
+                        material: item.material,
+                        qtd: item.quantidade,
+                        unidade_medida: item.unidadeMedida,
+                        preco: parseFloat(item.preco),
+                        total: parseFloat(item.total),
+                        status: 1,
+                    };
+
+                    const material_Config = {
+                        method: 'post',
+                        url: `${process.env.REACT_APP_API_BASE_URL}/wf-po/update/wf-po-material`,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`,
+                            'X-User-Email': user.email,
+                        },
+                        data: JSON.stringify(body),
+                    };
+
+                    await sendRequest(material_Config);
+
+                    const { unidade_medida, ...restBody } = body;
+                    const aprovacaoBody = {
+                        ...restBody,
+                        executor: 1,
+                        nome_executor: user.name,
+                    };
+
+                    const aprovacao_Config = {
+                        method: 'post',
+                        url: `${process.env.REACT_APP_API_BASE_URL}/wf-po/update/wf-po-aprovacao`,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`,
+                            'X-User-Email': user.email,
+                        },
+                        data: JSON.stringify(aprovacaoBody),
+                    };
+
+                    await sendRequest(aprovacao_Config);
+                }
+
+                hideLoadingOverlay();
+
+                setShowSuccessPopup(true);
+                setTimeout(() => {
+                    setShowSuccessPopup(false);
+                    window.location.reload();
+                }, 3000);
+            }
+            else{
+                hideLoadingOverlay();
+            }
+        } catch (error) {
+            hideLoadingOverlay();
+            console.error("Error adding wf-po:", error);
+        }
     };
 
     const isAddButtonDisabled = !selectedMaterial || !quantidade || !unidadeMedida;
 
     return (
         <div className="layout-geral">
-            <SidebarInterna menuItems={menuRequisicao} /> 
+            <div id="loading-overlay" className="loading-overlay">
+                <div className="loading-spinner"></div>
+            </div>
+            <SidebarInterna menuItems={menuRequisicao} />
             <div className="container">
                 <div className="form-wrapper">
 
                     <form className="formulario">
                         <div className="row">
                             <div className="campo">
-                                <label htmlFor="email">Email</label>
+                                <label htmlFor="email">Email *</label>
                                 <input type="email" id="email" value={user?.email || ''} readOnly />
                             </div>
                             <div className="campo">
-                                <label htmlFor="nome">Nome</label>
+                                <label htmlFor="nome">Nome *</label>
                                 <input type="text" id="nome" value={user?.name || 'Solicitante'} readOnly />
                             </div>
                         </div>
 
                         <div className="row">
                             <div className="campo">
-                                <label htmlFor="hub">Hub</label>
+                                <label htmlFor="hub">Hub *</label>
                                 <Select
                                     value={selectedHub}
                                     onChange={setSelectedHub}
@@ -399,7 +614,7 @@ const NovaRequisicao = () => {
                                 />
                             </div>
                             <div className="campo">
-                                <label htmlFor="unidade">Unidade</label>
+                                <label htmlFor="unidade">Unidade *</label>
                                 <Select
                                     value={selectedUnidade}
                                     onChange={setSelectedUnidade}
@@ -422,7 +637,7 @@ const NovaRequisicao = () => {
 
                         <div className="row">
                             <div className="campo">
-                                <label htmlFor="areaNegocio">Área de Negócio</label>
+                                <label htmlFor="areaNegocio">Área de Negócio *</label>
                                 <Select
                                     value={selectedAreaNegocio}
                                     onChange={setSelectedAreaNegocio}
@@ -431,7 +646,7 @@ const NovaRequisicao = () => {
                                 />
                             </div>
                             <div className="campo">
-                                <label htmlFor="tipoSolicitacao">Tipo de Solicitação</label>
+                                <label htmlFor="tipoSolicitacao">Tipo de Solicitação *</label>
                                 <Select
                                     value={selectedTipoSolicitacao}
                                     onChange={setSelectedTipoSolicitacao}
@@ -444,7 +659,7 @@ const NovaRequisicao = () => {
                         {selectedTipoSolicitacao?.value === 'Produto' && (
                             <div className="row">
                                 <div className="campo">
-                                    <label htmlFor="dataRemessa">Data de Remessa</label>
+                                    <label htmlFor="dataRemessa">Data de Remessa *</label>
                                     <input
                                         type="date"
                                         id="dataRemessa"
@@ -458,7 +673,7 @@ const NovaRequisicao = () => {
                         {selectedTipoSolicitacao?.value === 'Serviço' && (
                             <div className="row">
                                 <div className="campo" style={{ width: '100%' }}>
-                                    <label htmlFor="codigoFornecedor">Código do Fornecedor</label>
+                                    <label htmlFor="codigoFornecedor">Código do Fornecedor *</label>
                                     <input
                                         type="text"
                                         id="codigoFornecedor"
@@ -467,7 +682,7 @@ const NovaRequisicao = () => {
                                     />
                                 </div>
                                 <div className="campo" style={{ width: '100%' }}>
-                                    <label htmlFor="fornecedor">Fornecedor</label>
+                                    <label htmlFor="fornecedor">Fornecedor *</label>
                                     <Select
                                         id="fornecedor"
                                         value={selectedFornecedor}
@@ -480,7 +695,7 @@ const NovaRequisicao = () => {
                                     />
                                 </div>
                                 <div className="campo">
-                                    <label htmlFor="inicioServico">Início do Serviço</label>
+                                    <label htmlFor="inicioServico">Início do Serviço *</label>
                                     <input
                                         type="date"
                                         id="inicioServico"
@@ -489,7 +704,7 @@ const NovaRequisicao = () => {
                                     />
                                 </div>
                                 <div className="campo">
-                                    <label htmlFor="fimServico">Fim do Serviço</label>
+                                    <label htmlFor="fimServico">Fim do Serviço *</label>
                                     <input
                                         type="date"
                                         id="fimServico"
@@ -502,7 +717,7 @@ const NovaRequisicao = () => {
 
                         <div className="row">
                             <div className="campo">
-                                <label htmlFor="grupoMaterial">Grupo de Material</label>
+                                <label htmlFor="grupoMaterial">Grupo de Material*</label>
                                 <Select
                                     value={selectedGrupoMaterial}
                                     onChange={setSelectedGrupoMaterial}
@@ -512,7 +727,7 @@ const NovaRequisicao = () => {
                                 />
                             </div>
                             <div className="campo">
-                                <label htmlFor="motivoSolic">Motivo da Solicitação</label>
+                                <label htmlFor="motivoSolic">Motivo da Solicitação *</label>
                                 <Select
                                     value={selectedMotivoSolic}
                                     onChange={setSelectedMotivoSolic}
@@ -524,7 +739,7 @@ const NovaRequisicao = () => {
 
                         <div className="row">
                             <div className="campo">
-                                <label htmlFor="descricao">Descrição</label>
+                                <label htmlFor="descricao">Descrição *</label>
                                 <textarea
                                     id="descricao"
                                     rows="3"
@@ -593,7 +808,7 @@ const NovaRequisicao = () => {
                                     type="number"
                                     id="preco"
                                     value={preco}
-                                    readOnly
+                                    onChange={(e) => setPreco(e.target.value)}
                                 />
                             </div>
                             <div className="campo" style={{ width: '100%' }}>
@@ -620,8 +835,7 @@ const NovaRequisicao = () => {
 
                         <div className="total-info">
                             <p>
-                                Total: R$
-                                {items.reduce((acc, item) => acc + parseFloat(item.total), 0).toFixed(2)}
+                                Total: R$ {total.toFixed(2)}
                             </p>
                         </div>
 
@@ -676,9 +890,7 @@ const NovaRequisicao = () => {
                                                         <button
                                                             type="button"
                                                             className="botao-excluir"
-                                                            onClick={() =>
-                                                                setItems(items.filter((_, i) => i !== index))
-                                                            }
+                                                            onClick={() => handleRemoveItem(index)}
                                                         >
                                                             Remover
                                                         </button>
@@ -691,8 +903,7 @@ const NovaRequisicao = () => {
                             </div>
                             <div className="total-info">
                                 <p>
-                                    Total: R$
-                                    {items.reduce((acc, item) => acc + parseFloat(item.total), 0).toFixed(2)}
+                                    Total: R$ {total.toFixed(2)}
                                 </p>
                             </div>
                             <div className="campo botoes">
@@ -710,7 +921,7 @@ const NovaRequisicao = () => {
                     </div>
                 )}
             </div>
-        </div>
+        </div >
     );
 };
 
