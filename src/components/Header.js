@@ -3,10 +3,11 @@ import SearchBar from './SearchBar';
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/Header.css';
 import { FaBell } from 'react-icons/fa';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';  // FontAwesome import
+import { faHeadset } from '@fortawesome/free-solid-svg-icons';      // Import the headset icon
 import { useAuth } from '../context/AuthContext';
 import logoKora from '../assets/images/logokora.png';
 import SemFoto from '../assets/images/Sem_foto.png';
-import { faDisplay } from '../../node_modules/@fortawesome/free-solid-svg-icons/index';
 
 const Header = ({ pendentes = [] }) => {
   const { user, logout } = useAuth();
@@ -161,6 +162,13 @@ const Header = ({ pendentes = [] }) => {
                 alt="Foto de Perfil"
                 className="foto-perfil"
               />
+
+              {/* Stop propagation for the headset click */}
+              {user?.bl_analista && (
+                <div className="icone-headset" onClick={(e) => { e.stopPropagation(); navigate('/suporte/meus-atendimentos'); }}>
+                  <FontAwesomeIcon icon={faHeadset} title="Suporte" />
+                </div>
+              )}
 
               {isDropdownVisible && (
                 <div className="dropdown-perfil">

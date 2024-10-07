@@ -64,7 +64,7 @@ function AcessoTI() {
         { nome: 'Aplicativos', icone: faMobile, link: 'https://www.appsheet.com/start/2b5f0d42-fa81-4e5c-b998-688347035abd#view=Novo%20Ticket' },
         { nome: 'VPN/ZTNA', icone: faShieldAlt, link: '/suporte/novo-ticket-futuro', categoria: 'Cybersecurity'  },
         { nome: 'Micro Informática', icone: faLaptop, link: '/suporte/novo-ticket-futuro', categoria: 'Infraestrutura' },
-        { nome: 'Suporte', icone: faHeadset, link: '/suporte/meus-atendimentos' }
+        
     ];
 
     useEffect(() => {
