@@ -234,7 +234,7 @@ header {
   transform-origin: top center;
 }
 
-/* Headset icon styling */
+
 .icone-headset {
   font-size: 30px;
   color: rgb(177, 177, 177);
@@ -331,11 +331,7 @@ header {
   margin-top: 10px;
 }
 
-.perfil-usuario:active .foto-perfil {
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-  transform: scale(1.05);
-  border-color: #007aff;
-}
+
 
 .perfil-usuario .dropdown-toggle::after {
   content: '\25BC';
