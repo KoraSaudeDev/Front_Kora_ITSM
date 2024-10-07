@@ -487,6 +487,27 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
         };
     }, [showMenu]);
 
+    function formatDate(dateString, type = 1, sub3Hrs = false) {
+        if (!dateString) {
+            return '';
+        }
+
+        let date;
+        if (sub3Hrs) { date = new Date(new Date(dateString).getTime() + new Date(dateString).getTimezoneOffset() * 60000) }
+        else { date = new Date(dateString) }
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+
+        if (type === 1) return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+        else if (type === 2) return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        else if (type === 3) return date.toISOString().slice(0, 19);
+        else return '';
+    };
+
     const showLoadingOverlay = () => {
         document.getElementById('loading-overlay').style.display = 'flex';
     };
@@ -1349,7 +1370,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
                                     style={{ '--stagger': index + 1 }}
                                 >
                                     <td id='cont-tabela'>{atendimento.cod_fluxo}</td>
-                                    <td id='cont-tabela'>{new Date(atendimento.abertura).toLocaleString().replace(',', '')}</td>
+                                    <td id='cont-tabela'>{formatDate(atendimento.abertura, 1, true)}</td>
                                     <td id='cont-tabela'>
                                         <span
                                             className="status"
@@ -1407,7 +1428,7 @@ const AtendimentosTable = ({ titulo, apiUrl, filtrosExtras = {}, tipoTela, filtr
                                     <td id='cont-tabela'>{atendimento.categoria}</td>
                                     <td id='cont-tabela'>{atendimento.subcategoria}</td>
                                     <td id='cont-tabela'>{atendimento.assunto}</td>
-                                    <td id='cont-tabela'>{new Date(atendimento.data_limite).toLocaleString().replace(',', '')}</td>
+                                    <td id='cont-tabela'>{formatDate(atendimento.data_limite)}</td>
                                     <td id='cont-tabela'>{atendimento.grupo}</td>
                                     <td id='cont-tabela'>{atendimento.nome}</td>
                                     <td id='cont-tabela'>{atendimento.area_negocio}</td>
