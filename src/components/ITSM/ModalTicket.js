@@ -1139,14 +1139,14 @@ const Modal = ({ data, onClose }) => {
         if (String(destinatarioParts[0]) !== String(destinatarioDefault)) {
             id_executor = destinatarioParts[0];
             executor = selectedDestinatario.substring(id_executor.length + 3);
-            statusParam = "Em Andamento";
+            statusParam = "Em Aberto";
             const aberto_em = formatDate(new Date().toISOString(), 2);
 
             insert_tasks.push({
                 "cod_fluxo": data.id,
                 "aberto_em": aberto_em,
                 "aberto_por": user.name,
-                "status": "EM ATENDIMENTO",
+                "status": "EM ABERTO",
                 "descricao": "Solicitação encaminhada...",
                 "id_executor": id_executor,
                 "executor": executor,
