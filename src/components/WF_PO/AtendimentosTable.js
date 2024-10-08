@@ -110,9 +110,26 @@ const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela }) => {
         }
     };
 
-    const openTicketModal = (ticket) => {
-        setSelectedTicket(ticket);
-        setIsCartOpen(true);
+    const openTicketModal = async (ticket) => {
+        try {
+            const config = {
+                method: 'GET',
+                url: `${process.env.REACT_APP_API_BASE_URL}/wf-po/wf-po?id=${ticket.id}`,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    'X-User-Email': user.email,
+                },
+                data: filtrosExtras
+            };
+
+            const response = await axios.request(config);
+            setSelectedTicket(response.data);
+            setIsCartOpen(true);
+        }
+        catch (error) {
+            console.error("Erro ao buscar informações da requisição:", error);
+        }
     };
 
     const closeTicketModal = () => {
