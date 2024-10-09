@@ -40,6 +40,10 @@ const NovoTicketCompras = () => {
     const [preco, setPreco] = useState('');
     const [unidadeMedida, setUnidadeMedida] = useState('');
 
+    const [linhaMovel, setLinhaMovel] = useState({ numeroLinha: '', nomeUsuario: '', numeroMatricula: '', descricaoSolicitacao: '' });
+    const [chip, setChip] = useState({ quantidade: '', nomeUsuarios: '', numeroMatriculas: '' });
+    const [microsoft, setMicrosoft] = useState({ nomeColaborador: '', matriculaColaborador: '', emailColaborador: '', ferramenta: null, autorizacaoDiretor: null });
+
     const [items, setItems] = useState([]);
     const [total, setTotal] = useState(0);
     const [isCartOpen, setIsCartOpen] = useState(false);
@@ -55,7 +59,7 @@ const NovoTicketCompras = () => {
                 }));
             })
             .catch(error => console.error('Error fetching hubs:', error));
-    }, []);
+    }, [token, user.email]);
 
     useEffect(() => {
         if (selectedHub) {
@@ -208,6 +212,87 @@ const NovoTicketCompras = () => {
         setUnidadeMedida('');
     };
 
+    const renderAdditionalFields = () => {
+        if (selectedTipoEquipamento?.value === 'Linha Móvel') {
+            return (
+                <>
+                    <div className="campo">
+                        <label>Nº da linha *</label>
+                        <input type="text" value={linhaMovel.numeroLinha} onChange={(e) => setLinhaMovel({ ...linhaMovel, numeroLinha: e.target.value })} />
+                    </div>
+                    <div className="campo">
+                        <label>Nome do usuário *</label>
+                        <input type="text" value={linhaMovel.nomeUsuario} onChange={(e) => setLinhaMovel({ ...linhaMovel, nomeUsuario: e.target.value })} />
+                    </div>
+                    <div className="campo">
+                        <label>Nº da matrícula *</label>
+                        <input type="text" value={linhaMovel.numeroMatricula} onChange={(e) => setLinhaMovel({ ...linhaMovel, numeroMatricula: e.target.value })} />
+                    </div>
+                    <div className="campo">
+                        <label>Descrição da solicitação *</label>
+                        <textarea value={linhaMovel.descricaoSolicitacao} onChange={(e) => setLinhaMovel({ ...linhaMovel, descricaoSolicitacao: e.target.value })}></textarea>
+                    </div>
+                </>
+            );
+        } else if (selectedTipoEquipamento?.value === 'CHIP') {
+            return (
+                <>
+                    <div className="campo">
+                        <label>Quantidade *</label>
+                        <input type="number" value={chip.quantidade} onChange={(e) => setChip({ ...chip, quantidade: e.target.value })} />
+                    </div>
+                    <div className="campo">
+                        <label>Nome do usuário(s) *</label>
+                        <textarea value={chip.nomeUsuarios} onChange={(e) => setChip({ ...chip, nomeUsuarios: e.target.value })}></textarea>
+                    </div>
+                    <div className="campo">
+                        <label>Nº da matrícula(s) *</label>
+                        <textarea value={chip.numeroMatriculas} onChange={(e) => setChip({ ...chip, numeroMatriculas: e.target.value })}></textarea>
+                    </div>
+                </>
+            );
+        } else if (selectedTipoEquipamento?.value === 'Microsoft') {
+            return (
+                <>
+                    <div className="campo">
+                        <label>Nome do Colaborador *</label>
+                        <input type="text" value={microsoft.nomeColaborador} onChange={(e) => setMicrosoft({ ...microsoft, nomeColaborador: e.target.value })} />
+                    </div>
+                    <div className="campo">
+                        <label>Matrícula do Colaborador *</label>
+                        <input type="text" value={microsoft.matriculaColaborador} onChange={(e) => setMicrosoft({ ...microsoft, matriculaColaborador: e.target.value })} />
+                    </div>
+                    <div className="campo">
+                        <label>E-mail do Colaborador *</label>
+                        <input type="email" value={microsoft.emailColaborador} onChange={(e) => setMicrosoft({ ...microsoft, emailColaborador: e.target.value })} />
+                    </div>
+                    <div className="campo">
+                        <label>Ferramentas *</label>
+                        <Select
+                            value={microsoft.ferramenta}
+                            onChange={(selectedOption) => setMicrosoft({ ...microsoft, ferramenta: selectedOption })}
+                            options={[
+                                { value: 'Microsoft Office (Excel)', label: 'Microsoft Office (Excel)' },
+                                { value: 'Microsoft Power BI Free', label: 'Microsoft Power BI Free' },
+                                { value: 'Microsoft Project', label: 'Microsoft Project' },
+                                { value: 'Microsoft Planner', label: 'Microsoft Planner' },
+                                { value: 'Microsoft Power BI Pro', label: 'Microsoft Power BI Pro' },
+                                { value: 'Microsoft Visio', label: 'Microsoft Visio' }
+                            ]}
+                            isClearable
+                            placeholder="Selecione a ferramenta"
+                        />
+                    </div>
+                    <div className="campo">
+                        <label>Autorização do Diretor (anexo) *</label>
+                        <input type="file" onChange={(e) => setMicrosoft({ ...microsoft, autorizacaoDiretor: e.target.files[0] })} />
+                    </div>
+                </>
+            );
+        }
+        return null;
+    };
+
     const handleSendTicket = async () => {
         // Função para enviar o ticket
     };
@@ -222,7 +307,6 @@ const NovoTicketCompras = () => {
             <SidebarInterna menuItems={menuRequisicao} />
             <div className="container">
                 <div className="form-wrapper">
-                    {/* Novo Formulário */}
                     <form className="formulario" onSubmit={handleSendForm}>
                         <div className="row">
                             <div className="campo">
@@ -298,6 +382,9 @@ const NovoTicketCompras = () => {
                             </div>
                         </div>
 
+                        {/* Renderização Condicional dos Inputs com Base no Tipo de Equipamento Selecionado */}
+                        {renderAdditionalFields()}
+
                         <div className="row">
                             <div className="campo">
                                 <label htmlFor="gestorResponsavel">Gestor(a) Responsável *</label>
@@ -323,151 +410,154 @@ const NovoTicketCompras = () => {
                             </div>
                         </div>
 
-                        
-                    </form>
-
-                    
-                    <div className="cadastro-material">
-                        <div className="cadastro-material-header">
-                            <h3 id='titulo-cadastro'>Cadastrar Material</h3>
-                            <div className="cart-container">
-                                <FaShoppingCart className="cart-icon" onClick={toggleCartModal} />
-                                {items.length > 0 && (
-                                    <span className="cart-notification">{items.length}</span>
-                                )}
+                        {/* Parte de Cadastrar Material */}
+                        <div className="cadastro-material">
+                            <div className="cadastro-material-header">
+                                <h3 id="titulo-cadastro">Cadastrar Material</h3>
+                                <div className="cart-container">
+                                    <FaShoppingCart className="cart-icon" onClick={toggleCartModal} />
+                                    {items.length > 0 && (
+                                        <span className="cart-notification">{items.length}</span>
+                                    )}
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="campo" style={{ width: '100%' }}>
-                            <label htmlFor="codigoMaterial">Código do Material</label>
-                            <input
-                                type="text"
-                                id="codigoMaterial"
-                                value={codigoMaterial}
-                                onChange={(e) => setCodigoMaterial(e.target.value)}
-                            />
-                        </div>
-                        <div className="campo" style={{ width: '100%' }}>
-                            <label htmlFor="material">Material</label>
-                            <Select
-                                id="material"
-                                value={selectedMaterial}
-                                onChange={setSelectedMaterial}
-                                options={options.material}
-                                placeholder="Digite para pesquisar"
-                                onInputChange={handleMaterialInputChange}
-                                isClearable
-                            />
-                        </div>
-                        <div className="campo" style={{ width: '100%' }}>
-                            <label htmlFor="quantidade">Quantidade</label>
-                            <input
-                                type="number"
-                                id="quantidade"
-                                value={quantidade}
-                                onChange={(e) => setQuantidade(e.target.value)}
-                            />
-                        </div>
-                        <div className="campo" style={{ width: '100%' }}>
-                            <label htmlFor="preco">Preço</label>
-                            <input
-                                type="number"
-                                id="preco"
-                                value={preco}
-                                onChange={(e) => setPreco(e.target.value)}
-                            />
-                        </div>
-                        <div className="campo" style={{ width: '100%' }}>
-                            <label htmlFor="unidadeMedida">Unidade de Medida</label>
-                            <input
-                                type="text"
-                                id="unidadeMedida"
-                                value={unidadeMedida}
-                                readOnly
-                            />
-                        </div>
+                            <div className="campo" style={{ width: '100%' }}>
+                                <label htmlFor="equipamento">Equipamento *</label>
+                                <Select
+                                    id="equipamento"
+                                    value={selectedMaterial}
+                                    onChange={setSelectedMaterial}
+                                    options={options.material}
+                                    placeholder="Selecione o Equipamento"
+                                    onInputChange={handleMaterialInputChange}
+                                    isClearable
+                                />
+                            </div>
+                            <div className="campo" style={{ width: '100%' }}>
+                                <label htmlFor="valorEstimado">Valor Estimado *</label>
+                                <input
+                                    type="number"
+                                    id="valorEstimado"
+                                    value={preco}
+                                    onChange={(e) => setPreco(e.target.value)}
+                                />
+                            </div>
+                            <div className="campo" style={{ width: '100%' }}>
+                                <label htmlFor="quantidade">Quantidade</label>
+                                <input
+                                    type="number"
+                                    id="quantidade"
+                                    value={quantidade}
+                                    onChange={(e) => setQuantidade(e.target.value)}
+                                />
+                            </div>
+                            <div className="campo" style={{ width: '100%' }}>
+                                <label htmlFor="justificativa">Justificativa</label>
+                                <textarea
+                                    id="justificativa"
+                                    value={descricao}
+                                    onChange={(e) => setDescricao(e.target.value)}
+                                    placeholder="Insira a justificativa"
+                                />
+                            </div>
+                            <div className="campo" style={{ width: '100%' }}>
+                                <label htmlFor="linkProduto">Link do Produto Desejado</label>
+                                <input
+                                    type="text"
+                                    id="linkProduto"
+                                    value={inputMaterial}
+                                    onChange={(e) => setInputMaterial(e.target.value)}
+                                />
+                            </div>
+                            <div className="campo" style={{ width: '100%' }}>
+                                <label htmlFor="anexo">Anexo (se houver)</label>
+                                <input type="file" onChange={(e) => setAnexo(e.target.files[0])} />
+                            </div>
 
-                        <button
-                            type="button"
-                            onClick={editingIndex === null ? handleAddItem : handleSaveEdit}
-                            className="botao-adicionar"
-                            disabled={isAddButtonDisabled}
-                        >
-                            {editingIndex === null ? 'Adicionar' : 'Salvar'}
-                        </button>
-
-                        <div className="campo botoes">
-                            <button type="submit" className="botao-enviar">
-                                Enviar
+                            <button
+                                type="button"
+                                onClick={editingIndex === null ? handleAddItem : handleSaveEdit}
+                                className="botao-adicionar"
+                                disabled={isAddButtonDisabled}
+                            >
+                                {editingIndex === null ? 'Adicionar' : 'Salvar'}
                             </button>
-                        </div>
-                    </div>
 
-                    {isCartOpen && (
-                        <div className="modal-overlay">
-                            <div className="modal">
-                                <div className="modal-header">
-                                    <h3>Itens do Carrinho</h3>
-                                    <span className="close" onClick={toggleCartModal}>&times;</span>
-                                </div>
-                                <div className="tabela-itens">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>Código</th>
-                                                <th>Item</th>
-                                                <th>Quantidade</th>
-                                                <th>Preço</th>
-                                                <th>Unidade</th>
-                                                <th>Total</th>
-                                                <th>Ações</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {items.length === 0 ? (
-                                                <tr>
-                                                    <td colSpan="7">Nenhum registro encontrado</td>
-                                                </tr>
-                                            ) : (
-                                                items.map((item, index) => (
-                                                    <tr key={index}>
-                                                        <td>{item.codigo}</td>
-                                                        <td>{item.material}</td>
-                                                        <td>{item.quantidade}</td>
-                                                        <td>{item.preco}</td>
-                                                        <td>{item.unidadeMedida}</td>
-                                                        <td>{item.total}</td>
-                                                        <td>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => handleEditItem(index)}
-                                                            >
-                                                                Editar
-                                                            </button>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => handleRemoveItem(index)}
-                                                            >
-                                                                Remover
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                ))
-                                            )}
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div className="total-info">
-                                    <p>Total: R$ {total.toFixed(2)}</p>
-                                </div>
-                                <div className="campo botoes">
-                                    <button type="button" onClick={handleSendTicket}>
-                                        Enviar
-                                    </button>
-                                </div>
+                            <div className="campo botoes">
+                                <button type="submit" className="botao-enviar">
+                                    Enviar
+                                </button>
                             </div>
                         </div>
-                    )}
+
+                        {/* Modal do Carrinho */}
+                        {isCartOpen && (
+                            <div className="modal-overlay">
+                                <div className="modal">
+                                    <div className="modal-header">
+                                        <h3>Itens do Carrinho</h3>
+                                        <span className="close" onClick={toggleCartModal}>&times;</span>
+                                    </div>
+                                    <div className="tabela-itens">
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>Código</th>
+                                                    <th>Item</th>
+                                                    <th>Quantidade</th>
+                                                    <th>Preço</th>
+                                                    <th>Unidade</th>
+                                                    <th>Total</th>
+                                                    <th>Ações</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {items.length === 0 ? (
+                                                    <tr>
+                                                        <td colSpan="7">Nenhum registro encontrado</td>
+                                                    </tr>
+                                                ) : (
+                                                    items.map((item, index) => (
+                                                        <tr key={index}>
+                                                            <td>{item.codigo}</td>
+                                                            <td>{item.material}</td>
+                                                            <td>{item.quantidade}</td>
+                                                            <td>{item.preco}</td>
+                                                            <td>{item.unidadeMedida}</td>
+                                                            <td>{item.total}</td>
+                                                            <td>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleEditItem(index)}
+                                                                >
+                                                                    Editar
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleRemoveItem(index)}
+                                                                >
+                                                                    Remover
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    ))
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div className="total-info">
+                                        <p>Total: R$ {total.toFixed(2)}</p>
+                                    </div>
+                                    <div className="campo botoes">
+                                        <button type="button" onClick={handleSendTicket}>
+                                            Enviar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </form>
                 </div>
             </div>
         </div>
