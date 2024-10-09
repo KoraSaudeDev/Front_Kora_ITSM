@@ -5,14 +5,26 @@ import axios from 'axios';
 
 const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) => {
     const { user, token } = useAuth();
+
+    const [total, setTotal] = useState(0);
+    const [selectedItems, setSelectedItems] = useState([]);
+
     const [materiais, setMateriais] = useState([]);
     const [bionexo, setBionexo] = useState([]);
     const [aprovacoes, setAprovacoes] = useState([]);
     const [atividades, setAtividades] = useState([]);
-    
+
+    const [bloco, setBloco] = useState(null);
+    const [fase, setFase] = useState(null);
+    const [grupo, setGrupo] = useState(null);
+    const [isNextIntegraBio, setIsNextIntegraBio] = useState(false);
+    const [isNextIntegraSAP, setIsNextIntegraSAP] = useState(false);
+
     const [isHistoricoOpen, setIsHistoricoOpen] = useState(false);
     const [isAtividadesOpen, setIsAtividadesOpen] = useState(false);
     const [isBionexoOpen, setIsBionexoOpen] = useState(false);
+
+    const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
     const toggleHistorico = () => setIsHistoricoOpen(!isHistoricoOpen);
     const toggleAtividades = () => setIsAtividadesOpen(!isAtividadesOpen);
@@ -90,12 +102,30 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
         }
     };
 
+    const fetchFases = () => {
+        axios.get(
+            `${process.env.REACT_APP_API_BASE_URL}/wf-po/form/fases?bloco=${bloco}&valor=${total}&fase=${selectedTicket.id_fase}`,
+            { headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email } }
+        )
+            .then(response => {
+                if (response.data[0].id_fase) setFase(response.data[0].id_fase);
+                if (response.data[0].id_grupo) setGrupo(response.data[0].id_grupo);
+                if (response.data[0].isIntegraBio) setIsNextIntegraBio(response.data[0].isIntegraBio);
+                if (response.data[0].isIntegraSAP) setIsNextIntegraSAP(response.data[0].isIntegraSAP);
+            })
+            .catch(error => console.error('Error fetching fases:', error));
+    };
+
     useEffect(() => {
         if (selectedTicket) {
             fetchMateriais();
             fetchBionexo();
             fetchAprovacoes();
             fetchAtividades();
+            setTotal(parseFloat(selectedTicket.total_materiais) || 0);
+            setBloco(selectedTicket.numero_bloco);
+            setFase(selectedTicket.id_fase);
+            setGrupo(selectedTicket.id_grupo);
         }
     }, [selectedTicket]);
 
@@ -108,8 +138,24 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
             setIsHistoricoOpen(false);
             setIsAtividadesOpen(false);
             setIsBionexoOpen(false);
+            setTotal(0);
         }
     }, [isCartOpen]);
+
+    useEffect(() => {
+        const newTotal = materiais
+            .filter(material => material.status !== 'Reprovado')
+            .reduce((acc, material) => {
+                return acc + parseFloat(material.total);
+            }, 0);
+        setTotal(newTotal);
+    }, [materiais]);
+
+    useEffect(() => {
+        if (isCartOpen) {
+            fetchFases();
+        }
+    }, [total])
 
     function formatDate(dateString, type = 1, sub3Hrs = false) {
         if (!dateString) {
@@ -131,6 +177,224 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
         else if (type === 3) return date.toISOString().slice(0, 19);
         else return '';
     };
+
+    const sendRequest = async (config) => {
+        try {
+            const response = await axios.request(config);
+            console.log(JSON.stringify(response.data));
+            return response.data;
+        } catch (error) {
+            console.error('Request Error:', error);
+        }
+    };
+
+    const showLoadingOverlay = () => {
+        document.getElementById('loading-overlay').style.display = 'flex';
+    };
+
+    const hideLoadingOverlay = () => {
+        document.getElementById('loading-overlay').style.display = 'none';
+    };
+
+    const handleSelectAll = (e) => {
+        if (e.target.checked) {
+            setSelectedItems(materiais.map(material => material.codigo));
+        } else {
+            setSelectedItems([]);
+        }
+    };
+
+    const handleSelectItem = (codigo) => {
+        if (selectedItems.includes(codigo)) {
+            setSelectedItems(selectedItems.filter(item => item !== codigo));
+        } else {
+            setSelectedItems([...selectedItems, codigo]);
+        }
+    };
+
+    const handleApprove = () => {
+        const updatedMateriais = materiais.map((material) => {
+            if (selectedItems.includes(material.codigo)) {
+                if (material.status === 'Reprovado') {
+                    setTotal(prevTotal => prevTotal + parseFloat(material.total));
+                }
+                return { ...material, status: 'Aprovado', id_status: 2, motivo_reprova: null };
+            }
+            return material;
+        });
+        setMateriais(updatedMateriais);
+        setSelectedItems([]);
+    };
+
+    const handleReject = () => {
+        const motivo = prompt("Digite o motivo da reprovação:");
+        if (motivo) {
+            const updatedMateriais = materiais.map((material) => {
+                if (selectedItems.includes(material.codigo)) {
+                    setTotal(prevTotal => prevTotal - parseFloat(material.total));
+                    return { ...material, status: 'Reprovado', id_status: 3, motivo_reprova: motivo };
+                }
+                return material;
+            });
+            setMateriais(updatedMateriais);
+            setSelectedItems([]);
+        }
+    };
+
+    const handleQuantidadeChange = (codigo, novaQuantidade) => {
+        const quantidadeValida = isNaN(parseFloat(novaQuantidade)) || novaQuantidade === '' || parseFloat(novaQuantidade) < 0
+            ? 0
+            : parseFloat(novaQuantidade);
+
+        const updatedMateriais = materiais.map(material => {
+            if (material.codigo === codigo) {
+                const novoTotal = parseFloat(material.preco) * quantidadeValida;
+                return {
+                    ...material,
+                    qtd: quantidadeValida,
+                    total: novoTotal.toFixed(2)
+                };
+            }
+            return material;
+        });
+        setMateriais(updatedMateriais);
+    };
+
+    const handleSalvarTicket = async () => {
+        const aprovacoes_insert = materiais.map(material => ({
+            referencia_id: selectedTicket.id,
+            codigo: material.codigo,
+            grupo: material.grupo,
+            material: material.material,
+            qtd: material.qtd,
+            preco: material.preco,
+            total: material.total,
+            status: material.id_status,
+            executor: selectedTicket.id_grupo,
+            nome_executor: user.name,
+            motivo_reprova: material.motivo_reprova,
+        }));
+    
+        const materiais_update = materiais.map(material => ({
+            id: material.id,
+            qtd: material.qtd,
+            status: material.status === "Aprovado" ? 1 : material.id_status,
+            motivo_reprova: material.status !== "Aprovado" ? material.motivo_reprova : null,
+        }));
+    
+        const data = formatDate(new Date(), 2);
+        const atividade_insert = {
+            referencia_id: selectedTicket.id,
+            fase: fase,
+            executor: grupo,
+            nome_executor: user.name,
+            numero_bloco: selectedTicket.numero_bloco,
+            inicio: data,
+        };
+    
+        const atividades_update = atividades.length > 0 ? [{
+            id: atividades[atividades.length - 1].id,
+            nome_executor: user.name,
+            fim: data
+        }] : [];
+    
+        const requisicao_update = {
+            executor: grupo,
+            fase: fase,
+            total_materiais: total,
+        };
+    
+        showLoadingOverlay();
+    
+        try {
+            const wf_po_Config = {
+                method: 'patch',
+                url: `${process.env.REACT_APP_API_BASE_URL}/wf-po/update/wf-po/${selectedTicket.id}`,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    'X-User-Email': user.email,
+                },
+                data: JSON.stringify(requisicao_update),
+            };
+            console.log(wf_po_Config)
+            await sendRequest(wf_po_Config);
+    
+            for (const material of materiais_update) {
+                const material_Config = {
+                    method: 'patch',
+                    url: `${process.env.REACT_APP_API_BASE_URL}/wf-po/update/wf-po-material/${material.id}`,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        'X-User-Email': user.email,
+                    },
+                    data: JSON.stringify(material),
+                };
+                console.log(material_Config)
+                await sendRequest(material_Config);
+            }
+    
+            for (const task of atividades_update) {
+                const task_Config = {
+                    method: 'patch',
+                    url: `${process.env.REACT_APP_API_BASE_URL}/wf-po/update/wf-po-task/${task.id}`,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        'X-User-Email': user.email,
+                    },
+                    data: JSON.stringify(task),
+                };
+
+                console.log(task_Config)
+    
+                await sendRequest(task_Config);
+            }
+    
+            for (const aprovacao of aprovacoes_insert) {
+                const aprovacao_Config = {
+                    method: 'post',
+                    url: `${process.env.REACT_APP_API_BASE_URL}/wf-po/update/wf-po-aprovacao`,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        'X-User-Email': user.email,
+                    },
+                    data: JSON.stringify(aprovacao),
+                };
+                console.log(aprovacao_Config)
+                await sendRequest(aprovacao_Config);
+            }
+    
+            const task_insert_Config = {
+                method: 'post',
+                url: `${process.env.REACT_APP_API_BASE_URL}/wf-po/update/wf-po-task`,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    'X-User-Email': user.email,
+                },
+                data: JSON.stringify(atividade_insert),
+            };
+
+            
+            console.log(task_insert_Config)
+    
+            await sendRequest(task_insert_Config);
+    
+            hideLoadingOverlay();
+    
+            setShowSuccessPopup(true);
+            setTimeout(() => {
+                setShowSuccessPopup(false);
+                window.location.reload();
+            }, 3000);
+        } catch (error) {
+            hideLoadingOverlay();
+            console.error("Error saving wf-po:", error);
+        }
+    };    
 
     return (
         isCartOpen && selectedTicket && (
@@ -158,6 +422,7 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                                 <input id="input-nome" type="text" value={selectedTicket.nome} readOnly />
                             </div>
                         </div>
+
                         <div className="form-row">
                             <div className="campo">
                                 <label htmlFor="input-hub">Hub:</label>
@@ -172,6 +437,7 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                                 <input id="input-centro-custo" type="text" value={selectedTicket.centro_custo} readOnly />
                             </div>
                         </div>
+
                         <div className="form-row">
                             <div className="campo">
                                 <label htmlFor="input-area">Área:</label>
@@ -192,6 +458,7 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                                 <input id="input-bloco" type="text" value={selectedTicket.numero_bloco} readOnly />
                             </div>
                         </div>
+
                         {selectedTicket.tipo_solicitacao === "Serviço" && (
                             <div className="form-row">
                                 <div className="campo">
@@ -212,6 +479,7 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                                 </div>
                             </div>
                         )}
+
                         <div className="form-row">
                             <div className="campo">
                                 <label htmlFor="input-descricao">Descrição:</label>
@@ -223,10 +491,26 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                             </div>
                         </div>
 
+                        {editing && selectedTicket.id_fase < 10 && (
+                            <div className="botoes-acoes">
+                                <button onClick={handleApprove} disabled={selectedItems.length === 0}>Aprovar</button>
+                                <button onClick={handleReject} disabled={selectedItems.length === 0}>Reprovar</button>
+                            </div>
+                        )}
+
                         <table className="tabela-tickets">
                             <thead>
                                 <tr>
-                                    <th><input type="checkbox" id="checkbox-select" /></th>
+                                    {editing && (
+                                        <th>
+                                            <input
+                                                type="checkbox"
+                                                id="checkbox-select"
+                                                onChange={handleSelectAll}
+                                                checked={selectedItems.length === materiais.length && materiais.length > 0}
+                                            />
+                                        </th>
+                                    )}
                                     <th>Código</th>
                                     <th>Item</th>
                                     <th>Quantidade</th>
@@ -240,10 +524,29 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                                 {materiais.length > 0 ? (
                                     materiais.map((material, index) => (
                                         <tr key={index}>
-                                            <td><input type="checkbox" id="checkbox-item" /></td>
+                                            {editing && (
+                                                <td>
+                                                    <input
+                                                        type="checkbox"
+                                                        id="checkbox-item"
+                                                        checked={selectedItems.includes(material.codigo)}
+                                                        onChange={() => handleSelectItem(material.codigo)}
+                                                    />
+                                                </td>
+                                            )}
                                             <td>{material.codigo}</td>
                                             <td>{material.material}</td>
-                                            <td>{material.qtd}</td>
+                                            {editing ? (
+                                                <td>
+                                                    <input
+                                                        type="number"
+                                                        value={material.qtd}
+                                                        onChange={(e) => handleQuantidadeChange(material.codigo, e.target.value)}
+                                                    />
+                                                </td>
+                                            ) : (
+                                                <td>{material.qtd}</td>
+                                            )}
                                             <td>{material.preco}</td>
                                             <td>{material.total}</td>
                                             <td>{material.status}</td>
@@ -252,14 +555,14 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="8">Nenhum material encontrado.</td>
+                                        <td colSpan={editing ? "8" : "7"}>Nenhum material encontrado.</td>
                                     </tr>
                                 )}
                             </tbody>
                         </table>
 
                         <div className="total">
-                            <p id="total-info">Total: R$900.00</p>
+                            <p id="total-info">Total: R${total.toFixed(2)}</p>
                         </div>
 
                         {bionexo.length > 0 && (
@@ -432,16 +735,38 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                             )}
                         </div>
 
-                        <div className="footer-note" id="footer-note">
-                            <p>ATENÇÃO! Você é o último responsável pela aprovação dos materiais, ao enviar, será criado uma cotação no bionexo!</p>
-                        </div>
+                        {fase === 15 && (
+                            <div className="footer-note" id="footer-note">
+                                <p>ATENÇÃO! Você é o último responsável pela aprovação dos materiais, ao enviar, será criado uma cotação no bionexo!</p>
+                            </div>
+                        )}
+
+                        {fase === 45 && (
+                            <div className="footer-note" id="footer-note">
+                                <p>ATENÇÃO! Você é o último responsável pela aprovação da solicitação, ao enviar, será criado uma PO no SAP!</p>
+                            </div>
+                        )}
 
                         <div className="modal-footer" id="modal-footer">
-                            <button className="btn-voltar" id="btn-voltar" onClick={closeTicketModal}>Voltar</button>
+                            <button className="btn-voltar" id="btn-voltar" onClick={closeTicketModal}>Fechar</button>
+                            {editing && selectedTicket.id_fase < 10 && (
+                                <button
+                                    className="btn-voltar"
+                                    onClick={handleSalvarTicket}
+                                    disabled={materiais.some(material => material.status === "Pendente")}
+                                >
+                                    Enviar
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>
-            </div >
+                {showSuccessPopup && (
+                    <div className="popup-sucesso">
+                        <p>Enviado com sucesso!</p>
+                    </div>
+                )}
+            </div>
         )
     );
 };
