@@ -20,6 +20,7 @@ const Aprovacoes = () => {
                 <AtendimentosTable
                     url={`${process.env.REACT_APP_API_BASE_URL}/wf-po/aprovacoes?grupos=${user.wf_po_grupos_id.join(',')}&email=${user.email}&`}
                     tipo_tela="wf_po_aprovacoes"
+                    editing={true}
                 />
             </div>
         </div>

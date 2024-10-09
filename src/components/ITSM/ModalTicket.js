@@ -867,7 +867,7 @@ const Modal = ({ data, onClose }) => {
 
     const handleAnexoClick = async (anexoPath) => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/file/open-url?path=${anexoPath}`);
+            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/file/open-url?path=${anexoPath}`, { headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email } });
             if (response.data) {
                 window.open(response.data);
             }

@@ -3,13 +3,13 @@ import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 
-const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal }) => {
+const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) => {
     const { user, token } = useAuth();
     const [materiais, setMateriais] = useState([]);
     const [bionexo, setBionexo] = useState([]);
     const [aprovacoes, setAprovacoes] = useState([]);
     const [atividades, setAtividades] = useState([]);
-
+    
     const [isHistoricoOpen, setIsHistoricoOpen] = useState(false);
     const [isAtividadesOpen, setIsAtividadesOpen] = useState(false);
     const [isBionexoOpen, setIsBionexoOpen] = useState(false);

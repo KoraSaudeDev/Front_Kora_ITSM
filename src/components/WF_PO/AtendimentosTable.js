@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useRefresh } from '../../context/RefreshContext';
 import axios from 'axios';
 
-const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela }) => {
+const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela, editing = false }) => {
     const { user, token } = useAuth();
     const { refreshKey } = useRefresh();
     const [tickets, setTickets] = useState([]);
@@ -206,6 +206,7 @@ const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela }) => {
                 isCartOpen={isCartOpen}
                 selectedTicket={selectedTicket}
                 closeTicketModal={closeTicketModal}
+                editing={editing}
             />
         </>
     );
