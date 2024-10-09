@@ -60,7 +60,7 @@ function AcessoTI() {
         { nome: 'Relógio de Ponto', icone: faLaptop, link: 'https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#appName=TicketsGeral-448944302&view=Novo%20Ticket&defaults={%22Categoria%22:%22Rel%C3%B3gio%20de%20Ponto%22}' },
         { nome: 'Change', icone: faCog, link: 'https://www.appsheet.com/start/15c37ba0-bf1c-43ca-a5ef-eb0dc63ffe9d#appName=ITSM-ChangeV3-448944302&group=%5B%7B%22Column%22%3A%22ds_status%22%2C%22Order%22%3A%22Ascending%22%7D%5D&page=fastTable&sort=%5B%7B%22Column%22%3A%22dt_abertura%22%2C%22Order%22%3A%22Descending%22%7D%5D&table=Sl_minhas_solicitacoes&view=Minhas+Solicita%C3%A7%C3%B5es' },
         { nome: 'Gestão de Demandas', icone: faProjectDiagram, link: 'https://www.appsheet.com/start/77407a8b-89e2-418b-8b3c-4ec3053f05b7#view=Novo%20Ticket' },
-        { nome: 'PMO', icone: faGlobe, link: 'href="https://www.appsheet.com/dbs/database/yRZRN9Vusx4VmCVLn22vV0/table/NB0LFPjIa8442iSGIvcNf0"' },
+        { nome: 'PMO', icone: faGlobe, link:"https://www.appsheet.com/dbs/database/yRZRN9Vusx4VmCVLn22vV0/table/NB0LFPjIa8442iSGIvcNf0" },
         { nome: 'Aplicativos', icone: faMobile, link: 'https://www.appsheet.com/start/2b5f0d42-fa81-4e5c-b998-688347035abd#view=Novo%20Ticket' },
         { nome: 'VPN/ZTNA', icone: faShieldAlt, link: 'https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#=TicketsGeral-448944302&view=Novo%20Ticket&defaults={%22Categoria%22:%22Cybersecurity%22,%22Subcategoria%22:%22ZTNA%20-%20Conectividade%22}' },
         { nome: 'Micro Informática', icone: faLaptop, link: 'https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#appName=TicketsGeral-448944302&view=Novo%20Ticket&defaults={%22Categoria%22:%22Infraestrutura%22}' },
