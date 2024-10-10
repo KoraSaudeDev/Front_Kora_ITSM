@@ -29,6 +29,7 @@ const NovoTicketCompras = () => {
     const [selectedCentroCusto, setSelectedCentroCusto] = useState(null);
     const [selectedTipoEquipamento, setSelectedTipoEquipamento] = useState(null);
     const [gestorResponsavel, setGestorResponsavel] = useState(null);
+    const [anexo, setAnexo] = useState(null); 
 
     const [descricao, setDescricao] = useState('');
     const [observacao, setObservacao] = useState('');
