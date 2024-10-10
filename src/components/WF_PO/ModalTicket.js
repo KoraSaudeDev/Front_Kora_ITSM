@@ -25,11 +25,13 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
     const [isBionexoOpen, setIsBionexoOpen] = useState(false);
 
     const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+    const [aprovacaoMateriais, setAprovacaoMateriais] = useState(false);
+    const [aprovacaoSolicitacao, setAprovacaoSolicitacao] = useState(false);
 
     const toggleHistorico = () => setIsHistoricoOpen(!isHistoricoOpen);
     const toggleAtividades = () => setIsAtividadesOpen(!isAtividadesOpen);
     const toggleBionexo = () => setIsBionexoOpen(!isBionexoOpen);
-
+    
     const fetchMateriais = async () => {
         try {
             const response = await axios.get(
@@ -126,6 +128,8 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
             setBloco(selectedTicket.numero_bloco);
             setFase(selectedTicket.id_fase);
             setGrupo(selectedTicket.id_grupo);
+            setAprovacaoMateriais(editing && selectedTicket.id_fase < 10);
+            setAprovacaoSolicitacao(editing && selectedTicket.id_fase >= 10);
         }
     }, [selectedTicket]);
 
@@ -139,6 +143,12 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
             setIsAtividadesOpen(false);
             setIsBionexoOpen(false);
             setTotal(0);
+            setBloco(null);
+            setFase(null);
+            setGrupo(null);
+            setIsNextIntegraSAP(false);
+            setIsNextIntegraBio(false);
+            setAprovacaoMateriais(false);
         }
     }, [isCartOpen]);
 
@@ -155,7 +165,7 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
         if (isCartOpen) {
             fetchFases();
         }
-    }, [total])
+    }, [total]);
 
     function formatDate(dateString, type = 1, sub3Hrs = false) {
         if (!dateString) {
@@ -260,7 +270,7 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
         setMateriais(updatedMateriais);
     };
 
-    const handleSalvarTicket = async () => {
+    const handleSalvarAprovMat = async () => {
         const aprovacoes_insert = materiais.map(material => ({
             referencia_id: selectedTicket.id,
             codigo: material.codigo,
@@ -270,7 +280,7 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
             preco: material.preco,
             total: material.total,
             status: material.id_status,
-            executor: selectedTicket.id_grupo,
+            executor: selectedTicket.id_executor,
             nome_executor: user.name,
             motivo_reprova: material.motivo_reprova,
         }));
@@ -280,6 +290,7 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
             qtd: material.qtd,
             status: material.status === "Aprovado" ? 1 : material.id_status,
             motivo_reprova: material.status !== "Aprovado" ? material.motivo_reprova : null,
+            total: material.total,
         }));
     
         const data = formatDate(new Date(), 2);
@@ -317,7 +328,6 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                 },
                 data: JSON.stringify(requisicao_update),
             };
-            console.log(wf_po_Config)
             await sendRequest(wf_po_Config);
     
             for (const material of materiais_update) {
@@ -331,7 +341,6 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                     },
                     data: JSON.stringify(material),
                 };
-                console.log(material_Config)
                 await sendRequest(material_Config);
             }
     
@@ -346,9 +355,6 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                     },
                     data: JSON.stringify(task),
                 };
-
-                console.log(task_Config)
-    
                 await sendRequest(task_Config);
             }
     
@@ -363,7 +369,6 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                     },
                     data: JSON.stringify(aprovacao),
                 };
-                console.log(aprovacao_Config)
                 await sendRequest(aprovacao_Config);
             }
     
@@ -377,10 +382,6 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                 },
                 data: JSON.stringify(atividade_insert),
             };
-
-            
-            console.log(task_insert_Config)
-    
             await sendRequest(task_insert_Config);
     
             hideLoadingOverlay();
@@ -394,7 +395,11 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
             hideLoadingOverlay();
             console.error("Error saving wf-po:", error);
         }
-    };    
+    };
+    
+    const handleSalvarAprovSolic = async () => {
+        console.log(isNextIntegraBio, isNextIntegraSAP);
+    }
 
     return (
         isCartOpen && selectedTicket && (
@@ -491,7 +496,7 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                             </div>
                         </div>
 
-                        {editing && selectedTicket.id_fase < 10 && (
+                        {aprovacaoMateriais && (
                             <div className="botoes-acoes">
                                 <button onClick={handleApprove} disabled={selectedItems.length === 0}>Aprovar</button>
                                 <button onClick={handleReject} disabled={selectedItems.length === 0}>Reprovar</button>
@@ -501,7 +506,7 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                         <table className="tabela-tickets">
                             <thead>
                                 <tr>
-                                    {editing && (
+                                    {aprovacaoMateriais && (
                                         <th>
                                             <input
                                                 type="checkbox"
@@ -524,7 +529,7 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                                 {materiais.length > 0 ? (
                                     materiais.map((material, index) => (
                                         <tr key={index}>
-                                            {editing && (
+                                            {aprovacaoMateriais && (
                                                 <td>
                                                     <input
                                                         type="checkbox"
@@ -536,7 +541,7 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                                             )}
                                             <td>{material.codigo}</td>
                                             <td>{material.material}</td>
-                                            {editing ? (
+                                            {aprovacaoMateriais ? (
                                                 <td>
                                                     <input
                                                         type="number"
@@ -555,7 +560,7 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan={editing ? "8" : "7"}>Nenhum material encontrado.</td>
+                                        <td colSpan={aprovacaoMateriais ? "8" : "7"}>Nenhum material encontrado.</td>
                                     </tr>
                                 )}
                             </tbody>
@@ -680,7 +685,7 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                                                         <td>{aprovacao.total}</td>
                                                         <td>{aprovacao.status}</td>
                                                         <td>{aprovacao.executor}</td>
-                                                        <td>{aprovacao.motivo_reprova ? aprovacoes.motivo_reprova : 'N/A'}</td>
+                                                        <td>{aprovacao.motivo_reprova ? aprovacao.motivo_reprova : 'N/A'}</td>
                                                     </tr>
                                                 ))
                                             ) : (
@@ -706,6 +711,7 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                                             <tr>
                                                 <th>#</th>
                                                 <th>Fase</th>
+                                                <th>Grupo Executor</th>
                                                 <th>Executor</th>
                                                 <th>Início</th>
                                                 <th>Fim</th>
@@ -719,6 +725,7 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                                                         <td>{atividade.id}</td>
                                                         <td>{atividade.fase}</td>
                                                         <td>{atividade.executor}</td>
+                                                        <td>{atividade.nome_executor}</td>
                                                         <td>{formatDate(atividade.inicio, 1, true)}</td>
                                                         <td>{formatDate(atividade.fim, 1, true)}</td>
                                                         <td>{atividade.motivo_reprova ? atividade.motivo_reprova : 'N/A'}</td>
@@ -749,11 +756,19 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
 
                         <div className="modal-footer" id="modal-footer">
                             <button className="btn-voltar" id="btn-voltar" onClick={closeTicketModal}>Fechar</button>
-                            {editing && selectedTicket.id_fase < 10 && (
+                            {aprovacaoMateriais && (
                                 <button
                                     className="btn-voltar"
-                                    onClick={handleSalvarTicket}
+                                    onClick={handleSalvarAprovMat}
                                     disabled={materiais.some(material => material.status === "Pendente")}
+                                >
+                                    Enviar
+                                </button>
+                            )}
+                            {aprovacaoSolicitacao && (
+                                <button
+                                    className="btn-voltar"
+                                    onClick={handleSalvarAprovSolic}
                                 >
                                     Enviar
                                 </button>

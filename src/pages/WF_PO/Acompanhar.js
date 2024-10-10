@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import SidebarInterna from '../../components/SidebarInterna';
 import AtendimentosTable from '../../components/WF_PO/AtendimentosTable';
 import '../../styles/WF_PO/Solicitacoes.css';
+import '../../styles/WF_PO/NovaRequisicao.css';
 
 const Acompanhar = () => {
     const { user } = useAuth();
