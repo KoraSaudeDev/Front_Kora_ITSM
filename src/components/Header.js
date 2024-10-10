@@ -18,7 +18,12 @@ const Header = ({ pendentes = [] }) => {
   const [wfpoOpen, setWfpoOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  
+ 
   const isSuportePage = location.pathname.includes('/suporte');
+  const showSearchBar = ['/novo-ticket-futuro', '/suporte/meus-atendimentos', '/suporte/minha-equipe']
+  .some(path => location.pathname.includes(path));
+
 
   useEffect(() => {
     if (isSuportePage && (!user || !user.bl_analista)) {
@@ -114,7 +119,7 @@ const Header = ({ pendentes = [] }) => {
           />
         )}
 
-        {isSuportePage && user && user.bl_analista && (
+        {showSearchBar && (
           <div className="barra-busca">
             <SearchBar />
           </div>
