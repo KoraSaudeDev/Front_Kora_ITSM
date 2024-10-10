@@ -109,13 +109,13 @@ const NovoTicketCompras = () => {
     }, [selectedUnidade]);
 
     const handleSendForm = () => {
-        // Função para manipular o envio do formulário
+       
     };
 
     const menuRequisicao = [
-        { label: 'Nova Requisição', path: '/suporte/nova-requisicao-wf' },
-        { label: 'Minhas Solicitações', path: '/suporte/minhas-solicitacoes' },
-        { label: 'Acompanhar', path: '/suporte/acompanhar' },
+        { label: 'Nova Requisição', path: '/suporte/novo-ticket-compras' },
+        { label: 'Minhas Solicitações', path: '/suporte/nova-solicitacao-compras' },
+        { label: 'Validação', path: '/suporte/aprovacoes-compras' },
     ];
 
     const fetchMaterials = (inputValue, type) => {
