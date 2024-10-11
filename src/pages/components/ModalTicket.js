@@ -1555,7 +1555,7 @@ const Modal = ({ data, onClose }) => {
                 <div className="modal-header">
                     <h3>#{data.cod_fluxo}</h3>
                     <div className="botao-salvar-container">
-                        {isAllowedCreateUser && user.filas_id.includes("4124") && (
+                        {isAllowedCreateUser && (user.filas_id.includes("4124") || user.filas_id.includes(4124)) && (
                             <button className="botao-salvar-ticket" style={{ display: 'flex', alignItems: 'center', gap: '8px' }} onClick={handleCreateUser}>
                                 <FaUserPlus /> Criar Usuário
                             </button>
