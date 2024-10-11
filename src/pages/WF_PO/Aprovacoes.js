@@ -11,7 +11,7 @@ const Aprovacoes = () => {
         { label: 'Nova Requisição', path: '/suporte/nova-requisicao-wf' },
         { label: 'Minhas Solicitações', path: '/suporte/minhas-solicitacoes' },
         { label: 'Aprovações', path: '/suporte/aprovacoes' },
-        { label: 'Acompanhar', path: '/suporte/acompanhar' },
+        // { label: 'Acompanhar', path: '/suporte/acompanhar' },
     ];
 
     return (

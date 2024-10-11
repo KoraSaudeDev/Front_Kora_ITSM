@@ -25,13 +25,16 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
     const [isBionexoOpen, setIsBionexoOpen] = useState(false);
 
     const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+    const [showCloseBtn, setShowCloseBtn] = useState(false);
+    const [successMessage, setSuccessMessage] = useState('');
+
     const [aprovacaoMateriais, setAprovacaoMateriais] = useState(false);
     const [aprovacaoSolicitacao, setAprovacaoSolicitacao] = useState(false);
 
     const toggleHistorico = () => setIsHistoricoOpen(!isHistoricoOpen);
     const toggleAtividades = () => setIsAtividadesOpen(!isAtividadesOpen);
     const toggleBionexo = () => setIsBionexoOpen(!isBionexoOpen);
-    
+
     const fetchMateriais = async () => {
         try {
             const response = await axios.get(
@@ -44,7 +47,11 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                     }
                 }
             );
-            setMateriais(response.data);
+            const filteredMateriais = editing
+                ? response.data.filter(material => material.id_status !== 3)
+                : response.data;
+
+            setMateriais(filteredMateriais);
         } catch (error) {
             console.error('Erro ao buscar os materiais:', error);
         }
@@ -110,8 +117,8 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
             { headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email } }
         )
             .then(response => {
-                if (response.data[0].id_fase) setFase(response.data[0].id_fase);
-                if (response.data[0].id_grupo) setGrupo(response.data[0].id_grupo);
+                setFase(response.data[0]?.id_fase);
+                setGrupo(response.data[0]?.id_grupo);
                 if (response.data[0].isIntegraBio) setIsNextIntegraBio(response.data[0].isIntegraBio);
                 if (response.data[0].isIntegraSAP) setIsNextIntegraSAP(response.data[0].isIntegraSAP);
             })
@@ -270,6 +277,11 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
         setMateriais(updatedMateriais);
     };
 
+    const handleClosePopup = () => {
+        setShowSuccessPopup(false);
+        setShowCloseBtn(false);
+    };
+
     const handleSalvarAprovMat = async () => {
         const aprovacoes_insert = materiais.map(material => ({
             referencia_id: selectedTicket.id,
@@ -284,39 +296,38 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
             nome_executor: user.name,
             motivo_reprova: material.motivo_reprova,
         }));
-    
+
         const materiais_update = materiais.map(material => ({
             id: material.id,
             qtd: material.qtd,
-            status: material.status === "Aprovado" ? 1 : material.id_status,
-            motivo_reprova: material.status !== "Aprovado" ? material.motivo_reprova : null,
+            status: fase === 10 ? material.id_status : (material.status === "Aprovado" ? 1 : material.id_status),
+            motivo_reprova: fase === 10 ? material.motivo_reprova : (material.status !== "Aprovado" ? material.motivo_reprova : null),
             total: material.total,
         }));
-    
+
         const data = formatDate(new Date(), 2);
         const atividade_insert = {
             referencia_id: selectedTicket.id,
             fase: fase,
             executor: grupo,
-            nome_executor: user.name,
             numero_bloco: selectedTicket.numero_bloco,
             inicio: data,
         };
-    
+
         const atividades_update = atividades.length > 0 ? [{
             id: atividades[atividades.length - 1].id,
             nome_executor: user.name,
             fim: data
         }] : [];
-    
+
         const requisicao_update = {
             executor: grupo,
             fase: fase,
             total_materiais: total,
         };
-    
+
         showLoadingOverlay();
-    
+
         try {
             const wf_po_Config = {
                 method: 'patch',
@@ -329,7 +340,7 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                 data: JSON.stringify(requisicao_update),
             };
             await sendRequest(wf_po_Config);
-    
+
             for (const material of materiais_update) {
                 const material_Config = {
                     method: 'patch',
@@ -343,7 +354,7 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                 };
                 await sendRequest(material_Config);
             }
-    
+
             for (const task of atividades_update) {
                 const task_Config = {
                     method: 'patch',
@@ -357,7 +368,7 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                 };
                 await sendRequest(task_Config);
             }
-    
+
             for (const aprovacao of aprovacoes_insert) {
                 const aprovacao_Config = {
                     method: 'post',
@@ -371,7 +382,7 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                 };
                 await sendRequest(aprovacao_Config);
             }
-    
+
             const task_insert_Config = {
                 method: 'post',
                 url: `${process.env.REACT_APP_API_BASE_URL}/wf-po/update/wf-po-task`,
@@ -383,9 +394,10 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                 data: JSON.stringify(atividade_insert),
             };
             await sendRequest(task_insert_Config);
-    
+
             hideLoadingOverlay();
-    
+
+            setSuccessMessage("Enviado com sucesso!");
             setShowSuccessPopup(true);
             setTimeout(() => {
                 setShowSuccessPopup(false);
@@ -396,10 +408,168 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
             console.error("Error saving wf-po:", error);
         }
     };
-    
+
     const handleSalvarAprovSolic = async () => {
-        console.log(isNextIntegraBio, isNextIntegraSAP);
-    }
+        const dataAtual = formatDate(new Date(), 2);
+        const atividade_insert = [{
+            referencia_id: selectedTicket.id,
+            fase: fase,
+            executor: grupo,
+            numero_bloco: selectedTicket.numero_bloco,
+            inicio: dataAtual,
+        }];
+
+        const atividades_update = atividades.length > 0 ? [{
+            id: atividades[atividades.length - 1].id,
+            nome_executor: user.name,
+            fim: dataAtual
+        }] : [];
+
+        const requisicao_update = {
+            executor: grupo,
+            fase: fase,
+        };
+
+        showLoadingOverlay();
+        try {
+            if (isNextIntegraBio) {
+                const data = materiais.filter(material => material.id_status === 2);
+                const wf_po_Config = {
+                    method: 'post',
+                    url: `${process.env.REACT_APP_API_BASE_URL}/integracao/bionexo?id=${selectedTicket.id}`,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        'X-User-Email': user.email,
+                    },
+                    data: JSON.stringify(data),
+                };
+
+                const bionexo = await sendRequest(wf_po_Config);
+
+                if (bionexo?.code !== "1") {
+                    throw new Error(`Erro na integração com Bionexo: ${bionexo?.retorno || 'Erro desconhecido'}`);
+                }
+
+                if (bionexo?.retorno) {
+                    requisicao_update.id_bionexo = bionexo.retorno;
+                }
+            }
+
+            if (isNextIntegraSAP) {
+                const data = materiais.filter(material => material.id_status === 2);
+                const wf_po_Config = {
+                    method: 'post',
+                    url: `${process.env.REACT_APP_API_BASE_URL}/integracao/sap`,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        'X-User-Email': user.email,
+                    },
+                    data: JSON.stringify({
+                        "unidade": selectedTicket.unidade,
+                        "materiais": data,
+                    }),
+                };
+
+                const sap = await sendRequest(wf_po_Config);
+
+                if (sap?.error) {
+                    hideLoadingOverlay();
+                    setSuccessMessage(sap.error.join('<br>'));
+                    setShowSuccessPopup(true);
+                    setShowCloseBtn(true);
+                    return;
+                }
+
+                hideLoadingOverlay();
+                setSuccessMessage(sap?.retorno.join('<br>') ?? sap);
+                setShowSuccessPopup(true);
+
+                atividade_insert[0].fim = dataAtual;
+                atividade_insert[0].nome_executor = user.name;
+
+                atividade_insert.push({
+                    referencia_id: selectedTicket.id,
+                    executor: 13,
+                    fase: 55,
+                    numero_bloco: selectedTicket.numero_bloco,
+                    inicio: dataAtual,
+                })
+
+                requisicao_update.id_sap = sap?.id ?? null;
+                requisicao_update.executor = 13;
+                requisicao_update.fase = 55;
+            }
+
+            const wf_po_Config = {
+                method: 'patch',
+                url: `${process.env.REACT_APP_API_BASE_URL}/wf-po/update/wf-po/${selectedTicket.id}`,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    'X-User-Email': user.email,
+                },
+                data: JSON.stringify(requisicao_update),
+            };
+            await sendRequest(wf_po_Config);
+
+            for (const task of atividades_update) {
+                const task_Config = {
+                    method: 'patch',
+                    url: `${process.env.REACT_APP_API_BASE_URL}/wf-po/update/wf-po-task/${task.id}`,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        'X-User-Email': user.email,
+                    },
+                    data: JSON.stringify(task),
+                };
+                await sendRequest(task_Config);
+            }
+
+            for (const task of atividade_insert) {
+                const task_insert_Config = {
+                    method: 'post',
+                    url: `${process.env.REACT_APP_API_BASE_URL}/wf-po/update/wf-po-task`,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        'X-User-Email': user.email,
+                    },
+                    data: JSON.stringify(task),
+                };
+                await sendRequest(task_insert_Config);
+            }
+
+            hideLoadingOverlay();
+
+            if (isNextIntegraBio) {
+                setSuccessMessage(`Cotação inserida na bionexo: ${requisicao_update?.id_bionexo}. Enviado com sucesso!`);
+            }
+            else if (isNextIntegraSAP) {
+                setSuccessMessage(`Enviado com sucesso!`);
+            }
+            else {
+                setSuccessMessage(`Enviado com sucesso!`);
+            }
+
+            setShowSuccessPopup(true);
+            setTimeout(() => {
+                setShowSuccessPopup(false);
+                window.location.reload();
+            }, 3000);
+
+        } catch (error) {
+            hideLoadingOverlay();
+            console.error('Erro ao salvar requisição:', error);
+            setSuccessMessage(error.message || 'Erro ao salvar requisição.');
+            setShowSuccessPopup(true);
+            setTimeout(() => {
+                setShowSuccessPopup(false);
+            }, 5000);
+        }
+    };
 
     return (
         isCartOpen && selectedTicket && (
@@ -411,7 +581,9 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                     </div>
                     <div className="modal-content" id="modal-content">
                         <div className="requisicao-info" id="requisicao-info">
-                            <p><strong>Requisição:</strong> {selectedTicket.id}</p>
+                            <p><strong>#:</strong> {selectedTicket.id}</p>
+                            {selectedTicket.id_bionexo && (<p><strong>#Bio:</strong> {selectedTicket.id_bionexo}</p>)}
+                            {selectedTicket.id_sap && (<p><strong>#SAP:</strong> {selectedTicket.id_sap}</p>)}
                             <p><strong>Abertura:</strong> {formatDate(selectedTicket.dt_abertura, 1, true)}</p>
                             <p><strong>Fase:</strong> {selectedTicket.fase}</p>
                             <p><strong>Responsável:</strong> {selectedTicket.executor}</p>
@@ -420,47 +592,47 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                         <div className="form-row">
                             <div className="campo">
                                 <label htmlFor="input-email">Email:</label>
-                                <input id="input-email" type="email" value={selectedTicket.email} readOnly />
+                                <input id="input-email" type="email" value={selectedTicket.email??''} readOnly />
                             </div>
                             <div className="campo">
                                 <label htmlFor="input-nome">Nome:</label>
-                                <input id="input-nome" type="text" value={selectedTicket.nome} readOnly />
+                                <input id="input-nome" type="text" value={selectedTicket.nome??''} readOnly />
                             </div>
                         </div>
 
                         <div className="form-row">
                             <div className="campo">
                                 <label htmlFor="input-hub">Hub:</label>
-                                <input id="input-hub" type="text" value={selectedTicket.hub} readOnly />
+                                <input id="input-hub" type="text" value={selectedTicket.hub??''} readOnly />
                             </div>
                             <div className="campo">
                                 <label htmlFor="input-unidade">Unidade:</label>
-                                <input id="input-unidade" type="text" value={selectedTicket.unidade} readOnly />
+                                <input id="input-unidade" type="text" value={selectedTicket.unidade??''} readOnly />
                             </div>
                             <div className="campo">
                                 <label htmlFor="input-centro-custo">Centro de Custo:</label>
-                                <input id="input-centro-custo" type="text" value={selectedTicket.centro_custo} readOnly />
+                                <input id="input-centro-custo" type="text" value={selectedTicket.centro_custo??''} readOnly />
                             </div>
                         </div>
 
                         <div className="form-row">
                             <div className="campo">
                                 <label htmlFor="input-area">Área:</label>
-                                <input id="input-area" type="text" value={selectedTicket.area} readOnly />
+                                <input id="input-area" type="text" value={selectedTicket.area??''} readOnly />
                             </div>
                             <div className="campo">
                                 <label htmlFor="input-tipo-solicitacao">Tipo de Solicitação:</label>
-                                <input id="input-tipo-solicitacao" type="text" value={selectedTicket.tipo_solicitacao} readOnly />
+                                <input id="input-tipo-solicitacao" type="text" value={selectedTicket.tipo_solicitacao??''} readOnly />
                             </div>
                             {selectedTicket.tipo_solicitacao === "Produto" && (
                                 <div className="campo">
                                     <label htmlFor="input-data-remessa">Data Remessa:</label>
-                                    <input id="input-data-remessa" type="text" value={formatDate(selectedTicket.dt_remessa, 1, true)} readOnly />
+                                    <input id="input-data-remessa" type="text" value={formatDate(selectedTicket.dt_remessa, 1, true)??''} readOnly />
                                 </div>
                             )}
                             <div className="campo">
                                 <label htmlFor="input-bloco">Bloco:</label>
-                                <input id="input-bloco" type="text" value={selectedTicket.numero_bloco} readOnly />
+                                <input id="input-bloco" type="text" value={selectedTicket.numero_bloco??''} readOnly />
                             </div>
                         </div>
 
@@ -468,19 +640,19 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                             <div className="form-row">
                                 <div className="campo">
                                     <label htmlFor="input-cod-forn">Código do Fornecedor:</label>
-                                    <input id="input-cod-forn" type="text" value={selectedTicket.cod_fornecedor} readOnly />
+                                    <input id="input-cod-forn" type="text" value={selectedTicket.cod_fornecedor??''} readOnly />
                                 </div>
                                 <div className="campo">
                                     <label htmlFor="input-forn">Fornecedor:</label>
-                                    <input id="input-forn" type="text" value={selectedTicket.fornecedor} readOnly />
+                                    <input id="input-forn" type="text" value={selectedTicket.fornecedor??''} readOnly />
                                 </div>
                                 <div className="campo">
                                     <label htmlFor="input-inicio-serv">Início do Serviço:</label>
-                                    <input id="input-inicio-serv" type="text" value={formatDate(selectedTicket.dt_inicio_serv, 1, true)} readOnly />
+                                    <input id="input-inicio-serv" type="text" value={formatDate(selectedTicket.dt_inicio_serv, 1, true)??''} readOnly />
                                 </div>
                                 <div className="campo">
                                     <label htmlFor="input-fim-serv">Fim do Serviço:</label>
-                                    <input id="input-fim-serv" type="text" value={formatDate(selectedTicket.dt_fim_serv, 1, true)} readOnly />
+                                    <input id="input-fim-serv" type="text" value={formatDate(selectedTicket.dt_fim_serv, 1, true)??''} readOnly />
                                 </div>
                             </div>
                         )}
@@ -488,11 +660,11 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                         <div className="form-row">
                             <div className="campo">
                                 <label htmlFor="input-descricao">Descrição:</label>
-                                <textarea id="input-descricao" rows="2" value={selectedTicket.descricao} readOnly />
+                                <textarea id="input-descricao" rows="2" value={selectedTicket.descricao??''} readOnly />
                             </div>
                             <div className="campo">
                                 <label htmlFor="input-observacoes">Observações:</label>
-                                <textarea id="input-observacoes" rows="2" value={selectedTicket.observacoes} readOnly />
+                                <textarea id="input-observacoes" rows="2" value={selectedTicket.observacoes??''} readOnly />
                             </div>
                         </div>
 
@@ -641,7 +813,7 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                                                     <div className="form-row">
                                                         <div className="campo">
                                                             <strong>Comentário:</strong>
-                                                            <textarea rows={2} type="text" value={retornoBio.comentario} readOnly />
+                                                            <textarea rows={2} type="text" value={retornoBio.comentario ?? ''} readOnly />
                                                         </div>
                                                     </div>
                                                 </div>
@@ -742,13 +914,13 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                             )}
                         </div>
 
-                        {fase === 15 && (
+                        {fase === 15 && fase !== selectedTicket.id_fase && (
                             <div className="footer-note" id="footer-note">
                                 <p>ATENÇÃO! Você é o último responsável pela aprovação dos materiais, ao enviar, será criado uma cotação no bionexo!</p>
                             </div>
                         )}
 
-                        {fase === 45 && (
+                        {fase === 45 && fase !== selectedTicket.id_fase && (
                             <div className="footer-note" id="footer-note">
                                 <p>ATENÇÃO! Você é o último responsável pela aprovação da solicitação, ao enviar, será criado uma PO no SAP!</p>
                             </div>
@@ -778,7 +950,8 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                 </div>
                 {showSuccessPopup && (
                     <div className="popup-sucesso">
-                        <p>Enviado com sucesso!</p>
+                        <p dangerouslySetInnerHTML={{ __html: successMessage }}></p>
+                        {showCloseBtn && (<button onClick={handleClosePopup}>Ok</button>)}
                     </div>
                 )}
             </div>
