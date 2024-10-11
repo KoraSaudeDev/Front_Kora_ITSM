@@ -19,7 +19,7 @@ const Acompanhar = () => {
             <SidebarInterna menuItems={menuRequisicao} />
             <div className="container-solicitacoes">
                 <AtendimentosTable
-                    url={`${process.env.REACT_APP_API_BASE_URL}/wf-po/acompanhar`}
+                    url={`${process.env.REACT_APP_API_BASE_URL}/wf-po/acompanhar?`}
                     tipo_tela="wf_po_acompanhar"
                 />
             </div>

@@ -479,12 +479,12 @@ textarea {
     opacity: 1;
 }
 
-.popup-sucesso::before {
+/* .popup-sucesso::before {
     content: "✔";
     font-size: 24px;
     color: #4CAF50;
     margin-right: 10px;
-}
+} */
 
 @keyframes fadeIn {
     0% {

@@ -592,47 +592,47 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                         <div className="form-row">
                             <div className="campo">
                                 <label htmlFor="input-email">Email:</label>
-                                <input id="input-email" type="email" value={selectedTicket.email??''} readOnly />
+                                <input id="input-email" type="email" value={selectedTicket.email ?? ''} readOnly />
                             </div>
                             <div className="campo">
                                 <label htmlFor="input-nome">Nome:</label>
-                                <input id="input-nome" type="text" value={selectedTicket.nome??''} readOnly />
+                                <input id="input-nome" type="text" value={selectedTicket.nome ?? ''} readOnly />
                             </div>
                         </div>
 
                         <div className="form-row">
                             <div className="campo">
                                 <label htmlFor="input-hub">Hub:</label>
-                                <input id="input-hub" type="text" value={selectedTicket.hub??''} readOnly />
+                                <input id="input-hub" type="text" value={selectedTicket.hub ?? ''} readOnly />
                             </div>
                             <div className="campo">
                                 <label htmlFor="input-unidade">Unidade:</label>
-                                <input id="input-unidade" type="text" value={selectedTicket.unidade??''} readOnly />
+                                <input id="input-unidade" type="text" value={selectedTicket.unidade ?? ''} readOnly />
                             </div>
                             <div className="campo">
                                 <label htmlFor="input-centro-custo">Centro de Custo:</label>
-                                <input id="input-centro-custo" type="text" value={selectedTicket.centro_custo??''} readOnly />
+                                <input id="input-centro-custo" type="text" value={selectedTicket.centro_custo ?? ''} readOnly />
                             </div>
                         </div>
 
                         <div className="form-row">
                             <div className="campo">
                                 <label htmlFor="input-area">Área:</label>
-                                <input id="input-area" type="text" value={selectedTicket.area??''} readOnly />
+                                <input id="input-area" type="text" value={selectedTicket.area ?? ''} readOnly />
                             </div>
                             <div className="campo">
                                 <label htmlFor="input-tipo-solicitacao">Tipo de Solicitação:</label>
-                                <input id="input-tipo-solicitacao" type="text" value={selectedTicket.tipo_solicitacao??''} readOnly />
+                                <input id="input-tipo-solicitacao" type="text" value={selectedTicket.tipo_solicitacao ?? ''} readOnly />
                             </div>
                             {selectedTicket.tipo_solicitacao === "Produto" && (
                                 <div className="campo">
                                     <label htmlFor="input-data-remessa">Data Remessa:</label>
-                                    <input id="input-data-remessa" type="text" value={formatDate(selectedTicket.dt_remessa, 1, true)??''} readOnly />
+                                    <input id="input-data-remessa" type="text" value={formatDate(selectedTicket.dt_remessa, 1, true) ?? ''} readOnly />
                                 </div>
                             )}
                             <div className="campo">
                                 <label htmlFor="input-bloco">Bloco:</label>
-                                <input id="input-bloco" type="text" value={selectedTicket.numero_bloco??''} readOnly />
+                                <input id="input-bloco" type="text" value={selectedTicket.numero_bloco ?? ''} readOnly />
                             </div>
                         </div>
 
@@ -640,31 +640,42 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                             <div className="form-row">
                                 <div className="campo">
                                     <label htmlFor="input-cod-forn">Código do Fornecedor:</label>
-                                    <input id="input-cod-forn" type="text" value={selectedTicket.cod_fornecedor??''} readOnly />
+                                    <input id="input-cod-forn" type="text" value={selectedTicket.cod_fornecedor ?? ''} readOnly />
                                 </div>
                                 <div className="campo">
                                     <label htmlFor="input-forn">Fornecedor:</label>
-                                    <input id="input-forn" type="text" value={selectedTicket.fornecedor??''} readOnly />
+                                    <input id="input-forn" type="text" value={selectedTicket.fornecedor ?? ''} readOnly />
                                 </div>
                                 <div className="campo">
                                     <label htmlFor="input-inicio-serv">Início do Serviço:</label>
-                                    <input id="input-inicio-serv" type="text" value={formatDate(selectedTicket.dt_inicio_serv, 1, true)??''} readOnly />
+                                    <input id="input-inicio-serv" type="text" value={formatDate(selectedTicket.dt_inicio_serv, 1, true) ?? ''} readOnly />
                                 </div>
                                 <div className="campo">
                                     <label htmlFor="input-fim-serv">Fim do Serviço:</label>
-                                    <input id="input-fim-serv" type="text" value={formatDate(selectedTicket.dt_fim_serv, 1, true)??''} readOnly />
+                                    <input id="input-fim-serv" type="text" value={formatDate(selectedTicket.dt_fim_serv, 1, true) ?? ''} readOnly />
                                 </div>
                             </div>
                         )}
 
                         <div className="form-row">
                             <div className="campo">
+                                <label htmlFor="input-grupo-material">Grupo de Material:</label>
+                                <input id="input-grupo-material" type="text" value={selectedTicket.grupo_material ?? ''} readOnly />
+                            </div>
+                            <div className="campo">
+                                <label htmlFor="input-motivo-solic">Motivo da Solicitação:</label>
+                                <input id="input-motivo-solic" type="text" value={selectedTicket.motivo_solicitacao ?? ''} readOnly />
+                            </div>
+                        </div>
+
+                        <div className="form-row">
+                            <div className="campo">
                                 <label htmlFor="input-descricao">Descrição:</label>
-                                <textarea id="input-descricao" rows="2" value={selectedTicket.descricao??''} readOnly />
+                                <textarea id="input-descricao" rows="2" value={selectedTicket.descricao ?? ''} readOnly />
                             </div>
                             <div className="campo">
                                 <label htmlFor="input-observacoes">Observações:</label>
-                                <textarea id="input-observacoes" rows="2" value={selectedTicket.observacoes??''} readOnly />
+                                <textarea id="input-observacoes" rows="2" value={selectedTicket.observacoes ?? ''} readOnly />
                             </div>
                         </div>
 

@@ -3,6 +3,7 @@ import { FaChevronLeft, FaChevronRight, FaShoppingCart } from 'react-icons/fa';
 import ModalTicket from './ModalTicket';
 import { useAuth } from '../../context/AuthContext';
 import { useRefresh } from '../../context/RefreshContext';
+import Select from 'react-select';
 import axios from 'axios';
 
 const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela, editing = false }) => {
@@ -14,11 +15,32 @@ const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela, editing = false
     const [totalPages, setTotalPages] = useState(1);
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [selectedTicket, setSelectedTicket] = useState(null);
+    const [options, setOptions] = useState({ grupoMaterial: [] });
+    const [selectedGrupoMaterial, setSelectedGrupoMaterial] = useState(null);
 
     const prevPageRef = useRef(currentPage);
     const prevItemsPerPageRef = useRef(itemsPerPage);
 
     const cacheKey = `${tipo_tela}_page_${currentPage}_items_${itemsPerPage}`;
+
+    useEffect(() => {
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/sap/grupo-mercadoria`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'X-User-Email': user.email
+            }
+        })
+            .then(response => {
+                setOptions(prevOptions => ({
+                    ...prevOptions,
+                    grupoMaterial: response.data.map(item => ({
+                        value: item,
+                        label: item
+                    }))
+                }));
+            })
+            .catch(error => console.error('Error fetching grupo de mercadoria:', error));
+    }, []);
 
     useEffect(() => {
         const fetchTickets = async () => {
@@ -34,10 +56,13 @@ const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela, editing = false
                     setTotalPages(Math.ceil(totalItems / itemsPerPage));
                 }
 
-                const requestUrl = `${url}?page=${currentPage}&per_page=${itemsPerPage}`;
+                const requestUrl = `${url}page=${currentPage}&per_page=${itemsPerPage}`;
+
+                if (selectedGrupoMaterial) filtrosExtras["grupo_mercadoria"] = selectedGrupoMaterial.value;
+                else delete filtrosExtras["grupo_mercadoria"];
 
                 const config = {
-                    method: 'GET',
+                    method: 'POST',
                     url: requestUrl,
                     headers: {
                         'Content-Type': 'application/json',
@@ -54,10 +79,12 @@ const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela, editing = false
                 setTickets(fetchedTickets);
                 setTotalPages(Math.ceil(totalItems / itemsPerPage));
 
-                localStorage.setItem(
-                    cacheKey,
-                    JSON.stringify({ tickets: fetchedTickets, totalItems })
-                );
+                if (!selectedGrupoMaterial) {
+                    localStorage.setItem(
+                        cacheKey,
+                        JSON.stringify({ tickets: fetchedTickets, totalItems })
+                    );
+                }
 
                 hideLoadingOverlay();
             } catch (error) {
@@ -73,7 +100,7 @@ const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela, editing = false
 
         return () => {
         };
-    }, [currentPage, itemsPerPage, refreshKey]);
+    }, [currentPage, itemsPerPage, refreshKey, selectedGrupoMaterial]);
 
     function formatDate(dateString, type = 1, sub3Hrs = false) {
         if (!dateString) {
@@ -102,6 +129,12 @@ const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela, editing = false
 
     const hideLoadingOverlay = () => {
         document.getElementById('loading-overlay').style.display = 'none';
+    };
+
+    const handleGrupoMatChange = (e) => {
+        showLoadingOverlay();
+        setCurrentPage(1);
+        setSelectedGrupoMaterial(e);
     };
 
     const handlePageChange = (newPage) => {
@@ -139,7 +172,7 @@ const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela, editing = false
 
     const renderTickets = () => {
         return tickets.map((ticket, index) => (
-            <tr key={index}>
+            <tr key={index} onClick={() => openTicketModal(ticket)}>
                 <td>{ticket.id}</td>
                 <td>{formatDate(ticket.dt_abertura, 1, true)}</td>
                 <td>{ticket.nome}</td>
@@ -148,12 +181,8 @@ const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela, editing = false
                 <td>{ticket.executor}</td>
                 <td>{ticket.hub}</td>
                 <td>{ticket.unidade}</td>
-                <td>
-                    <FaShoppingCart
-                        className="cart-icon"
-                        onClick={() => openTicketModal(ticket)}
-                    />
-                </td>
+                <td>{ticket.grupo_material}</td>
+                <td>{ticket.tipo_solicitacao}</td>
             </tr>
         ));
     };
@@ -162,6 +191,18 @@ const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela, editing = false
         <>
             <div id="loading-overlay" className="loading-overlay">
                 <div className="loading-spinner"></div>
+            </div>
+            <div className="form-row">
+                <div className="campo">
+                    <label htmlFor="select-grupo-material">Grupo de Material:</label>
+                    <Select
+                        id="select-grupo-material"
+                        value={selectedGrupoMaterial}
+                        onChange={(e) => { handleGrupoMatChange(e) }}
+                        options={options.grupoMaterial}
+                        isClearable
+                    />
+                </div>
             </div>
             <table className="tabela-tickets">
                 <thead>
@@ -174,7 +215,8 @@ const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela, editing = false
                         <th>Responsável</th>
                         <th>HUB</th>
                         <th>Unidade</th>
-                        <th>Ação</th>
+                        <th>Grupo Mercadoria</th>
+                        <th>Tipo Solicitação</th>
                     </tr>
                 </thead>
                 <tbody>
