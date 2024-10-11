@@ -65,14 +65,34 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 1119999;
     animation: fadeIn 0.3s ease;
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
+}
+
+.loading-spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-top: 4px solid #007aff;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    position: absolute;
+    z-index: 1001;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg); 
+    }
+    100% {
+        transform: rotate(360deg); 
+    }
 }
 
 .modal {
@@ -318,7 +338,7 @@ textarea {
 
 .container-solicitacoes{
     width: 84%;
-    min-height: auto;
+    min-height: 400px;
     border-radius: 4px;
     margin-top: 0px;
     margin-left: 0px;
@@ -461,30 +481,55 @@ textarea {
 }
 
 .popup-sucesso {
+    display: flex;
+    flex-direction: column;
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: #f0f0f5;
+    background-color: #ffffff;
     color: #3E4676;
-    padding: 25px 40px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 30px 50px;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
     z-index: 9999;
-    font-size: 16px;
+    font-size: 18px;
     text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     opacity: 1;
+    transition: all 0.3s ease;
 }
 
-/* .popup-sucesso::before {
-    content: "✔";
-    font-size: 24px;
-    color: #4CAF50;
-    margin-right: 10px;
-} */
+
+.popup-sucesso p {
+    margin: 10px 0 20px;
+    font-weight: 500;
+    font-size: 18px;
+}
+
+.popup-sucesso .button-container {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.popup-sucesso button {
+    padding: 12px 24px;
+    background-color: #4CAF50;
+    color: #fff;
+    width: 150px;
+    margin-left: 80%;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.popup-sucesso button:hover {
+    background-color: #43a047;
+}
+
 
 @keyframes fadeIn {
     0% {
@@ -494,5 +539,138 @@ textarea {
     100% {
         opacity: 1;
         transform: translate(-50%, -50%);
+    }
+}
+
+
+.botoes-acoes {
+    display: flex;
+    gap: 10px; 
+}
+
+.botoes-acoes button {
+    padding: 10px 20px; 
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    min-width: 100px; 
+}
+
+
+.botoes-acoes button:first-child {
+    background-color: #28a745; 
+    color: white;
+}
+
+.botoes-acoes button:first-child:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.1);
+}
+
+.botoes-acoes button:last-child {
+    background-color: #dc3545; 
+    color: white;
+}
+
+.botoes-acoes button:last-child:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none; 
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5); 
+    z-index: 9999; 
+}
+
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(255, 255, 255, 0.5);
+    border-top: 5px solid #007aff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 10000; 
+}
+
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9998; 
+    animation: fadeIn 0.3s ease; 
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px); 
+}
+
+
+.modal {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 1200px;
+    height: 80%;
+    max-height: 80%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    position: relative;
+    z-index: 9999;
+    animation: scaleUp 0.5s ease-in-out forwards;
+}
+
+
+@keyframes scaleUp {
+    0% {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
     }
 }

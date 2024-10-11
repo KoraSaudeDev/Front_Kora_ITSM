@@ -300,7 +300,7 @@ const NovaRequisicao = () => {
     const showLoadingOverlay = () => {
         document.getElementById('loading-overlay').style.display = 'flex';
     };
-
+    
     const hideLoadingOverlay = () => {
         document.getElementById('loading-overlay').style.display = 'none';
     };
@@ -847,6 +847,7 @@ const NovaRequisicao = () => {
 
                 {isCartOpen && (
                     <div className={`modal-overlay ${isCartOpen ? 'modal-opening' : 'modal-closing'}`}>
+                        
                         <div className="modal">
                             <div className="modal-header">
                                 <h3>Itens do Carrinho</h3>

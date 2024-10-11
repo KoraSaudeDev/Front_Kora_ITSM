@@ -3,104 +3,87 @@ import { FaChevronLeft, FaChevronRight, FaShoppingCart } from 'react-icons/fa';
 import ModalTicket from './ModalTicket';
 import { useAuth } from '../../context/AuthContext';
 import { useRefresh } from '../../context/RefreshContext';
-import Select from 'react-select';
 import axios from 'axios';
 
 const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela, editing = false }) => {
     const { user, token } = useAuth();
-    const { refreshKey, triggerRefresh } = useRefresh();
+    const { refreshKey } = useRefresh();
     const [tickets, setTickets] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [totalPages, setTotalPages] = useState(1);
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [selectedTicket, setSelectedTicket] = useState(null);
-    const [options, setOptions] = useState({ grupoMaterial: [] });
-    const [selectedGrupoMaterial, setSelectedGrupoMaterial] = useState(null);
 
     const prevPageRef = useRef(currentPage);
     const prevItemsPerPageRef = useRef(itemsPerPage);
 
     const cacheKey = `${tipo_tela}_page_${currentPage}_items_${itemsPerPage}`;
 
-    useEffect(() => {
-        axios.get(`${process.env.REACT_APP_API_BASE_URL}/sap/grupo-mercadoria`, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'X-User-Email': user.email
-            }
-        })
-            .then(response => {
-                setOptions(prevOptions => ({
-                    ...prevOptions,
-                    grupoMaterial: response.data.map(item => ({
-                        value: item,
-                        label: item
-                    }))
-                }));
-            })
-            .catch(error => console.error('Error fetching grupo de mercadoria:', error));
-    }, []);
+  
+    const fakeTickets = [
+        {
+            id: 'TK001',
+            dt_abertura: '2024-10-10T08:45:00',
+            nome: 'Lucas Silva',
+            email: 'lucas.silva@example.com',
+            fase: 'Em Andamento',
+            executor: 'João Pereira',
+            hub: 'São Paulo',
+            unidade: 'Unidade Central'
+        },
+        {
+            id: 'TK002',
+            dt_abertura: '2024-10-09T11:30:00',
+            nome: 'Maria Souza',
+            email: 'maria.souza@example.com',
+            fase: 'Pendente',
+            executor: 'Ana Costa',
+            hub: 'Rio de Janeiro',
+            unidade: 'Unidade Sul'
+        },
+        {
+            id: 'TK003',
+            dt_abertura: '2024-10-08T14:00:00',
+            nome: 'Pedro Oliveira',
+            email: 'pedro.oliveira@example.com',
+            fase: 'Concluído',
+            executor: 'Carlos Santos',
+            hub: 'Belo Horizonte',
+            unidade: 'Unidade Norte'
+        },
+        {
+            id: 'TK004',
+            dt_abertura: '2024-10-07T09:15:00',
+            nome: 'Cláudia Martins',
+            email: 'claudia.martins@example.com',
+            fase: 'Cancelado',
+            executor: 'Fernanda Lima',
+            hub: 'Brasília',
+            unidade: 'Unidade Oeste'
+        },
+        {
+            id: 'TK005',
+            dt_abertura: '2024-10-06T16:30:00',
+            nome: 'Ricardo Almeida',
+            email: 'ricardo.almeida@example.com',
+            fase: 'Em Andamento',
+            executor: 'Juliana Souza',
+            hub: 'Curitiba',
+            unidade: 'Unidade Leste'
+        }
+    ];
 
     useEffect(() => {
-        const fetchTickets = async () => {
-            try {
-                if (prevPageRef.current !== currentPage || prevItemsPerPageRef.current !== itemsPerPage) {
-                    showLoadingOverlay();
-                }
-
-                const cachedData = localStorage.getItem(cacheKey);
-                if (cachedData) {
-                    const { tickets, totalItems } = JSON.parse(cachedData);
-                    setTickets(tickets);
-                    setTotalPages(Math.ceil(totalItems / itemsPerPage));
-                }
-
-                const requestUrl = `${url}page=${currentPage}&per_page=${itemsPerPage}`;
-
-                if (selectedGrupoMaterial) filtrosExtras["grupo_mercadoria"] = selectedGrupoMaterial.value;
-                else delete filtrosExtras["grupo_mercadoria"];
-
-                const config = {
-                    method: 'POST',
-                    url: requestUrl,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
-                        'X-User-Email': user.email,
-                    },
-                    data: filtrosExtras
-                };
-
-                const response = await axios.request(config);
-                const fetchedTickets = response.data.tickets;
-                const totalItems = response.data.total_items;
-
-                setTickets(fetchedTickets);
-                setTotalPages(Math.ceil(totalItems / itemsPerPage));
-
-                if (!selectedGrupoMaterial) {
-                    localStorage.setItem(
-                        cacheKey,
-                        JSON.stringify({ tickets: fetchedTickets, totalItems })
-                    );
-                }
-
-                hideLoadingOverlay();
-            } catch (error) {
-                console.error('Erro ao buscar tickets:', error);
-                hideLoadingOverlay();
-            }
-        };
-
-        fetchTickets();
+      
+        setTickets(fakeTickets);
+        setTotalPages(1);
 
         prevPageRef.current = currentPage;
         prevItemsPerPageRef.current = itemsPerPage;
 
-        return () => {
-        };
-    }, [currentPage, itemsPerPage, refreshKey, selectedGrupoMaterial]);
+        return () => {};
+    }, [currentPage, itemsPerPage, refreshKey]);
 
     function formatDate(dateString, type = 1, sub3Hrs = false) {
         if (!dateString) {
@@ -108,8 +91,11 @@ const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela, editing = false
         }
 
         let date;
-        if (sub3Hrs) { date = new Date(new Date(dateString).getTime() + new Date(dateString).getTimezoneOffset() * 60000) }
-        else { date = new Date(dateString) }
+        if (sub3Hrs) { 
+            date = new Date(new Date(dateString).getTime() + new Date(dateString).getTimezoneOffset() * 60000);
+        } else { 
+            date = new Date(dateString);
+        }
         const day = String(date.getDate()).padStart(2, '0');
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const year = date.getFullYear();
@@ -121,21 +107,7 @@ const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela, editing = false
         else if (type === 2) return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
         else if (type === 3) return date.toISOString().slice(0, 19);
         else return '';
-    };
-
-    const showLoadingOverlay = () => {
-        document.getElementById('loading-overlay').style.display = 'flex';
-    };
-
-    const hideLoadingOverlay = () => {
-        document.getElementById('loading-overlay').style.display = 'none';
-    };
-
-    const handleGrupoMatChange = (e) => {
-        showLoadingOverlay();
-        setCurrentPage(1);
-        setSelectedGrupoMaterial(e);
-    };
+    }
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -168,12 +140,11 @@ const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela, editing = false
     const closeTicketModal = () => {
         setIsCartOpen(false);
         setSelectedTicket(null);
-        triggerRefresh();
     };
 
     const renderTickets = () => {
         return tickets.map((ticket, index) => (
-            <tr key={index} onClick={() => openTicketModal(ticket)}>
+            <tr key={index}>
                 <td>{ticket.id}</td>
                 <td>{formatDate(ticket.dt_abertura, 1, true)}</td>
                 <td>{ticket.nome}</td>
@@ -182,8 +153,12 @@ const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela, editing = false
                 <td>{ticket.executor}</td>
                 <td>{ticket.hub}</td>
                 <td>{ticket.unidade}</td>
-                <td>{ticket.grupo_material}</td>
-                <td>{ticket.tipo_solicitacao}</td>
+                <td>
+                    <FaShoppingCart
+                        className="cart-icon"
+                        onClick={() => openTicketModal(ticket)}
+                    />
+                </td>
             </tr>
         ));
     };
@@ -192,18 +167,6 @@ const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela, editing = false
         <>
             <div id="loading-overlay" className="loading-overlay">
                 <div className="loading-spinner"></div>
-            </div>
-            <div className="form-row">
-                <div className="campo-material">
-                    <label htmlFor="select-grupo-material">Grupo de Material:</label>
-                    <Select
-                        id="select-grupo-material"
-                        value={selectedGrupoMaterial}
-                        onChange={(e) => { handleGrupoMatChange(e) }}
-                        options={options.grupoMaterial}
-                        isClearable
-                    />
-                </div>
             </div>
             <table className="tabela-tickets">
                 <thead>
@@ -216,14 +179,13 @@ const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela, editing = false
                         <th>Responsável</th>
                         <th>HUB</th>
                         <th>Unidade</th>
-                        <th>Grupo Mercadoria</th>
-                        <th>Tipo Solicitação</th>
+                        <th>Ação</th>
                     </tr>
                 </thead>
                 <tbody>
                     {tickets.length > 0 ? renderTickets() : (
                         <tr>
-                            <td colSpan="10">Nenhum registro encontrado</td>
+                            <td colSpan="9">Nenhum registro encontrado</td>
                         </tr>
                     )}
                 </tbody>
@@ -245,12 +207,14 @@ const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela, editing = false
                 </button>
             </div>
 
-            <ModalTicket
-                isCartOpen={isCartOpen}
-                selectedTicket={selectedTicket}
-                closeTicketModal={closeTicketModal}
-                editing={editing}
-            />
+            {isCartOpen && selectedTicket && (
+                <ModalTicket
+                    isCartOpen={isCartOpen}
+                    selectedTicket={selectedTicket}
+                    closeTicketModal={closeTicketModal}
+                    editing={editing}
+                />
+            )}
         </>
     );
 };
