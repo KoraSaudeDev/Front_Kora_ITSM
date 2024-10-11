@@ -8,7 +8,7 @@ import axios from 'axios';
 
 const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela, editing = false }) => {
     const { user, token } = useAuth();
-    const { refreshKey } = useRefresh();
+    const { refreshKey, triggerRefresh } = useRefresh();
     const [tickets, setTickets] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -168,6 +168,7 @@ const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela, editing = false
     const closeTicketModal = () => {
         setIsCartOpen(false);
         setSelectedTicket(null);
+        triggerRefresh();
     };
 
     const renderTickets = () => {

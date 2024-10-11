@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
+import { useRefresh } from '../../context/RefreshContext';
 import axios from 'axios';
 
 const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) => {
@@ -409,6 +410,96 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
         }
     };
 
+    const handleCancelarSolic = async () => {
+        const motivo = prompt("Digite o motivo do cancelamento:");
+        if (motivo) {
+            const dataAtual = formatDate(new Date(), 2);
+            const atividade_insert = [{
+                referencia_id: selectedTicket.id,
+                fase: -1,
+                executor: null,
+                numero_bloco: selectedTicket.numero_bloco,
+                motivo_reprova: motivo,
+                inicio: dataAtual,
+                fim: dataAtual,
+                nome_executor: user.name,
+            }];
+
+            const atividades_update = atividades.length > 0 ? [{
+                id: atividades[atividades.length - 1].id,
+                nome_executor: user.name,
+                fim: dataAtual
+            }] : [];
+
+            const requisicao_update = {
+                executor: null,
+                fase: -1,
+            };
+
+            showLoadingOverlay();
+            try {
+                const wf_po_Config = {
+                    method: 'patch',
+                    url: `${process.env.REACT_APP_API_BASE_URL}/wf-po/update/wf-po/${selectedTicket.id}`,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        'X-User-Email': user.email,
+                    },
+                    data: JSON.stringify(requisicao_update),
+                };
+                await sendRequest(wf_po_Config);
+
+                for (const task of atividades_update) {
+                    const task_Config = {
+                        method: 'patch',
+                        url: `${process.env.REACT_APP_API_BASE_URL}/wf-po/update/wf-po-task/${task.id}`,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`,
+                            'X-User-Email': user.email,
+                        },
+                        data: JSON.stringify(task),
+                    };
+                    await sendRequest(task_Config);
+                }
+
+                for (const task of atividade_insert) {
+                    const task_insert_Config = {
+                        method: 'post',
+                        url: `${process.env.REACT_APP_API_BASE_URL}/wf-po/update/wf-po-task`,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`,
+                            'X-User-Email': user.email,
+                        },
+                        data: JSON.stringify(task),
+                    };
+                    await sendRequest(task_insert_Config);
+                }
+
+                hideLoadingOverlay();
+
+
+                setSuccessMessage(`Cancelado com sucesso!`);
+                setShowSuccessPopup(true);
+                setTimeout(() => {
+                    setShowSuccessPopup(false);
+                    window.location.reload();
+                }, 3000);
+
+            } catch (error) {
+                hideLoadingOverlay();
+                console.error('Erro ao salvar cancelamento da requisição:', error);
+                setSuccessMessage(error.message || 'Erro ao salvar cancelamento da requisição.');
+                setShowSuccessPopup(true);
+                setTimeout(() => {
+                    setShowSuccessPopup(false);
+                }, 5000);
+            }
+        }
+    };
+
     const handleSalvarAprovSolic = async () => {
         const dataAtual = formatDate(new Date(), 2);
         const atividade_insert = [{
@@ -568,6 +659,71 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
             setTimeout(() => {
                 setShowSuccessPopup(false);
             }, 5000);
+        }
+    };
+
+    const handleSalvarReprovSolic = async () => {
+        const motivo = prompt("Digite o motivo da reprovação:");
+        if (motivo) {
+            const dataAtual = formatDate(new Date(), 2);
+            const atividades_update = atividades.length > 0 ? [{
+                id: atividades[atividades.length - 1].id,
+                nome_executor: user.name,
+                fim: dataAtual,
+                motivo_reprova: motivo,
+            }] : [];
+
+            const requisicao_update = {
+                executor: null,
+                fase: -1,
+            };
+
+            showLoadingOverlay();
+            try {
+                const wf_po_Config = {
+                    method: 'patch',
+                    url: `${process.env.REACT_APP_API_BASE_URL}/wf-po/update/wf-po/${selectedTicket.id}`,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        'X-User-Email': user.email,
+                    },
+                    data: JSON.stringify(requisicao_update),
+                };
+                await sendRequest(wf_po_Config);
+
+                for (const task of atividades_update) {
+                    const task_Config = {
+                        method: 'patch',
+                        url: `${process.env.REACT_APP_API_BASE_URL}/wf-po/update/wf-po-task/${task.id}`,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`,
+                            'X-User-Email': user.email,
+                        },
+                        data: JSON.stringify(task),
+                    };
+                    await sendRequest(task_Config);
+                }
+
+                hideLoadingOverlay();
+
+                setSuccessMessage(`Reprovado com sucesso!`);
+                setShowSuccessPopup(true);
+                setTimeout(() => {
+                    setShowSuccessPopup(false);
+                    window.location.reload();
+                }, 3000);
+
+            } catch (error) {
+                hideLoadingOverlay();
+                console.error('Erro ao salvar reprovação da requisição:', error);
+                setSuccessMessage(error.message || 'Erro ao salvar reprovação da requisição.');
+                setShowSuccessPopup(true);
+                setTimeout(() => {
+                    setShowSuccessPopup(false);
+                }, 5000);
+            }
         }
     };
 
@@ -940,21 +1096,32 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                         <div className="modal-footer" id="modal-footer">
                             <button className="btn-voltar" id="btn-voltar" onClick={closeTicketModal}>Fechar</button>
                             {aprovacaoMateriais && (
-                                <button
-                                    className="btn-voltar"
-                                    onClick={handleSalvarAprovMat}
-                                    disabled={materiais.some(material => material.status === "Pendente")}
-                                >
-                                    Enviar
-                                </button>
+                                <>
+                                    <button className="btn-voltar" id="btn-voltar" onClick={handleCancelarSolic}>Cancelar Solicitação</button>
+                                    <button
+                                        className="btn-voltar"
+                                        onClick={handleSalvarAprovMat}
+                                        disabled={materiais.some(material => material.status === "Pendente")}
+                                    >
+                                        Enviar
+                                    </button>
+                                </>
                             )}
                             {aprovacaoSolicitacao && (
-                                <button
-                                    className="btn-voltar"
-                                    onClick={handleSalvarAprovSolic}
-                                >
-                                    Enviar
-                                </button>
+                                <>
+                                    <button
+                                        className="btn-voltar"
+                                        onClick={handleSalvarReprovSolic}
+                                    >
+                                        Reprovar
+                                    </button>
+                                    <button
+                                        className="btn-voltar"
+                                        onClick={handleSalvarAprovSolic}
+                                    >
+                                        Aprovar
+                                    </button>
+                                </>
                             )}
                         </div>
                     </div>
