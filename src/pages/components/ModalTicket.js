@@ -292,15 +292,17 @@ const Modal = ({ data, onClose }) => {
 
         axios.get(`${process.env.REACT_APP_API_BASE_URL}/tickets/form/usuarios-executores`, { headers: { 'Authorization': `Bearer ${authToken}`, 'X-User-Email': user.email } })
             .then(response => {
-                const formattedData = response.data.map(destinatario => {
-                    if (String(destinatario.id) === String(selectedDestinatario)) {
-                        setSelectedDestinatario(`${destinatario.id} - ${destinatario.fila}`)
-                    }
-                    return {
-                        value: `${destinatario.id} - ${destinatario.fila}`,
-                        label: destinatario.fila
-                    };
-                });
+                const formattedData = response.data
+                    .filter(destinatario => destinatario.id !== 4124)
+                    .map(destinatario => {
+                        if (String(destinatario.id) === String(selectedDestinatario)) {
+                            setSelectedDestinatario(`${destinatario.id} - ${destinatario.fila}`)
+                        }
+                        return {
+                            value: `${destinatario.id} - ${destinatario.fila}`,
+                            label: destinatario.fila
+                        };
+                    });
                 setOptions(prevOptions => ({ ...prevOptions, destinatarios: formattedData }));
             })
             .catch(error => {
@@ -1157,19 +1159,19 @@ const Modal = ({ data, onClose }) => {
             if (atividades.length > 0) {
                 const ultimaAtividadeIndex = atividades.length - 1;
                 const ultimaAtividade = atividades[ultimaAtividadeIndex];
-    
+
                 ultimaAtividade.alterar = 1;
-    
+
                 if (!ultimaAtividade.dt_fim) {
                     ultimaAtividade.dt_fim = aberto_em;
                 }
                 if (!ultimaAtividade.ds_concluido_por) {
                     ultimaAtividade.ds_concluido_por = user.name;
                 }
-    
+
                 const updatedAtividades = [...atividades];
                 updatedAtividades[ultimaAtividadeIndex] = ultimaAtividade;
-    
+
                 setAtividades(updatedAtividades);
 
                 update_tasks.push({
@@ -1553,7 +1555,7 @@ const Modal = ({ data, onClose }) => {
                 <div className="modal-header">
                     <h3>#{data.cod_fluxo}</h3>
                     <div className="botao-salvar-container">
-                        {isAllowedCreateUser && (
+                        {isAllowedCreateUser && user.filas_id.includes("4124") && (
                             <button className="botao-salvar-ticket" style={{ display: 'flex', alignItems: 'center', gap: '8px' }} onClick={handleCreateUser}>
                                 <FaUserPlus /> Criar Usuário
                             </button>
