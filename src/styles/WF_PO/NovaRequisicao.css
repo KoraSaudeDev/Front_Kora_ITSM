@@ -473,11 +473,10 @@ textarea {
     z-index: 9999;
     font-size: 16px;
     text-align: center;
-    opacity: 0;
-    animation: fadeInOut 3.5s forwards;
     display: flex;
     align-items: center;
     justify-content: center;
+    opacity: 1;
 }
 
 .popup-sucesso::before {
@@ -487,24 +486,13 @@ textarea {
     margin-right: 10px;
 }
 
-@keyframes fadeInOut {
+@keyframes fadeIn {
     0% {
         opacity: 0;
         transform: translate(-50%, -60%);
     }
-
-    15% {
-        opacity: 1;
-        transform: translate(-50%, -50%);
-    }
-
-    85% {
-        opacity: 1;
-        transform: translate(-50%, -50%);
-    }
-
     100% {
-        opacity: 0;
-        transform: translate(-50%, -40%);
+        opacity: 1;
+        transform: translate(-50%, -50%);
     }
 }
