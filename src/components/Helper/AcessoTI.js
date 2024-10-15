@@ -47,8 +47,8 @@ function AcessoTI() {
 
     const secoesMenores = [
         { nome: 'Outros', icone: faToolbox, link: 'https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#appName=TicketsGeral-448944302&page=form&row=&table=SL_novo_ticket&view=Novo+Ticket' },
-        { nome: 'Laboratório LIS', icone: faFlask, link: 'https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#appName=TicketsGeral-448944302&view=Novo%20Ticket&defaults={%22Categoria%22:%22LIS%22}' },
-        { nome: 'RIS/PACS', icone: faServer, link: 'https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#appName=TicketsGeral-448944302&view=Novo%20Ticket&defaults={%22Categoria%22:%22RIS/PACS%22}' },
+        { nome: 'Sistema de Laboratório', icone: faFlask, link: 'https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#appName=TicketsGeral-448944302&view=Novo%20Ticket&defaults={%22Categoria%22:%22LIS%22}' },
+        { nome: 'Sistemas de PACS', icone: faServer, link: 'https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#appName=TicketsGeral-448944302&view=Novo%20Ticket&defaults={%22Categoria%22:%22RIS/PACS%22}' },
         { nome: 'Agenda AOL', icone: faCalendar, link: 'https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#appName=TicketsGeral-448944302&view=Novo%20Ticket&defaults={%22Categoria%22:%22Agendamento%22}' },
         { nome: 'Senior', icone: faUserCircle, link: 'https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#appName=TicketsGeral-448944302&view=Novo%20Ticket&defaults={%22Categoria%22:%22S%C3%AAnior%22}' },
         { nome: 'Painéis do BI', icone: faChartLine, link: 'https://www.appsheet.com/start/894918c5-7548-431d-96c0-5c1f2f0a51a0#appName=TicketsGeral-448944302&view=Novo%20Ticket&defaults={%22Categoria%22:%22BI%22}' },
