@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
 import { FaShoppingCart } from 'react-icons/fa';
-import '../../../styles/WF_PO/NovaRequisicao.css';
+import '../../../styles/ITSM/Compras/NovoTicketCompras.css';
 import { useAuth } from '../../../context/AuthContext';
 import axios from 'axios';
 import SidebarInterna from '../../../components/SidebarInterna';

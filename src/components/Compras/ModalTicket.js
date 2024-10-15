@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
+import { useRefresh } from '../../context/RefreshContext';
 import axios from 'axios';
 
 const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) => {
@@ -277,6 +278,38 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
         setMateriais(updatedMateriais);
     };
 
+    const handleIncrementQuantidade = (codigo) => {
+        const updatedMateriais = materiais.map(material => {
+            if (material.codigo === codigo) {
+                const novaQuantidade = material.qtd + 1;
+                const novoTotal = parseFloat(material.preco) * novaQuantidade;
+                return {
+                    ...material,
+                    qtd: novaQuantidade,
+                    total: novoTotal.toFixed(2)
+                };
+            }
+            return material;
+        });
+        setMateriais(updatedMateriais);
+    };
+
+    const handleDecrementQuantidade = (codigo) => {
+        const updatedMateriais = materiais.map(material => {
+            if (material.codigo === codigo) {
+                const novaQuantidade = material.qtd > 0 ? material.qtd - 1 : 0;
+                const novoTotal = parseFloat(material.preco) * novaQuantidade;
+                return {
+                    ...material,
+                    qtd: novaQuantidade,
+                    total: novoTotal.toFixed(2)
+                };
+            }
+            return material;
+        });
+        setMateriais(updatedMateriais);
+    };
+
     const handleClosePopup = () => {
         setShowSuccessPopup(false);
         setShowCloseBtn(false);
@@ -406,6 +439,96 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
         } catch (error) {
             hideLoadingOverlay();
             console.error("Error saving wf-po:", error);
+        }
+    };
+
+    const handleCancelarSolic = async () => {
+        const motivo = prompt("Digite o motivo do cancelamento:");
+        if (motivo) {
+            const dataAtual = formatDate(new Date(), 2);
+            const atividade_insert = [{
+                referencia_id: selectedTicket.id,
+                fase: -1,
+                executor: null,
+                numero_bloco: selectedTicket.numero_bloco,
+                motivo_reprova: motivo,
+                inicio: dataAtual,
+                fim: dataAtual,
+                nome_executor: user.name,
+            }];
+
+            const atividades_update = atividades.length > 0 ? [{
+                id: atividades[atividades.length - 1].id,
+                nome_executor: user.name,
+                fim: dataAtual
+            }] : [];
+
+            const requisicao_update = {
+                executor: null,
+                fase: -1,
+            };
+
+            showLoadingOverlay();
+            try {
+                const wf_po_Config = {
+                    method: 'patch',
+                    url: `${process.env.REACT_APP_API_BASE_URL}/wf-po/update/wf-po/${selectedTicket.id}`,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        'X-User-Email': user.email,
+                    },
+                    data: JSON.stringify(requisicao_update),
+                };
+                await sendRequest(wf_po_Config);
+
+                for (const task of atividades_update) {
+                    const task_Config = {
+                        method: 'patch',
+                        url: `${process.env.REACT_APP_API_BASE_URL}/wf-po/update/wf-po-task/${task.id}`,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`,
+                            'X-User-Email': user.email,
+                        },
+                        data: JSON.stringify(task),
+                    };
+                    await sendRequest(task_Config);
+                }
+
+                for (const task of atividade_insert) {
+                    const task_insert_Config = {
+                        method: 'post',
+                        url: `${process.env.REACT_APP_API_BASE_URL}/wf-po/update/wf-po-task`,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`,
+                            'X-User-Email': user.email,
+                        },
+                        data: JSON.stringify(task),
+                    };
+                    await sendRequest(task_insert_Config);
+                }
+
+                hideLoadingOverlay();
+
+
+                setSuccessMessage(`Cancelado com sucesso!`);
+                setShowSuccessPopup(true);
+                setTimeout(() => {
+                    setShowSuccessPopup(false);
+                    window.location.reload();
+                }, 3000);
+
+            } catch (error) {
+                hideLoadingOverlay();
+                console.error('Erro ao salvar cancelamento da requisição:', error);
+                setSuccessMessage(error.message || 'Erro ao salvar cancelamento da requisição.');
+                setShowSuccessPopup(true);
+                setTimeout(() => {
+                    setShowSuccessPopup(false);
+                }, 5000);
+            }
         }
     };
 
@@ -571,6 +694,71 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
         }
     };
 
+    const handleSalvarReprovSolic = async () => {
+        const motivo = prompt("Digite o motivo da reprovação:");
+        if (motivo) {
+            const dataAtual = formatDate(new Date(), 2);
+            const atividades_update = atividades.length > 0 ? [{
+                id: atividades[atividades.length - 1].id,
+                nome_executor: user.name,
+                fim: dataAtual,
+                motivo_reprova: motivo,
+            }] : [];
+
+            const requisicao_update = {
+                executor: null,
+                fase: -1,
+            };
+
+            showLoadingOverlay();
+            try {
+                const wf_po_Config = {
+                    method: 'patch',
+                    url: `${process.env.REACT_APP_API_BASE_URL}/wf-po/update/wf-po/${selectedTicket.id}`,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        'X-User-Email': user.email,
+                    },
+                    data: JSON.stringify(requisicao_update),
+                };
+                await sendRequest(wf_po_Config);
+
+                for (const task of atividades_update) {
+                    const task_Config = {
+                        method: 'patch',
+                        url: `${process.env.REACT_APP_API_BASE_URL}/wf-po/update/wf-po-task/${task.id}`,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`,
+                            'X-User-Email': user.email,
+                        },
+                        data: JSON.stringify(task),
+                    };
+                    await sendRequest(task_Config);
+                }
+
+                hideLoadingOverlay();
+
+                setSuccessMessage(`Reprovado com sucesso!`);
+                setShowSuccessPopup(true);
+                setTimeout(() => {
+                    setShowSuccessPopup(false);
+                    window.location.reload();
+                }, 3000);
+
+            } catch (error) {
+                hideLoadingOverlay();
+                console.error('Erro ao salvar reprovação da requisição:', error);
+                setSuccessMessage(error.message || 'Erro ao salvar reprovação da requisição.');
+                setShowSuccessPopup(true);
+                setTimeout(() => {
+                    setShowSuccessPopup(false);
+                }, 5000);
+            }
+        }
+    };
+
     return (
         isCartOpen && selectedTicket && (
             <div className="modal-overlay" id="modal-cart">
@@ -592,47 +780,47 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                         <div className="form-row">
                             <div className="campo">
                                 <label htmlFor="input-email">Email:</label>
-                                <input id="input-email" type="email" value={selectedTicket.email??''} readOnly />
+                                <input id="input-email" type="email" value={selectedTicket.email ?? ''} readOnly />
                             </div>
                             <div className="campo">
                                 <label htmlFor="input-nome">Nome:</label>
-                                <input id="input-nome" type="text" value={selectedTicket.nome??''} readOnly />
+                                <input id="input-nome" type="text" value={selectedTicket.nome ?? ''} readOnly />
                             </div>
                         </div>
 
                         <div className="form-row">
                             <div className="campo">
                                 <label htmlFor="input-hub">Hub:</label>
-                                <input id="input-hub" type="text" value={selectedTicket.hub??''} readOnly />
+                                <input id="input-hub" type="text" value={selectedTicket.hub ?? ''} readOnly />
                             </div>
                             <div className="campo">
                                 <label htmlFor="input-unidade">Unidade:</label>
-                                <input id="input-unidade" type="text" value={selectedTicket.unidade??''} readOnly />
+                                <input id="input-unidade" type="text" value={selectedTicket.unidade ?? ''} readOnly />
                             </div>
                             <div className="campo">
                                 <label htmlFor="input-centro-custo">Centro de Custo:</label>
-                                <input id="input-centro-custo" type="text" value={selectedTicket.centro_custo??''} readOnly />
+                                <input id="input-centro-custo" type="text" value={selectedTicket.centro_custo ?? ''} readOnly />
                             </div>
                         </div>
 
                         <div className="form-row">
                             <div className="campo">
                                 <label htmlFor="input-area">Área:</label>
-                                <input id="input-area" type="text" value={selectedTicket.area??''} readOnly />
+                                <input id="input-area" type="text" value={selectedTicket.area ?? ''} readOnly />
                             </div>
                             <div className="campo">
                                 <label htmlFor="input-tipo-solicitacao">Tipo de Solicitação:</label>
-                                <input id="input-tipo-solicitacao" type="text" value={selectedTicket.tipo_solicitacao??''} readOnly />
+                                <input id="input-tipo-solicitacao" type="text" value={selectedTicket.tipo_solicitacao ?? ''} readOnly />
                             </div>
                             {selectedTicket.tipo_solicitacao === "Produto" && (
                                 <div className="campo">
                                     <label htmlFor="input-data-remessa">Data Remessa:</label>
-                                    <input id="input-data-remessa" type="text" value={formatDate(selectedTicket.dt_remessa, 1, true)??''} readOnly />
+                                    <input id="input-data-remessa" type="text" value={formatDate(selectedTicket.dt_remessa, 1, true) ?? ''} readOnly />
                                 </div>
                             )}
                             <div className="campo">
                                 <label htmlFor="input-bloco">Bloco:</label>
-                                <input id="input-bloco" type="text" value={selectedTicket.numero_bloco??''} readOnly />
+                                <input id="input-bloco" type="text" value={selectedTicket.numero_bloco ?? ''} readOnly />
                             </div>
                         </div>
 
@@ -640,31 +828,42 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                             <div className="form-row">
                                 <div className="campo">
                                     <label htmlFor="input-cod-forn">Código do Fornecedor:</label>
-                                    <input id="input-cod-forn" type="text" value={selectedTicket.cod_fornecedor??''} readOnly />
+                                    <input id="input-cod-forn" type="text" value={selectedTicket.cod_fornecedor ?? ''} readOnly />
                                 </div>
                                 <div className="campo">
                                     <label htmlFor="input-forn">Fornecedor:</label>
-                                    <input id="input-forn" type="text" value={selectedTicket.fornecedor??''} readOnly />
+                                    <input id="input-forn" type="text" value={selectedTicket.fornecedor ?? ''} readOnly />
                                 </div>
                                 <div className="campo">
                                     <label htmlFor="input-inicio-serv">Início do Serviço:</label>
-                                    <input id="input-inicio-serv" type="text" value={formatDate(selectedTicket.dt_inicio_serv, 1, true)??''} readOnly />
+                                    <input id="input-inicio-serv" type="text" value={formatDate(selectedTicket.dt_inicio_serv, 1, true) ?? ''} readOnly />
                                 </div>
                                 <div className="campo">
                                     <label htmlFor="input-fim-serv">Fim do Serviço:</label>
-                                    <input id="input-fim-serv" type="text" value={formatDate(selectedTicket.dt_fim_serv, 1, true)??''} readOnly />
+                                    <input id="input-fim-serv" type="text" value={formatDate(selectedTicket.dt_fim_serv, 1, true) ?? ''} readOnly />
                                 </div>
                             </div>
                         )}
 
                         <div className="form-row">
                             <div className="campo">
+                                <label htmlFor="input-grupo-material">Grupo de Material:</label>
+                                <input id="input-grupo-material" type="text" value={selectedTicket.grupo_material ?? ''} readOnly />
+                            </div>
+                            <div className="campo">
+                                <label htmlFor="input-motivo-solic">Motivo da Solicitação:</label>
+                                <input id="input-motivo-solic" type="text" value={selectedTicket.motivo_solicitacao ?? ''} readOnly />
+                            </div>
+                        </div>
+
+                        <div className="form-row">
+                            <div className="campo">
                                 <label htmlFor="input-descricao">Descrição:</label>
-                                <textarea id="input-descricao" rows="2" value={selectedTicket.descricao??''} readOnly />
+                                <textarea id="input-descricao" rows="2" value={selectedTicket.descricao ?? ''} readOnly />
                             </div>
                             <div className="campo">
                                 <label htmlFor="input-observacoes">Observações:</label>
-                                <textarea id="input-observacoes" rows="2" value={selectedTicket.observacoes??''} readOnly />
+                                <textarea id="input-observacoes" rows="2" value={selectedTicket.observacoes ?? ''} readOnly />
                             </div>
                         </div>
 
@@ -715,18 +914,24 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                                             <td>{material.material}</td>
                                             {aprovacaoMateriais ? (
                                                 <td>
-                                                    <input
-                                                        type="number"
-                                                        value={material.qtd}
-                                                        onChange={(e) => handleQuantidadeChange(material.codigo, e.target.value)}
-                                                    />
+                                                    <div className="quantidade-container">
+                                                        <button onClick={() => handleDecrementQuantidade(material.codigo)}>-</button>
+                                                        <input
+                                                            type="number"
+                                                            value={material.qtd}
+                                                            onChange={(e) => handleQuantidadeChange(material.codigo, e.target.value)}
+                                                        />
+                                                        <button onClick={() => handleIncrementQuantidade(material.codigo)}>+</button>
+                                                    </div>
                                                 </td>
                                             ) : (
                                                 <td>{material.qtd}</td>
                                             )}
                                             <td>{material.preco}</td>
                                             <td>{material.total}</td>
-                                            <td>{material.status}</td>
+                                            <td className={material.status === "Pendente" ? "status-pendente" : material.status === "Aprovado" ? "status-aprovado" : "status-outro"}>
+                                                {material.status}
+                                            </td>
                                             <td>{material.motivo_reprova ? material.motivo_reprova : 'N/A'}</td>
                                         </tr>
                                     ))
@@ -929,21 +1134,32 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                         <div className="modal-footer" id="modal-footer">
                             <button className="btn-voltar" id="btn-voltar" onClick={closeTicketModal}>Fechar</button>
                             {aprovacaoMateriais && (
-                                <button
-                                    className="btn-voltar"
-                                    onClick={handleSalvarAprovMat}
-                                    disabled={materiais.some(material => material.status === "Pendente")}
-                                >
-                                    Enviar
-                                </button>
+                                <>
+                                    <button className="btn-voltar" id="btn-voltar" onClick={handleCancelarSolic}>Cancelar Solicitação</button>
+                                    <button
+                                        className="btn-voltar"
+                                        onClick={handleSalvarAprovMat}
+                                        disabled={materiais.some(material => material.status === "Pendente")}
+                                    >
+                                        Enviar
+                                    </button>
+                                </>
                             )}
                             {aprovacaoSolicitacao && (
-                                <button
-                                    className="btn-voltar"
-                                    onClick={handleSalvarAprovSolic}
-                                >
-                                    Enviar
-                                </button>
+                                <>
+                                    <button
+                                        className="btn-voltar"
+                                        onClick={handleSalvarReprovSolic}
+                                    >
+                                        Reprovar
+                                    </button>
+                                    <button
+                                        className="btn-voltar"
+                                        onClick={handleSalvarAprovSolic}
+                                    >
+                                        Aprovar
+                                    </button>
+                                </>
                             )}
                         </div>
                     </div>
@@ -959,4 +1175,4 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
     );
 };
 
-export default ModalTicket;
+export default ModalTicket

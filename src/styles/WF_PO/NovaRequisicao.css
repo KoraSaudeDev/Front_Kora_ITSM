@@ -674,3 +674,93 @@ textarea {
         opacity: 1;
     }
 }
+
+
+.quantidade-container {
+    display: flex;
+    align-items: center;
+}
+
+.quantidade-container input[type="number"] {
+    width: 50px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px;
+    margin: 0 5px;
+}
+
+.quantidade-container button {
+    background-color: #007aff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.quantidade-container button:hover {
+    background-color: #005bb5;
+}
+
+
+.status-pendente {
+    background-color: orange;
+    color: white;
+    padding: 5px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.status-aprovado {
+    background-color: green;
+    color: white;
+    padding: 5px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.status-outro {
+    background-color: black;
+    color: white;
+    padding: 5px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+
+.popup-sucesso {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: lightgray;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+
+.popup-sucesso button {
+    margin-top: 10px;
+    background-color: #007aff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.popup-sucesso button:hover {
+    background-color: #005bb5;
+}

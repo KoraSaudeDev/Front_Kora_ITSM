@@ -278,6 +278,38 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
         setMateriais(updatedMateriais);
     };
 
+    const handleIncrementQuantidade = (codigo) => {
+        const updatedMateriais = materiais.map(material => {
+            if (material.codigo === codigo) {
+                const novaQuantidade = material.qtd + 1;
+                const novoTotal = parseFloat(material.preco) * novaQuantidade;
+                return {
+                    ...material,
+                    qtd: novaQuantidade,
+                    total: novoTotal.toFixed(2)
+                };
+            }
+            return material;
+        });
+        setMateriais(updatedMateriais);
+    };
+
+    const handleDecrementQuantidade = (codigo) => {
+        const updatedMateriais = materiais.map(material => {
+            if (material.codigo === codigo) {
+                const novaQuantidade = material.qtd > 0 ? material.qtd - 1 : 0;
+                const novoTotal = parseFloat(material.preco) * novaQuantidade;
+                return {
+                    ...material,
+                    qtd: novaQuantidade,
+                    total: novoTotal.toFixed(2)
+                };
+            }
+            return material;
+        });
+        setMateriais(updatedMateriais);
+    };
+
     const handleClosePopup = () => {
         setShowSuccessPopup(false);
         setShowCloseBtn(false);
@@ -882,18 +914,24 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
                                             <td>{material.material}</td>
                                             {aprovacaoMateriais ? (
                                                 <td>
-                                                    <input
-                                                        type="number"
-                                                        value={material.qtd}
-                                                        onChange={(e) => handleQuantidadeChange(material.codigo, e.target.value)}
-                                                    />
+                                                    <div className="quantidade-container">
+                                                        <button onClick={() => handleDecrementQuantidade(material.codigo)}>-</button>
+                                                        <input
+                                                            type="number"
+                                                            value={material.qtd}
+                                                            onChange={(e) => handleQuantidadeChange(material.codigo, e.target.value)}
+                                                        />
+                                                        <button onClick={() => handleIncrementQuantidade(material.codigo)}>+</button>
+                                                    </div>
                                                 </td>
                                             ) : (
                                                 <td>{material.qtd}</td>
                                             )}
                                             <td>{material.preco}</td>
                                             <td>{material.total}</td>
-                                            <td>{material.status}</td>
+                                            <td className={material.status === "Pendente" ? "status-pendente" : material.status === "Aprovado" ? "status-aprovado" : "status-outro"}>
+                                                {material.status}
+                                            </td>
                                             <td>{material.motivo_reprova ? material.motivo_reprova : 'N/A'}</td>
                                         </tr>
                                     ))
@@ -1137,4 +1175,4 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, editing }) 
     );
 };
 
-export default ModalTicket;
+export default ModalTicket

@@ -2,8 +2,7 @@ import React from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import SidebarInterna from '../../../components/SidebarInterna';
 import AtendimentosTable from '../../../components/Compras/AtendimentosTable';
-import '../../../styles/WF_PO/Solicitacoes.css';
-import '../../../styles/WF_PO/NovaRequisicao.css';
+import '../../../styles/ITSM/Compras/NovoTicketCompras.css';
 
 const SolicitacaoCompras = () => {
     const { user } = useAuth();
