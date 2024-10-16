@@ -2,25 +2,17 @@ import React, { useState, useEffect, useRef } from 'react';
 import { FaChevronLeft, FaChevronRight, FaShoppingCart } from 'react-icons/fa';
 import ModalTicket from './ModalTicket';
 import { useAuth } from '../../context/AuthContext';
-import { useRefresh } from '../../context/RefreshContext';
-import axios from 'axios';
 
 const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela, editing = false }) => {
     const { user, token } = useAuth();
-    const { refreshKey } = useRefresh();
     const [tickets, setTickets] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [itemsPerPage] = useState(10);
     const [totalPages, setTotalPages] = useState(1);
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [selectedTicket, setSelectedTicket] = useState(null);
 
-    const prevPageRef = useRef(currentPage);
-    const prevItemsPerPageRef = useRef(itemsPerPage);
-
-    const cacheKey = `${tipo_tela}_page_${currentPage}_items_${itemsPerPage}`;
-
-  
+    // Fake data for tickets (replace this with API calls)
     const fakeTickets = [
         {
             id: 'TK001',
@@ -30,7 +22,19 @@ const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela, editing = false
             fase: 'Em Andamento',
             executor: 'João Pereira',
             hub: 'São Paulo',
-            unidade: 'Unidade Central'
+            unidade: 'Unidade Central',
+            centroCusto: 'Marketing',
+            tipoEquipamento: 'Estação de Trabalho',
+            descricao: 'Aquisição de novo notebook para o setor de Marketing.',
+            observacao: 'Urgente. Precisa ser entregue até o final do mês.',
+            materiais: [
+                { nome: 'Notebook Dell XPS 13', quantidade: 2, preco: 7500, total: 15000 }
+            ],
+            total_materiais: 15000,
+            comentarios: [
+                { usuario: 'Lucas Silva', mensagem: 'Precisamos desse equipamento o quanto antes.', timestamp: '2024-10-11 10:12' },
+                { usuario: 'João Pereira', mensagem: 'Estou agilizando a compra.', timestamp: '2024-10-12 11:22' }
+            ]
         },
         {
             id: 'TK002',
@@ -40,101 +44,51 @@ const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela, editing = false
             fase: 'Pendente',
             executor: 'Ana Costa',
             hub: 'Rio de Janeiro',
-            unidade: 'Unidade Sul'
+            unidade: 'Unidade Sul',
+            centroCusto: 'RH',
+            tipoEquipamento: 'CHIP',
+            descricao: 'Solicitação de chips para novas linhas móveis.',
+            observacao: '',
+            materiais: [
+                { nome: 'CHIP Vivo', quantidade: 5, preco: 10, total: 50 }
+            ],
+            total_materiais: 50,
+            comentarios: [
+                { usuario: 'Ana Costa', mensagem: 'Enviarei os chips na próxima semana.', timestamp: '2024-10-10 12:32' }
+            ]
         },
-        {
-            id: 'TK003',
-            dt_abertura: '2024-10-08T14:00:00',
-            nome: 'Pedro Oliveira',
-            email: 'pedro.oliveira@example.com',
-            fase: 'Concluído',
-            executor: 'Carlos Santos',
-            hub: 'Belo Horizonte',
-            unidade: 'Unidade Norte'
-        },
-        {
-            id: 'TK004',
-            dt_abertura: '2024-10-07T09:15:00',
-            nome: 'Cláudia Martins',
-            email: 'claudia.martins@example.com',
-            fase: 'Cancelado',
-            executor: 'Fernanda Lima',
-            hub: 'Brasília',
-            unidade: 'Unidade Oeste'
-        },
-        {
-            id: 'TK005',
-            dt_abertura: '2024-10-06T16:30:00',
-            nome: 'Ricardo Almeida',
-            email: 'ricardo.almeida@example.com',
-            fase: 'Em Andamento',
-            executor: 'Juliana Souza',
-            hub: 'Curitiba',
-            unidade: 'Unidade Leste'
-        }
+        // Outros tickets aqui...
     ];
 
+    // useEffect to load tickets on mount
     useEffect(() => {
-      
         setTickets(fakeTickets);
         setTotalPages(1);
+    }, []);
 
-        prevPageRef.current = currentPage;
-        prevItemsPerPageRef.current = itemsPerPage;
-
-        return () => {};
-    }, [currentPage, itemsPerPage, refreshKey]);
-
-    function formatDate(dateString, type = 1, sub3Hrs = false) {
-        if (!dateString) {
-            return '';
-        }
-
-        let date;
-        if (sub3Hrs) { 
-            date = new Date(new Date(dateString).getTime() + new Date(dateString).getTimezoneOffset() * 60000);
-        } else { 
-            date = new Date(dateString);
-        }
+    // Format date function
+    function formatDate(dateString) {
+        if (!dateString) return '';
+        let date = new Date(dateString);
         const day = String(date.getDate()).padStart(2, '0');
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const year = date.getFullYear();
         const hours = String(date.getHours()).padStart(2, '0');
         const minutes = String(date.getMinutes()).padStart(2, '0');
-        const seconds = String(date.getSeconds()).padStart(2, '0');
-
-        if (type === 1) return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
-        else if (type === 2) return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-        else if (type === 3) return date.toISOString().slice(0, 19);
-        else return '';
+        return `${day}/${month}/${year} ${hours}:${minutes}`;
     }
 
+    // Pagination handler
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
             setCurrentPage(newPage);
         }
     };
 
-    const openTicketModal = async (ticket) => {
-        try {
-            const config = {
-                method: 'GET',
-                url: `${process.env.REACT_APP_API_BASE_URL}/wf-po/wf-po?id=${ticket.id}`,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                    'X-User-Email': user.email,
-                },
-                data: filtrosExtras
-            };
-
-            const response = await axios.request(config);
-            setSelectedTicket(response.data);
-            setIsCartOpen(true);
-        }
-        catch (error) {
-            console.error("Erro ao buscar informações da requisição:", error);
-        }
+    // Modal handler to view ticket
+    const openTicketModal = (ticket) => {
+        setSelectedTicket(ticket);
+        setIsCartOpen(true);
     };
 
     const closeTicketModal = () => {
@@ -142,11 +96,12 @@ const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela, editing = false
         setSelectedTicket(null);
     };
 
+    // Render tickets dynamically
     const renderTickets = () => {
         return tickets.map((ticket, index) => (
             <tr key={index}>
                 <td>{ticket.id}</td>
-                <td>{formatDate(ticket.dt_abertura, 1, true)}</td>
+                <td>{formatDate(ticket.dt_abertura)}</td>
                 <td>{ticket.nome}</td>
                 <td>{ticket.email}</td>
                 <td>{ticket.fase}</td>
@@ -154,10 +109,7 @@ const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela, editing = false
                 <td>{ticket.hub}</td>
                 <td>{ticket.unidade}</td>
                 <td>
-                    <FaShoppingCart
-                        className="cart-icon"
-                        onClick={() => openTicketModal(ticket)}
-                    />
+                    <FaShoppingCart className="cart-icon" onClick={() => openTicketModal(ticket)} />
                 </td>
             </tr>
         ));
@@ -165,9 +117,6 @@ const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela, editing = false
 
     return (
         <>
-            <div id="loading-overlay" className="loading-overlay">
-                <div className="loading-spinner"></div>
-            </div>
             <table className="tabela-tickets">
                 <thead>
                     <tr>
@@ -195,14 +144,14 @@ const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela, editing = false
                 <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
-                    id="btn-prev-page">
+                >
                     <FaChevronLeft />
                 </button>
-                <span id="pagination-info">{currentPage} de {totalPages}</span>
+                <span>{currentPage} de {totalPages}</span>
                 <button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    id="btn-next-page">
+                >
                     <FaChevronRight />
                 </button>
             </div>
@@ -212,7 +161,6 @@ const AtendimentosTable = ({ url, filtrosExtras = {}, tipo_tela, editing = false
                     isCartOpen={isCartOpen}
                     selectedTicket={selectedTicket}
                     closeTicketModal={closeTicketModal}
-                    editing={editing}
                 />
             )}
         </>

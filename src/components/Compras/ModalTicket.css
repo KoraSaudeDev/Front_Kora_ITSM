@@ -1,0 +1,199 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal {
+    background-color: #fff;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 1500px;
+    padding: 25px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+}
+
+h4{
+    font-size: 20px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+}
+
+.close-button {
+    background-color: transparent;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.modal-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-columns {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+/* Estilo da Divisória Vertical */
+.vertical-divider {
+    width: 2px;
+    background-color: #ddd;
+    margin: 0 15px;
+}
+
+/* Estilo da Coluna Esquerda - Resumo */
+.left-column {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.ticket-info {
+    background-color: #f4f4f4;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+/* Estilo da Coluna Direita - Carrinho de Compras */
+.right-column {
+    flex: 1;
+    margin-left: 10px;
+    border: 1px solid #ddd;
+    background-color: #f4f4f4;
+}
+
+
+/* Estilo da Tabela de Materiais */
+.materials-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+}
+
+.materials-table th, .materials-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+    font-size: 14px;
+}
+
+.cart-total {
+    text-align: right;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 25px;
+}
+
+.approve-button, .reject-button {
+    background-color: #28a745;
+    color: #fff;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-right: 20px;
+    font-size: 16px;
+}
+
+.reject-button {
+    background-color: #dc3545;
+}
+
+.chat-container {
+    max-height: 250px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    
+}
+
+.chat-message {
+    margin-bottom: 12px;
+}
+
+.chat-timestamp {
+    font-size: 0.75rem;
+    color: #777;
+    display: block;
+}
+
+.chat-input {
+    display: flex;
+    align-items: center;
+}
+
+.chat-input input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+.chat-input button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 25px;
+}
+
+.close-footer-button {
+    background-color: #555;
+    color: #fff;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.left-column, .right-column {
+    flex: 1;
+    margin-right: 10px;
+    padding: 20px;  /* Adiciona um espaçamento interno maior */
+    background-color: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+}
+
+.ticket-info div {
+    margin-bottom: 15px;  /* Aumenta o espaçamento entre os campos */
+    line-height: 1.6;     /* Melhora a legibilidade ao aumentar o espaçamento entre linhas */
+}
+
+.ticket-info {
+    padding: 10px;
+}
