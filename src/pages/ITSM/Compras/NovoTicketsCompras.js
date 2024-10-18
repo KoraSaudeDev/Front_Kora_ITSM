@@ -495,7 +495,7 @@ const NovoTicketCompras = () => {
                         {/* Modal do Carrinho */}
                         {isCartOpen && (
                             <div className="modal-overlay">
-                                <div className="modal">
+                                <div className="modal-tc">
                                     <div className="modal-header">
                                         <h3>Itens do Carrinho</h3>
                                         <span className="close" onClick={toggleCartModal}>&times;</span>
@@ -551,7 +551,7 @@ const NovoTicketCompras = () => {
                                         <p>Total: R$ {total.toFixed(2)}</p>
                                     </div>
                                     <div className="campo botoes">
-                                        <button type="button" onClick={handleSendTicket}>
+                                        <button id='enviar-modal' type="button" onClick={handleSendTicket}>
                                             Enviar
                                         </button>
                                     </div>

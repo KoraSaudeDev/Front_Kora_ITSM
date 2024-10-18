@@ -10,12 +10,16 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, showApprova
     const [materiais, setMateriais] = useState([]);
     const [chatMessages, setChatMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
+    const [solicitacao, setSolicitacao] = useState('');
+    const [pedido, setPedido] = useState('');
 
     useEffect(() => {
         if (selectedTicket && token) {
             fetchMateriais();
             fetchChatMessages();
             setTotal(parseFloat(selectedTicket.total_materiais) || 0);
+            setSolicitacao(selectedTicket.solicitacao || '');
+            setPedido(selectedTicket.pedido || '');
         }
     }, [selectedTicket, token]);
 
@@ -59,6 +63,19 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, showApprova
         }
     };
 
+    const handleBlur = async (field, value) => {
+        try {
+            await axios.put(`${process.env.REACT_APP_API_BASE_URL}/wf-po/update-ticket`, {
+                ticket_id: selectedTicket.id,
+                [field]: value,
+            }, {
+                headers: { 'Authorization': `Bearer ${token}`, 'X-User-Email': user.email }
+            });
+        } catch (error) {
+            console.error(`Erro ao atualizar ${field}:`, error);
+        }
+    };
+
     return (
         isCartOpen && (
             <div className="modal-overlay">
@@ -69,24 +86,52 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, showApprova
                     </div>
 
                     <div className="modal-content">
-                        {/* Mostrar os botões Aprovar/Reprovar apenas se showApprovalButtons for true */}
-                        {showApprovalButtons && (
-                            <div className="actions">
-                                <button className="approve-button"><FaCheck /> Aprovar</button>
-                                <button className="reject-button"><FaTimes /> Reprovar</button>
+                        {/* Linha com os botões Aprovar/Reprovar e campos Solicitação/Pedido */}
+                        <div className="actions-and-fields">
+                            {showApprovalButtons && (
+                                <div className="actions">
+                                    <button className="approve-button"><FaCheck /> Aprovar</button>
+                                    <button className="reject-button"><FaTimes /> Reprovar</button>
+                                </div>
+                            )}
+                            <div className="request-fields">
+                                <div>
+                                    <strong>Solicitação:</strong>
+                                    <input
+                                        type="text"
+                                        value={solicitacao}
+                                        onChange={(e) => setSolicitacao(e.target.value)}
+                                        onBlur={() => handleBlur('solicitacao', solicitacao)}
+                                        placeholder="Digite a solicitação"
+                                    />
+                                </div>
+                                <div>
+                                    <strong>Pedido:</strong>
+                                    <input
+                                        type="text"
+                                        value={pedido}
+                                        onChange={(e) => setPedido(e.target.value)}
+                                        onBlur={() => handleBlur('pedido', pedido)}
+                                        placeholder="Digite o pedido"
+                                    />
+                                </div>
                             </div>
-                        )}
+                        </div>
 
                         <div className="modal-columns">
                             <div className="left-column">
                                 <h4>Resumo do Ticket</h4>
                                 <div className="ticket-info">
+                                    <div><strong>Aberto em:</strong> {new Date(selectedTicket.abertura).toLocaleString() || 'Data não disponível'}</div>
+                                    <div><strong>Relator:</strong> {selectedTicket.relator || 'Não especificado'}</div>
+                                    <div><strong>E-mail:</strong> {selectedTicket.email || 'Não especificado'}</div>
+                                    <div><strong>Setor Requerente:</strong> {selectedTicket.setorRequerente || 'Não especificado'}</div>
                                     <div><strong>HUB:</strong> {selectedTicket.hub || 'Não especificado'}</div>
-                                    <div><strong>Unidade:</strong> {selectedTicket.unidade || 'Não especificada'}</div>
+                                    <div><strong>Unidade de Negócio:</strong> {selectedTicket.unidadeNegocio || 'Não especificado'}</div>
                                     <div><strong>Centro de Custo:</strong> {selectedTicket.centroCusto || 'Não especificado'}</div>
                                     <div><strong>Tipo de Equipamento:</strong> {selectedTicket.tipoEquipamento || 'Não especificado'}</div>
+                                    <div><strong>Gestor(a) Responsável:</strong> {selectedTicket.gestorResponsavel || 'Não especificado'}</div>
                                     <div><strong>Descrição:</strong> {selectedTicket.descricao || 'Nenhuma descrição fornecida'}</div>
-                                    <div><strong>Observação:</strong> {selectedTicket.observacao || 'Nenhuma observação fornecida'}</div>
                                 </div>
                             </div>
 
@@ -98,24 +143,40 @@ const ModalTicket = ({ isCartOpen, selectedTicket, closeTicketModal, showApprova
                                     <table className="materials-table">
                                         <thead>
                                             <tr>
-                                                <th>Item</th>
-                                                <th>Qtd</th>
-                                                <th>Preço</th>
-                                                <th>Total</th>
+                                                <th>Equipamento</th>
+                                                <th>Valor Estimado</th>
+                                                <th>Quantidade</th>
+                                                <th>Justificativa</th>
+                                                <th>Link do Produto</th>
+                                                <th>Anexo</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {materiais.length === 0 ? (
                                                 <tr>
-                                                    <td colSpan="4">Nenhum material adicionado</td>
+                                                    <td colSpan="6">Nenhum material adicionado</td>
                                                 </tr>
                                             ) : (
                                                 materiais.map((material, index) => (
                                                     <tr key={index}>
-                                                        <td>{material.nome}</td>
+                                                        <td>{material.equipamento}</td>
+                                                        <td>R${material.valorEstimado}</td>
                                                         <td>{material.quantidade}</td>
-                                                        <td>R${material.preco}</td>
-                                                        <td>R${(material.quantidade * material.preco).toFixed(2)}</td>
+                                                        <td>{material.justificativa}</td>
+                                                        <td>
+                                                            <a href={material.linkProduto} target="_blank" rel="noopener noreferrer">
+                                                                Link
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            {material.anexo ? (
+                                                                <a href={material.anexo} target="_blank" rel="noopener noreferrer">
+                                                                    Ver Anexo
+                                                                </a>
+                                                            ) : (
+                                                                'Nenhum anexo'
+                                                            )}
+                                                        </td>
                                                     </tr>
                                                 ))
                                             )}
