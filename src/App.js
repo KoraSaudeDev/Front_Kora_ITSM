@@ -20,6 +20,7 @@ import AcessoMarketing from './components/Helper/AcessoMarketing';
 import AcessoFinanceiro from './components/Helper/AcessoFinanceiro';
 import AcessoAssistencial from './components/Helper/AcessoAssistencial';
 import AcessoContabilidade from './components/Helper/AcessoContabilidade';
+import LinkUteis from './components/Helper/LinkUteis'; 
 
 axios.interceptors.response.use(
   response => response,
@@ -103,6 +104,7 @@ const App = () => {
             <Route path="/helper/AcessoFinanceiro" element={<ProtectedRoute element={<AcessoFinanceiro />} />} />
             <Route path="/helper/AcessoAssistencial" element={<ProtectedRoute element={<AcessoAssistencial />} />} />
             <Route path="/helper/AcessoContabilidade" element={<ProtectedRoute element={<AcessoContabilidade />} />} />
+            <Route path="/helper/AcessoLinkUteis" element={<ProtectedRoute element={<LinkUteis />} />} /> {/* Novo link */}
             <Route path="/acesso" element={<Navigate to="/helper" />} />
             <Route path="/acesso/*" element={<Navigate to="/helper" />} />
 
