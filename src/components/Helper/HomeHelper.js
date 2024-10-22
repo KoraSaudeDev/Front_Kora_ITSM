@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../styles/Helper/HomeHelper.css';
-import HeaderHelper from '../Helper/Header-Helper';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLaptopCode, faUsers, faShoppingCart, faDollarSign, faBullseye, faStethoscope, faChartLine } from '@fortawesome/free-solid-svg-icons';
+import HeaderHelper from '../Helper/Header-Helper';
+import { faLaptopCode, faUsers, faShoppingCart, faDollarSign, faBullseye, faStethoscope, faChartLine, faGlobe } from '@fortawesome/free-solid-svg-icons';
 
 function HomeHelper() {
     const [imageLoaded, setImageLoaded] = useState(false);
-    const [alertas, setAlertas] = useState({}); 
+    const [alertas, setAlertas] = useState({});
     const navigate = useNavigate();
 
     const secoes = [
         { nome: 'TI', icone: faLaptopCode, bgColor: '#F4E1C9', textColor: '#1c1c1e', habilitado: true },
         { nome: 'RH', icone: faUsers, bgColor: '#A2C9E1', textColor: '#1c1c1e', habilitado: true },
-        { nome: 'Suprimentos', icone: faShoppingCart, bgColor: '#1C293E', textColor: '#ffffff', habilitado: true },
+        { nome: 'Suprimentos', icone: faShoppingCart, bgColor: '#F4E1C9', textColor: '#1c1c1e', habilitado: true },
+        { nome: 'Link Úteis', icone: faGlobe, bgColor: '#1C293E', textColor: '#ffffff', habilitado: true },
         { nome: 'Financeiro', icone: faDollarSign, bgColor: '#A2C9E1', textColor: '#1c1c1e', habilitado: true },
         { nome: 'Marketing', icone: faBullseye, bgColor: '#A2C9E1', textColor: '#1c1c1e', habilitado: true },
         { nome: 'Assistencial', icone: faStethoscope, bgColor: '#F4E1C9', textColor: '#1c1c1e', habilitado: true },
@@ -40,9 +41,10 @@ function HomeHelper() {
                 case 'TI': navigate('/helper/acessoTI'); break;
                 case 'RH': navigate('/helper/AcessoRH'); break;
                 case 'Suprimentos': navigate('/helper/AcessoSuprimentos'); break;
-                case 'Marketing': navigate('/helper/AcessoMarketing'); break;
+                case 'Link Úteis': navigate('/helper/AcessoLinkUteis'); break;
                 case 'Financeiro': navigate('/helper/AcessoFinanceiro'); break;
                 case 'Assistencial': navigate('/helper/AcessoAssistencial'); break;
+                case 'Marketing': navigate('/helper/AcessoMarketing'); break;
                 case 'Controladoria & Contabilidade': navigate('/helper/AcessoContabilidade'); break;
                 default: break;
             }
@@ -52,12 +54,13 @@ function HomeHelper() {
     return (
         <div className={`background-branco-home ${imageLoaded ? 'image-loaded' : 'image-loading'}`}>
             <HeaderHelper />
+
             <div className="container-helper-home">
                 <div className="cartoes-container-helper-home">
                     {secoes.map((secao, indice) => (
                         <div
                             key={indice}
-                            className={`cartao-helper-home pos-${indice}`} 
+                            className={`cartao-helper-home pos-${indice}`}
                             onClick={() => aoClicarHelper(indice)}
                             style={{ backgroundColor: secao.bgColor }}
                         >

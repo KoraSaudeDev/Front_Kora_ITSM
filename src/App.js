@@ -25,6 +25,8 @@ import MeusAtendimentos from './pages/Atendimentos/MeusAtendimentos';
 import MinhaEquipe from './pages/Atendimentos/MinhaEquipe';
 import AllTickets from './pages/Atendimentos/AllTickets';
 import NovoTicket from './pages/Atendimentos/NovoTicket';
+import AcessoLinkUteis from './components/Helper/LinkUteis';
+
 
 axios.interceptors.response.use(
   response => response,
@@ -54,6 +56,7 @@ const App = () => {
             <Route path="/helper/AcessoFinanceiro" element={<AcessoFinanceiro />} />
             <Route path="/helper/AcessoAssistencial" element={<AcessoAssistencial />} />
             <Route path="/helper/AcessoContabilidade" element={<AcessoContabilidade />} />
+            <Route path="/helper/AcessoLinkUteis" element={<AcessoLinkUteis />} />
             <Route path="/suporte/login" element={<Login />} />
             <Route path="/" element={<Navigate to="/helper" />} />
             <Route path="/acesso" element={<Navigate to="/helper" />} />
