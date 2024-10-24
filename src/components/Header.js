@@ -88,7 +88,6 @@ const Header = ({ pendentes = [] }) => {
   return (
     <header>
       <div className="conteudo-cabecalho">
-
         {isSuportePage && user && user.bl_analista ? (
           <div className="toggle-menu" onClick={alternarMenu} data-tooltip="Menu">
             &#9776;
@@ -127,7 +126,7 @@ const Header = ({ pendentes = [] }) => {
 
         <div className="cabecalho2">
           <div className="conteudo-cabecalho2">
-            <div
+            {user && <div
               className={`icone notification ${isSwinging ? 'swinging' : ''}`}
               onClick={handleToggleNotifications}
               data-tooltip="Notificação"
@@ -136,7 +135,8 @@ const Header = ({ pendentes = [] }) => {
               {pendentes.length > 0 && (
                 <div className="notification-dot pulsating"></div>
               )}
-            </div>
+            </div>}
+         
             {showNotifications && (
               <div className={`caixa-notificacoes ${showNotifications ? 'ativa' : ''}`}>
                 {pendentes.length > 0 ? (
@@ -158,7 +158,7 @@ const Header = ({ pendentes = [] }) => {
                 )}
               </div>
             )}
-            <div
+            {user &&  <div
               className={`perfil-usuario ${isDropdownVisible ? 'dropdown-open' : ''}`}
               onClick={toggleDropdown}
             >
@@ -227,7 +227,8 @@ const Header = ({ pendentes = [] }) => {
                   </div>
                 </div>
               )}
-            </div>
+            </div>}
+           
           </div>
         </div>
       </div>

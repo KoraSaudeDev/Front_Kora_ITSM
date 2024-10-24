@@ -10,6 +10,7 @@ import { RefreshProvider } from './context/RefreshContext';
 
 import Main from './components/Main';
 import Login from './pages/Login';
+import Cadastro from 'pages/Cadastro';
 import NotFound from './pages/NotFound';
 
 import HomeHelper from './components/Helper/HomeHelper';
@@ -109,7 +110,7 @@ const App = () => {
             <Route path="/acesso/*" element={<Navigate to="/helper" />} />
 
             <Route path="/login" element={<Login />} />
-
+            <Route path="/cadastro" element={<Cadastro />} />
             <Route path="/" element={<Navigate to="/login" />} />
 
             <Route
